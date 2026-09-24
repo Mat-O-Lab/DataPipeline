@@ -59,6 +59,7 @@ plugins:
         - "brainstorms/*"
         - "plans/*"
         - "specs/*"
+        - "examples/*"
         - "plan.md"
         - "references.md"
 

@@ -34,6 +34,18 @@ The Mat-O-Lab DataStack is a production-proven pipeline that turns raw laborator
 
 ---
 
+## Real-world examples
+
+Three domains — one pipeline pattern:
+
+| Domain | Source format | Output | Real example |
+|---|---|---|---|
+| Lab / materials science | CSV measurement file (tensile test, spectroscopy) | PMDco-aligned RDF knowledge graph | [IOFMaterialsTutorial](https://github.com/Mat-O-Lab/IOFMaterialsTutorial) |
+| Microscopy imaging | OMERO server metadata (OME-XML) | OME-ontology RDF, SPARQL-queryable | [BAMresearch DF-TEM-PAW](https://github.com/BAMresearch/DF-TEM-PAW) |
+| Automotive supply chain | SAMM / Catena-X JSON payload | SAMM-aligned RDF, PMDco cross-walk | [futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space) |
+
+---
+
 ## What the pipeline does
 
 The DataStack handles three distinct resource types through one consistent pattern:
@@ -63,5 +75,5 @@ The pipeline runs in production at two public portals:
 The microscopy pipeline path is described in a peer-reviewed paper:
 
 > Hanke et al. (2023). *FAIR microscopy data via the Mat-O-Lab pipeline.*
-> Integrating Materials and Manufacturing Innovation.
-> [doi:10.1007/s40192-023-00331-5](https://link.springer.com/article/10.1007/s40192-023-00331-5)
+> Scientific Data (Nature).
+> [doi:10.1038/s41597-023-02244-6](https://doi.org/10.1038/s41597-023-02244-6)

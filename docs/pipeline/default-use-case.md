@@ -6,7 +6,63 @@ title: Default Use Case — CSV Lab Data
 
 > **Create complete, consistent metadata for a non-semantic resource — then use semantic technologies to transform that further.**
 
-This page walks through exactly what happens when a researcher uploads a CSV measurement file to the DataStack. No Docker knowledge required — this is what you see and what you get.
+---
+
+## Pipeline Overview
+
+The DataStack pipeline has three parallel swim lanes. The microservice lane is the semantic core. The data source lane shows the different ingress routes. The CKAN lane shows how CKAN automates the microservice calls and stores every artifact.
+
+```mermaid
+graph LR
+  subgraph Sources ["Data Sources (Stage 1)"]
+    direction TB
+    csv[CSV Lab File<br/>tensile test, spectroscopy…]
+    img[Microscopy Image<br/>OMERO server]
+    eln[ELN / LIMS entry<br/>openBIS]
+    db[(SQL Database)]
+  end
+
+  subgraph Extractors ["Stage 1 — Extractors"]
+    direction TB
+    CSVToCSVW["CSVToCSVW<br/>→ CSVW JSON-LD"]
+    OmeroExtractor["OmeroExtractor<br/>→ OME JSON-LD"]
+    OpenBISmantic["OpenBISmantic<br/>→ Schema.org JSON-LD"]
+    Ontop["Ontop<br/>→ Virtual SPARQL"]
+  end
+
+  subgraph Semantics ["Stage 2 — Mapping & Conversion"]
+    MapToMethod["MapToMethod<br/>(mapping authoring)"]
+    RDFConverter["RDFConverter<br/>YARRRML/RML execution"]
+    KG["RDF Knowledge Graph<br/>target ontology aligned"]
+  end
+
+  subgraph CKAN ["CKAN Integration (parallel automation lane)"]
+    direction TB
+    ext1["ckanext-csvtocsvw<br/>auto-calls CSVToCSVW on CSV upload"]
+    ext2["ckanext-csvwmapandtransform<br/>auto-selects mapping + calls RDFConverter"]
+    ext3["ckanext-fuseki<br/>syncs RDF to Fuseki triple store"]
+    Fuseki[(Fuseki<br/>SPARQL endpoint)]
+  end
+
+  csv --> CSVToCSVW
+  img --> OmeroExtractor
+  eln --> OpenBISmantic
+  db --> Ontop
+
+  CSVToCSVW --> MapToMethod
+  OmeroExtractor --> MapToMethod
+  OpenBISmantic --> MapToMethod
+
+  MapToMethod --> RDFConverter
+  RDFConverter --> KG
+
+  ext1 -. automates .-> CSVToCSVW
+  ext2 -. automates .-> RDFConverter
+  KG --> ext3
+  ext3 --> Fuseki
+```
+
+The page below details the **CSV lab data path** — the default and most automated route.
 
 ---
 

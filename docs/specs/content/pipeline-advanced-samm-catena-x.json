@@ -1,0 +1,69 @@
+{
+  "page": "pipeline/advanced/samm-catena-x.md",
+  "title": "SAMM / Catena-X Pipeline Pattern",
+  "status": "stub",
+  "primary_persona": "P3",
+  "secondary_personas": ["P4"],
+  "narrative_arc": {
+    "enters_knowing": "They know RML/YARRRML and want to understand the two-stage SPARQL CONSTRUCT pattern used for Catena-X.",
+    "leaves_knowing": "Why two stages are needed for SAMM models, how the SPARQL INSERT pattern works, how to replicate it for their domain.",
+    "steps": [
+      "Why SAMM needs two stages — SAMM structure doesn't map directly to PMDco; intermediate RDF step needed",
+      "Stage 1: YARRRML mapping to Catena-X namespace (intermediate RDF)",
+      "Inline: first 15 lines of a real PA6GF30 YARRRML mapping showing SAMM prefixes",
+      "Stage 2: SPARQL CONSTRUCT bridging intermediate to PMDco",
+      "Inline: SPARQL INSERT structure for one property (from samm-idta-pipeline-patterns.json)",
+      "Live example: PA6GF30 dataset on futurecarproduction.materialsdata.space",
+      "Trigger mechanism: browser helper page (not automated) — explicit note",
+      "When to use this pattern vs. direct YARRRML/RML"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/samm-idta-pipeline-patterns.json",
+      "docs/specs/rdfconverter-service.json"
+    ],
+    "example_urls": {
+      "live_instance": "https://futurecarproduction.materialsdata.space",
+      "pa6gf30_search": "https://futurecarproduction.materialsdata.space/api/3/action/package_search?q=PA6GF30",
+      "catena_x_namespace": "https://github.com/eclipse-tractusx",
+      "yarrrml_spec": "https://rml.io/yarrrml/spec/",
+      "rml_spec": "https://rml.io/specs/rml/"
+    },
+    "live_api_calls": [
+      "GET https://futurecarproduction.materialsdata.space/api/3/action/package_search?q=PA6GF30&rows=1"
+    ]
+  },
+  "inline_assets_required": [
+    {
+      "type": "yaml",
+      "description": "First 15 lines of a real PA6GF30 YARRRML mapping showing SAMM prefixes and CX namespace. Fetch from futurecarproduction.materialsdata.space mappings group or use samm-idta-pipeline-patterns.json sparql_insert_structure."
+    },
+    {
+      "type": "sparql",
+      "description": "SPARQL CONSTRUCT/INSERT snippet showing one property bridge: CX intermediate → PMDco. Use concrete_example_pa6gf30.sparql_insert_structure from spec."
+    }
+  ],
+  "walkthrough_requirements": [
+    {
+      "step": "Find a PA6GF30 dataset on live instance",
+      "command": "curl 'https://futurecarproduction.materialsdata.space/api/3/action/package_search?q=PA6GF30&rows=1'",
+      "expected": "Dataset with YARRRML mapping resource in mappings group"
+    },
+    {
+      "step": "Fetch the mapping YAML URL from the dataset",
+      "command": "curl '<mapping_resource_url>' | head -30",
+      "expected": "YARRRML with samm: prefix visible in prefixes block"
+    }
+  ],
+  "quality_gate": [
+    "Two-stage pattern explained with clear stage 1 / stage 2 division",
+    "Inline YARRRML snippet shows real SAMM prefix",
+    "Inline SPARQL snippet present",
+    "Trigger mechanism (browser helper, not automated) stated explicitly",
+    "PA6GF30 live example linked",
+    "When-to-use-this-vs-direct comparison present",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "samm-idta-pipeline-patterns.json has concrete_example_pa6gf30.sparql_insert_structure with 4 node types per property and 13 properties mapped — use as primary inline source. Two-path comparison table is in spec as two_path_comparison. Execution mechanism: NOT automated — browser helper page."
+}

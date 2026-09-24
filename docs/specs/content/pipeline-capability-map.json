@@ -1,0 +1,53 @@
+{
+  "page": "pipeline/capability-map.md",
+  "title": "Capability Map",
+  "status": "authored",
+  "primary_persona": "P1",
+  "secondary_personas": ["P3"],
+  "narrative_arc": {
+    "enters_knowing": "They have a data source and want to know if the pipeline supports it.",
+    "leaves_knowing": "Whether their use case is supported, what extractor handles it, what limitations to plan around.",
+    "steps": [
+      "Intro: pipeline is resource-type agnostic — any JSON-LD producer can plug in",
+      "Stage 1 matrix — 8 rows (one per source type), extractor, output ontologies, status",
+      "Stage 2 paths — 2 rows (direct YARRRML/RML vs. two-stage SPARQL CONSTRUCT)",
+      "Pattern authoring tools — OntosphereIO (current), deprecated tools note",
+      "CAN section — 8 bullet points",
+      "CANNOT section — 7 bullet points, fuseki manual trigger as item 1"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/csvtocsvw-service.json",
+      "docs/specs/omeroextractor-service.json",
+      "docs/specs/openbismantic-service.json",
+      "docs/specs/samm-idta-pipeline-patterns.json"
+    ],
+    "example_urls": {
+      "ontosphere": "https://github.com/ThHanke/ontosphere",
+      "pmdco_patterns": "https://github.com/materialdigital/core-ontology/tree/main/patterns/",
+      "live_samm": "https://futurecarproduction.materialsdata.space"
+    },
+    "live_api_calls": []
+  },
+  "inline_assets_required": [
+    {
+      "type": "table",
+      "description": "Stage 1 matrix: 8 rows. Columns: Resource type | Extractor | Output ontologies | Status | Notes. All extractor column entries link to extractor pages."
+    },
+    {
+      "type": "table",
+      "description": "Stage 2 paths: 2 rows. Columns: Path | Trigger | Steps | When to use."
+    }
+  ],
+  "walkthrough_requirements": [],
+  "quality_gate": [
+    "Stage 1 matrix has exactly 8 rows matching docs/plan.md source data",
+    "Pattern term 'pattern' used (not 'graph prototype')",
+    "CANNOT section includes fuseki manual trigger as explicit limitation",
+    "All extractor links in matrix resolve",
+    "OntosphereIO linked as recommended tool (not draw.io)",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Page is substantially authored. Verify 8-row count matches plan.md. Confirm 'pattern' terminology used throughout (PMDCO term per memory)."
+}

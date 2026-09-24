@@ -1,0 +1,60 @@
+{
+  "page": "pipeline/overview.md",
+  "title": "Pipeline Overview",
+  "status": "partial",
+  "primary_persona": "P2",
+  "secondary_personas": ["P3", "P4"],
+  "narrative_arc": {
+    "enters_knowing": "They want to understand the full system topology before deploying or integrating.",
+    "leaves_knowing": "Every component, its role, its connection to adjacent components, and which are automated vs. manual.",
+    "steps": [
+      "Master Mermaid diagram — all services, all data flows, CKAN automation dashes vs. manual arrows",
+      "Component table — service name, image, role, public URL or 'internal only'",
+      "Two transformation paths — direct YARRRML/RML vs. two-stage YARRRML + SPARQL CONSTRUCT",
+      "Automation boundary — what CKAN automates, what requires manual trigger",
+      "Cross-links to each component page"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/datastack.json",
+      "docs/specs/csvtocsvw-service.json",
+      "docs/specs/maptomethod-service.json",
+      "docs/specs/rdfconverter-service.json",
+      "docs/specs/ckanext-csvtocsvw.json",
+      "docs/specs/ckanext-csvwmapandtransform.json",
+      "docs/specs/ckanext-fuseki.json"
+    ],
+    "example_urls": {
+      "datastack_repo": "https://github.com/Mat-O-Lab/DataStack",
+      "csvtocsvw_api": "https://csvtocsvw.matolab.org/api/docs",
+      "maptomethod_api": "https://maptomethod.matolab.org/api/docs",
+      "rdfconverter_api": "https://rdfconverter.matolab.org/api/docs"
+    },
+    "live_api_calls": [
+      "GET https://csvtocsvw.matolab.org/info",
+      "GET https://maptomethod.matolab.org/info",
+      "GET https://rdfconverter.matolab.org/info"
+    ]
+  },
+  "inline_assets_required": [
+    {
+      "type": "mermaid",
+      "description": "Master system diagram: all Docker services, data flow arrows, CKAN automation lanes. Dashed arrows = automated, solid = manual or data flow."
+    },
+    {
+      "type": "table",
+      "description": "Component table: 12 rows, columns: Service | Docker image | Role | Public URL | Managed by"
+    }
+  ],
+  "walkthrough_requirements": [],
+  "quality_gate": [
+    "Mermaid diagram present showing all 12 services from datastack.json",
+    "Component table has Docker image name for each service",
+    "Automation boundary explicitly called out (what CKAN automates vs. manual)",
+    "Two transformation paths described",
+    "All component cross-links resolve",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Fetch real /info responses from public services to get accurate version numbers for component table."
+}

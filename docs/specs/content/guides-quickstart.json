@@ -1,0 +1,79 @@
+{
+  "page": "guides/quickstart.md",
+  "title": "Quickstart",
+  "status": "partial",
+  "primary_persona": "P2",
+  "secondary_personas": [],
+  "narrative_arc": {
+    "enters_knowing": "They have Docker Compose and want to deploy DataStack from scratch.",
+    "leaves_knowing": "Stack is running, CSV processed automatically, SPARQL endpoint available.",
+    "steps": [
+      "Prerequisites box — Docker Compose v2, Git, public-facing URL or LAN IP, 10 GB RAM",
+      "Clone + submodule init",
+      "Configure .env — inline snippet of the 5–6 must-set variables",
+      "docker compose up — what to expect in logs (services starting order)",
+      "Create admin account + API token — exact CKAN UI path",
+      "Set BACKGROUNDJOBS_API_TOKEN — !!! warning admonition, explain why jobs fail without it",
+      "Create mappings group — exact name 'mappings', case-sensitive !!! note",
+      "Upload test CSV — what appears in dataset (3–4 auto-created resources)",
+      "Optional: trigger Fuseki, open SPARQL via Sparklis"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/datastack.json"
+    ],
+    "example_urls": {
+      "datastack_repo": "https://github.com/Mat-O-Lab/DataStack",
+      "datastack_env_example": "https://raw.githubusercontent.com/Mat-O-Lab/DataStack/main/.env.example",
+      "example_csv": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv"
+    },
+    "live_api_calls": [
+      "GET https://raw.githubusercontent.com/Mat-O-Lab/DataStack/main/.env.example"
+    ]
+  },
+  "inline_assets_required": [
+    {
+      "type": "bash",
+      "description": ".env snippet: the 5–6 variables that must be set before first boot. Fetch from DataStack .env.example for real variable names. Must include: CKAN_SITE_URL, CKAN_SYSADMIN_PASS, BACKGROUNDJOBS_API_TOKEN, and at least 2 CKANINI__ extension keys."
+    },
+    {
+      "type": "admonition",
+      "description": "!!! warning for BACKGROUNDJOBS_API_TOKEN — not just a bullet point. Explain: background jobs won't run, pipeline stalls silently."
+    },
+    {
+      "type": "admonition",
+      "description": "!!! note for mappings group name — case-sensitive, must be exactly 'mappings'."
+    }
+  ],
+  "walkthrough_requirements": [
+    {
+      "step": "Verify clone succeeded",
+      "command": "ls ckan-docker/",
+      "expected": "Docker build context files present",
+      "verify_label": "✓ Verify: ckan-docker/ directory exists"
+    },
+    {
+      "step": "Verify stack is up",
+      "command": "curl -s http://localhost:5000/api/3/action/site_read | python3 -m json.tool",
+      "expected": "{\"success\": true, ...}",
+      "verify_label": "✓ Verify: CKAN home page loads at http://localhost:5000"
+    },
+    {
+      "step": "Verify background jobs configured",
+      "command": "curl -s http://localhost:5000/api/3/action/status_show | python3 -m json.tool",
+      "expected": "Site status JSON with ckan_version",
+      "verify_label": "✓ Verify: CKAN API responds with site status"
+    }
+  ],
+  "quality_gate": [
+    "All 9 story outline steps present in order",
+    "Inline .env snippet present with real variable names from DataStack repo",
+    "Every step has a '✓ Verify' indicator",
+    "BACKGROUNDJOBS_API_TOKEN is a !!! warning (not a bullet)",
+    "mappings group name is a !!! note with case-sensitive warning",
+    "Fuseki step explicitly marked optional",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Page is partial — most steps are roughed in. Main gaps: real .env variable names (fetch from DataStack repo), docker compose log output description, exact CKAN UI paths for API token creation. datastack.json post_boot_setup section has the 5-step sequence to follow."
+}

@@ -1,0 +1,69 @@
+{
+  "page": "reference/data-formats.md",
+  "title": "Data Formats",
+  "status": "partial",
+  "primary_persona": "P3",
+  "secondary_personas": ["P4"],
+  "narrative_arc": {
+    "enters_knowing": "They want to understand what format flows between stages — reference lookup.",
+    "leaves_knowing": "The input format, tool, output format, and available serializations at each of the 4 pipeline stages. One short inline snippet per stage.",
+    "steps": [
+      "4-row pipeline flow table: Stage | Input | Tool | Output | Available formats",
+      "CSVW JSON-LD inline snippet — 10 lines showing column annotation structure",
+      "Turtle RDF inline snippet — 5 lines showing basic RDF triples",
+      "YARRRML mapping inline snippet — 5 lines showing prefixes + one mapping rule",
+      "Joined Turtle inline snippet — 5 lines showing PMDco triples with QUDT unit",
+      "Format compatibility note — CSVToCSVW and RDFConverter share same 8 return_type options"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/csvtocsvw-service.json",
+      "docs/specs/rdfconverter-service.json"
+    ],
+    "example_urls": {
+      "example_csvw": "https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example2-metadata.json",
+      "iof_mapping": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml",
+      "iof_joined": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-joined.ttl",
+      "w3c_csvw": "https://www.w3.org/TR/tabular-data-primer/",
+      "yarrrml_spec": "https://rml.io/yarrrml/spec/"
+    },
+    "live_api_calls": [
+      "GET https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example2-metadata.json (first 10 lines for CSVW snippet)",
+      "GET https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml (first 10 lines for YARRRML snippet)",
+      "GET https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-joined.ttl (first 10 lines for joined Turtle snippet)"
+    ]
+  },
+  "inline_assets_required": [
+    {
+      "type": "table",
+      "description": "4-row pipeline flow table. Already in page — verify all 4 stages accurate.",
+      "status": "done"
+    },
+    {
+      "type": "json",
+      "description": "CSVW JSON-LD snippet: 10 lines from example2-metadata.json showing column annotation. Fetch from GitHub raw URL. Label with source URL.",
+      "status": "needed"
+    },
+    {
+      "type": "yaml",
+      "description": "YARRRML mapping snippet: 10 lines from IOFMaterialsTutorial mapping. Fetch from GitHub raw URL.",
+      "status": "needed"
+    },
+    {
+      "type": "turtle",
+      "description": "Joined Turtle snippet: 5–8 lines from IOFMaterialsTutorial joined output. Fetch from GitHub raw URL.",
+      "status": "needed"
+    }
+  ],
+  "walkthrough_requirements": [],
+  "quality_gate": [
+    "4-row flow table present with all 4 stages",
+    "8 return_type options listed (same for CSVToCSVW and RDFConverter)",
+    "At least 2 inline format examples (CSVW JSON-LD minimum, plus one of YARRRML or Turtle)",
+    "Real URLs used as sources for inline examples (not synthesized)",
+    "W3C CSVW primer linked when CSVW first introduced",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Page has the 4-row table. Main gap: no inline format examples yet. Fetch first 10 lines of each format from real GitHub raw URLs. The CSVW snippet from example2-metadata.json will show column annotations with qudt:unit — a good concrete format example."
+}

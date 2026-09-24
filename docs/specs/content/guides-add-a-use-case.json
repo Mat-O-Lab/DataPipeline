@@ -1,0 +1,58 @@
+{
+  "page": "guides/add-a-use-case.md",
+  "title": "Add a Use Case",
+  "status": "partial",
+  "primary_persona": "P4",
+  "secondary_personas": ["P3"],
+  "narrative_arc": {
+    "enters_knowing": "They want to extend the pipeline for a new data source or target ontology.",
+    "leaves_knowing": "Two adaptation paths (new source type vs. new target ontology), what to change in each, configuration table.",
+    "steps": [
+      "Two dimensions intro: new source type vs. new target ontology — independent choices",
+      "Path A: new source type — deploy or write extractor → produces JSON-LD → rest unchanged. Four options: deploy existing extractor, extend existing, write new FastAPI service, use RDFConverter direct",
+      "Path B: new target ontology — design pattern in OntosphereIO → MapToMethod generates mapping → rest unchanged",
+      "Configuration changes for each path: formats list, plugin list, exact vs. best_match strategy",
+      "When to use two-stage SPARQL CONSTRUCT (complex ontology alignment) vs. direct YARRRML/RML",
+      "Checklist: done when extractor produces JSON-LD, mapping has rules_skipped == 0, joined Turtle visible in CKAN"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/datastack.json",
+      "docs/specs/ckanext-csvwmapandtransform.json",
+      "docs/specs/samm-idta-pipeline-patterns.json"
+    ],
+    "example_urls": {
+      "ontosphere": "https://github.com/ThHanke/ontosphere",
+      "pmdco_patterns": "https://github.com/materialdigital/core-ontology/tree/main/patterns/",
+      "omeroextractor_repo": "https://github.com/Mat-O-Lab/OmeroExtractor",
+      "openbismantic_repo": "https://github.com/Mat-O-Lab/OpenBISmantic"
+    },
+    "live_api_calls": []
+  },
+  "inline_assets_required": [
+    {
+      "type": "text",
+      "description": "Decision tree diagram (code block, ASCII or Mermaid): New use case → [new source] or [new target ontology], each branch shows what changes and what stays the same."
+    },
+    {
+      "type": "bash",
+      "description": "Configuration snippet showing how to add a new format to CKANINI__CKANEXT__CSVTOCSVW__FORMATS and a new plugin to CKAN__PLUGINS."
+    },
+    {
+      "type": "table",
+      "description": "Configuration changes table: Path | Config key | What to change | Default. Covers formats, plugins, mapping_strategy."
+    }
+  ],
+  "walkthrough_requirements": [],
+  "quality_gate": [
+    "Both adaptation paths (source / ontology) present with distinct sections",
+    "Four extractor options for new source type listed",
+    "OntosphereIO linked as pattern authoring tool for new ontology path",
+    "Configuration changes table present",
+    "Two-stage vs. direct YARRRML comparison (link to samm-catena-x.md)",
+    "Done checklist at end",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Page is partial. Main gap: source-type options need more concrete guidance (which existing extractor to reuse, minimal interface a new extractor must satisfy — produces JSON-LD as output). Check omeroextractor-service.json and openbismantic-service.json for extractor interface description."
+}

@@ -1,0 +1,70 @@
+{
+  "page": "pipeline/default-use-case.md",
+  "title": "Default Use Case — CSV Lab Data",
+  "status": "authored",
+  "primary_persona": "P1",
+  "secondary_personas": [],
+  "narrative_arc": {
+    "enters_knowing": "They have a CSV file with lab measurements and want FAIR data.",
+    "leaves_knowing": "The full automation chain, what their data looks like at each stage, what is manual, where to go next.",
+    "steps": [
+      "Core principle block quote",
+      "Swim lane pipeline diagram (already present)",
+      "CSV path intro — what triggers the pipeline",
+      "Step-by-step automation chain (7 steps), each with component name and artifact produced",
+      "Inline CSVW JSON-LD snippet at step 2 (column annotations with QUDT units)",
+      "Inline joined Turtle snippet at step 6 (PMDco triples)",
+      "Manual step warning for Fuseki at step 7",
+      "What you end up with — 4-resource CKAN dataset table",
+      "Where to go next — quickstart, author-a-mapping, capability-map"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/ckanext-csvtocsvw.json",
+      "docs/specs/ckanext-csvwmapandtransform.json",
+      "docs/specs/ckanext-fuseki.json"
+    ],
+    "example_urls": {
+      "cross_project_use_case": "https://dataportal.material-digital.de/api/3/action/package_show?id=cross-project-use-case",
+      "example_csv": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv",
+      "example_csvw": "https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example2-metadata.json",
+      "publication": "https://link.springer.com/article/10.1007/s40192-023-00331-5",
+      "pmdco": "https://github.com/materialdigital/core-ontology",
+      "qudt": "https://qudt.org/",
+      "prov_o": "https://www.w3.org/TR/prov-o/",
+      "w3c_csvw": "https://www.w3.org/TR/tabular-data-primer/"
+    },
+    "live_api_calls": [
+      "GET https://dataportal.material-digital.de/api/3/action/package_show?id=cross-project-use-case"
+    ]
+  },
+  "inline_assets_required": [
+    {
+      "type": "mermaid",
+      "description": "Swim lane diagram already present — verify it renders correctly",
+      "status": "done"
+    },
+    {
+      "type": "json",
+      "description": "CSVW JSON-LD snippet showing column annotations with qudt:unit IRIs. Must show at least 2 columns with different units.",
+      "status": "done — uses illustrative example. Upgrade to real if fetch from dataportal.material-digital.de succeeds."
+    },
+    {
+      "type": "turtle",
+      "description": "Joined Turtle snippet showing PMDco triples with QUDT unit values and PROV-O provenance.",
+      "status": "done — uses illustrative example. Label if not from live source."
+    }
+  ],
+  "walkthrough_requirements": [],
+  "quality_gate": [
+    "7-step automation chain present with no steps omitted",
+    "Two inline code blocks (CSVW JSON-LD + joined Turtle)",
+    "Fuseki step explicitly labeled as manual with !!! warning admonition",
+    "Zero Docker or API terminology (P1 language only)",
+    "4-resource outcome table present",
+    "All three 'Where to go next' links resolve",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Page is substantially authored. Main gap: CSVW and Turtle examples are illustrative. Attempt to fetch real examples from dataportal.material-digital.de and replace if available. If live fetch fails, keep illustrative examples with explicit label."
+}

@@ -1,0 +1,54 @@
+{
+  "page": "reference/configuration.md",
+  "title": "Configuration",
+  "status": "partial",
+  "primary_persona": "P2",
+  "secondary_personas": ["P4"],
+  "narrative_arc": {
+    "enters_knowing": "They want to configure or debug a specific setting — reference lookup, not sequential read.",
+    "leaves_knowing": "The CKANINI__ env var form and ini key for every configuration key across DataStack and all three extensions.",
+    "steps": [
+      "CKANINI__ convention explained — one short paragraph with transformation example",
+      "DataStack .env section — core CKAN variables (not extension-specific)",
+      "ckanext-csvtocsvw section — formats list, return_type, url pattern",
+      "ckanext-csvwmapandtransform section — mapping_strategy, timeout_check, timeout_create, db_url",
+      "ckanext-fuseki section — fuseki URL, sparql proxy endpoint, upload flow",
+      "Cross-reference: which keys must match between extensions (e.g. db_url inherits from sqlalchemy.url)"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/datastack.json",
+      "docs/specs/ckanext-csvtocsvw.json",
+      "docs/specs/ckanext-csvwmapandtransform.json",
+      "docs/specs/ckanext-fuseki.json"
+    ],
+    "example_urls": {
+      "datastack_env_example": "https://raw.githubusercontent.com/Mat-O-Lab/DataStack/main/.env.example"
+    },
+    "live_api_calls": []
+  },
+  "inline_assets_required": [
+    {
+      "type": "bash",
+      "description": "CKANINI__ transformation example: .env line → ckan.ini key. Already partially in page.",
+      "status": "partial"
+    },
+    {
+      "type": "table",
+      "description": "Per extension: table with columns: Config key (ini form) | CKANINI__ env var form | Default | Description. Must show both forms side by side — operators use env var form.",
+      "status": "needed"
+    }
+  ],
+  "walkthrough_requirements": [],
+  "quality_gate": [
+    "CKANINI__ convention explained with concrete transformation example",
+    "All 4 components covered (DataStack .env, csvtocsvw, csvwmapandtransform, fuseki)",
+    "Both ini key and CKANINI__ env form visible in each table (critical for operators)",
+    "db_url config key in csvwmapandtransform documented (inherits from sqlalchemy.url)",
+    "BACKGROUNDJOBS_API_TOKEN documented in DataStack .env section",
+    "rdfconverter_timeout_check: 30 and rdfconverter_timeout_create: 120 defaults shown",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Page is partial. All config keys are in spec JSON files. ckanext-csvwmapandtransform has 9 config keys including db_url and both timeout values. ckanext-fuseki has auto_hooks_state = DISABLED — document this. Use CKANINI__ convention transform format: 'CKANINI__CKANEXT__CSVTOCSVW__FORMATS → ckanext.csvtocsvw.formats'."
+}

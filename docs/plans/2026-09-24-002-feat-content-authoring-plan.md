@@ -10,7 +10,7 @@ origin: docs/plan.md
 
 ## Overview
 
-Fill in the six highest-priority stub pages with real content — inline examples from live repos and CKAN instances, each page shaped around a story outline before content is written, and each audience approached with a distinct voice and entry point.
+Fill in nine stub pages across six authoring units with real content — inline examples from live repos and CKAN instances, each page shaped around a story outline before content is written, and each audience approached with a distinct voice and entry point.
 
 The goal is not technically complete reference pages. The goal is pages that make a new user say "I understand what this does and I know how to start."
 
@@ -33,10 +33,15 @@ These personas drive tone, depth, and what examples to use on every page. Each p
 
 ## Requirements Trace
 
+**Must (new-user onboarding):**
 - R1. `pipeline/default-use-case.md` — story arc for P1 (researcher), inline CSVW and Turtle examples from live CKAN
 - R2. `guides/quickstart.md` — step-by-step deploy for P2 (data engineer), inline `.env` snippets, inline verification outputs
-- R3. `guides/author-a-mapping.md` — mapping authoring workflow for P3 (ontology engineer), inline API requests and responses
 - R4. `pipeline/capability-map.md` — resource type matrix for P1, capability table for all personas
+
+**Should (practitioner depth):**
+- R3. `guides/author-a-mapping.md` — mapping authoring workflow for P3 (ontology engineer), inline API requests and responses
+
+**Could (reference and developer):**
 - R5. `reference/api-endpoints.md`, `reference/configuration.md`, `reference/data-formats.md` — reference for P3 and P4, derived from spec files with inline examples
 - R6. `guides/standalone-apis.md`, `guides/add-a-use-case.md` — P4 focused, inline curl examples
 
@@ -60,8 +65,8 @@ The spec files are the source of truth for technical facts. The story outline an
 
 ### Deferred to Separate Tasks
 
-- `docs/extractors/omeroextractor.md`, `docs/extractors/openbismantic.md`, `docs/extractors/ontop.md` — spec files marked TODO
-- `pipeline/advanced/samm-catena-x.md`, `pipeline/advanced/idta-aas.md` — `docs/specs/samm-idta-pipeline-patterns.md` has full content; medium-priority follow-on
+- `docs/extractors/omeroextractor.md`, `docs/extractors/openbismantic.md`, `docs/extractors/ontop.md` — spec files marked TODO. **Re-entry:** ready when the respective `docs/specs/*.md` TODO sections are completed by the extractor maintainer.
+- `pipeline/advanced/samm-catena-x.md`, `pipeline/advanced/idta-aas.md` — deferred for timeline only; `docs/specs/samm-idta-pipeline-patterns.md` has full content. **Re-entry:** can be authored any time after the Must-tier units ship.
 - Per-repo README cross-links — separate PRs per upstream repo
 
 ## Context & Research
@@ -75,7 +80,7 @@ The spec files are the source of truth for technical facts. The story outline an
 - `docs/specs/ckanext-csvwmapandtransform.md` — mapping discovery, selection strategies
 - `docs/specs/ckanext-fuseki.md` — fuseki_update flow, named graph conventions
 - `docs/specs/maptomethod-service.md` — mapping authoring workflow, API endpoints
-- `docs/specs/rdfconverter-service.md` — /api/checkmapping, /api/createrdf, /api/test
+- `docs/specs/rdfconverter-service.md` — /api/createrdf, /api/createrdfupload, /api/checkmapping, /api/yarrrmltorml, /api/rdfvalidator, /api/test (6 endpoints)
 - `docs/references.md` — live CKAN instances, public microservice URLs, publication DOI
 - `docs/specs/samm-idta-pipeline-patterns.md` — capability-map background
 
@@ -126,7 +131,7 @@ These are well-documented upstream resources. Content pages must **link to them*
 - **Persona-matched language:** P1 pages avoid Docker and API terminology. P2 pages use shell commands and env var names directly. P3 pages use precise API contract language. P4 pages assume framework familiarity.
 - **One example inline, upstream docs for depth:** If a concept is load-bearing for the page's story (the reader can't proceed without understanding it), explain it with exactly one annotated inline example, then link to the upstream reference. If the concept is not load-bearing, link only — no inline explanation. Never write a full tutorial for something YARRRML, RML, CSVW, or PMDco docs already cover well.
 - **`mkdocs build --strict` after each unit:** Treats warnings as errors — catches broken links before they accumulate.
-- **`navigation.instant` check:** If Mermaid diagrams break in `mkdocs serve` after writing Unit 1 (which may add a sequence diagram), disable `navigation.instant` in `mkdocs.yml`.
+- **`navigation.instant` check:** After Unit 1, decide whether to add `navigation.instant` to `mkdocs.yml` features — if enabled, test whether Mermaid diagrams render correctly in `mkdocs serve` with it on.
 
 ## Open Questions
 
@@ -141,15 +146,29 @@ These are well-documented upstream resources. Content pages must **link to them*
 
 - Exact CSVW JSON-LD snippet length — truncate at natural boundary, around 20–30 lines
 - Whether a Mermaid flow diagram improves `default-use-case.md` over a numbered list — decide during story outline phase
-- Whether `navigation.instant` should be disabled — test during `mkdocs serve` in Unit 1
+- Whether to add `navigation.instant` to mkdocs.yml features — test Mermaid rendering if enabled
 
 ## Implementation Units
 
-- [ ] **Unit 0: Annotated example artifacts**
+### Pre-flight: Scaffold strict baseline
 
-**Goal:** Prepare a small set of focused, annotated code examples that are explained line by line — used as the teaching material across all content pages. Created once, referenced everywhere.
+Before any unit begins, run:
 
-**Requirements:** Foundation for R1–R6 (all units use these examples)
+```bash
+mkdocs build --strict
+```
+
+Fix all failures before proceeding. Without a passing baseline, per-unit `mkdocs build --strict` cannot distinguish scaffold-inherited failures from authoring errors. Common scaffold failures: pages in nav with broken cross-links, stubs referencing unwritten pages.
+
+**Recommended execution order:** Unit 0 → Unit 1 → Unit 4 → Unit 2 → Unit 3 → Unit 5 → Unit 6. Unit 4 (capability-map) moves to position 3 because it serves all personas, needs no live research, and all units 1–3 cross-link to it. Writing it early ensures those cross-links resolve.
+
+---
+
+- [ ] **Unit 0: Annotated example artifacts** `[Prerequisite]`
+
+**Goal:** Prepare annotated ground-truth example artifacts for author reference — each unit's author reads these to understand the real data shapes, then writes persona-appropriate inline examples for their page. These files are not embedded directly into pages.
+
+**Requirements:** Author reference for R1–R6 (each unit writes its own inline examples; these files provide authoritative data shapes to reference)
 
 **Dependencies:** None — this is the first unit
 
@@ -169,9 +188,11 @@ Each example is short enough to read fully (20–40 lines max).
 
 **Approach:**
 
-`sample.csv` — a minimal 5-column, 5-row materials science measurement file:
-- Columns: `sample_id`, `temperature_C`, `tensile_strength_MPa`, `yield_strength_MPa`, `elongation_pct`
-- 3–4 data rows
+`sample.csv` — a minimal materials science measurement file using CSVToCSVW's **multi-block format** to demonstrate its differentiating features:
+- Block 1 (metadata, 2–3 rows): key-value pairs (e.g., `material, PA6GF30`; `test_standard, DIN EN ISO 527`)
+- Blank separator line
+- Block 2 (data table): column headers with unit-bearing names (`temperature_C`, `tensile_strength_MPa`, `yield_strength_MPa`, `elongation_pct`) + 3–4 data rows
+- Column names must be recognizable to QUDT so the CSVW output demonstrates unit annotation
 - This is the canonical input that every pipeline example traces through
 
 `sample.csvw.json` — the CSVW JSON-LD that CSVToCSVW produces for `sample.csv`:
@@ -217,14 +238,14 @@ And a failing example (rules_skipped > 0) with explanation comment.
 
 ---
 
-- [ ] **Unit 1: `pipeline/default-use-case.md`**
+- [ ] **Unit 1: `pipeline/default-use-case.md`** `[Must]`
 
 **Primary persona:** P1 — Researcher  
 **Goal:** Researcher reads the page and understands exactly what happens to their CSV file and what they get back — without needing to know any Docker or API details
 
 **Requirements:** R1
 
-**Dependencies:** None
+**Dependencies:** Unit 0 (author reference artifacts)
 
 **Files:**
 - Modify: `docs/pipeline/default-use-case.md`
@@ -278,14 +299,14 @@ And a failing example (rules_skipped > 0) with explanation comment.
 
 ---
 
-- [ ] **Unit 2: `guides/quickstart.md`**
+- [ ] **Unit 2: `guides/quickstart.md`** `[Must]`
 
 **Primary persona:** P2 — Data engineer  
 **Goal:** Engineer reads the page and can deploy a running DataStack from scratch in one session, knowing exactly what to verify at each step
 
 **Requirements:** R2
 
-**Dependencies:** None
+**Dependencies:** Unit 0 (author reference artifacts)
 
 **Files:**
 - Modify: `docs/guides/quickstart.md`
@@ -323,7 +344,7 @@ And a failing example (rules_skipped > 0) with explanation comment.
 - `docs/components/datastack.md` Key Environment Variables table
 
 **Test scenarios:**
-- Happy path: all 8 steps from `docs/plan.md` lines 169–178 present and in order
+- Happy path: all deploy steps from `docs/plan.md` and DataStack README present and in order (step count determined during research)
 - Happy path: inline `.env` snippet present with real variable names
 - Happy path: every step has a "✓ Verify" indicator
 - Edge case: `BACKGROUNDJOBS_API_TOKEN` is a warning admonition — not just a bullet point
@@ -333,12 +354,12 @@ And a failing example (rules_skipped > 0) with explanation comment.
 **Verification:**
 - `mkdocs build --strict` exits 0
 - Inline `.env` snippet present
-- All 8 steps accounted for
+- All deploy steps accounted for (no steps omitted for space)
 - `BACKGROUNDJOBS_API_TOKEN` warning admonition present
 
 ---
 
-- [ ] **Unit 3: `guides/author-a-mapping.md`**
+- [ ] **Unit 3: `guides/author-a-mapping.md`** `[Should]`
 
 **Primary persona:** P3 — Ontology engineer  
 **Goal:** Ontology engineer can author a YARRRML mapping for their data and upload it to CKAN, understanding each API call and its expected output
@@ -354,7 +375,7 @@ And a failing example (rules_skipped > 0) with explanation comment.
 ```
 [Reader knows: their CSV data has a CSVW; they have an ontology pattern in Turtle]
 → What MapToMethod does (one paragraph — the "compiler" metaphor: data structure + ontology pattern → mapping rules)
-→ Prerequisites: CSVW URL, pattern/template Turtle URL, both publicly accessible
+→ Prerequisites: CSVW URL, pattern/template Turtle URL (both publicly accessible), running CKAN instance with mappings group. Note: local/intranet URLs require a public proxy or file-serving step not covered in this guide.
 → Step 1: Explore data types — GET /api/types (inline response: list of type URIs)
 → Step 2: Explore data entities — GET /api/entities (inline response: column dict)
 → Step 3: Explore template entities — same endpoints on template URL
@@ -387,13 +408,13 @@ And a failing example (rules_skipped > 0) with explanation comment.
 - `docs/specs/rdfconverter-service.md` /api/checkmapping and /api/test
 
 **Test scenarios:**
-- Happy path: all 8 steps in story outline are covered in order
+- Happy path: all steps in story outline are covered in order
 - Happy path: inline JSON for `/api/types` response present
 - Happy path: inline JSON for `/api/entities` response present (at least 3 columns shown)
 - Happy path: inline YARRRML snippet present (first ~10 lines of a real mapping)
 - Happy path: inline `/api/checkmapping` response JSON showing `rules_skipped: 0`
 - Edge case: troubleshooting section present for `rules_skipped > 0` case
-- Error path: "both URLs must be publicly accessible" prerequisite is prominent — not buried
+- Error path: "both URLs must be publicly accessible, CKAN instance required" prerequisites are prominent and listed at top of page — not buried; note that local/intranet URLs are out of scope for this guide
 
 **Verification:**
 - `mkdocs build --strict` exits 0
@@ -402,14 +423,14 @@ And a failing example (rules_skipped > 0) with explanation comment.
 
 ---
 
-- [ ] **Unit 4: `pipeline/capability-map.md`**
+- [ ] **Unit 4: `pipeline/capability-map.md`** `[Must]`
 
 **Primary persona:** P1 (researcher scanning), P3 (ontology engineer reading in detail)  
 **Goal:** Any reader can determine in under 2 minutes whether the pipeline handles their data source and what outcome to expect
 
 **Requirements:** R4
 
-**Dependencies:** None
+**Dependencies:** Unit 0 (author reference artifacts)
 
 **Files:**
 - Modify: `docs/pipeline/capability-map.md`
@@ -456,7 +477,7 @@ And a failing example (rules_skipped > 0) with explanation comment.
 
 ---
 
-- [ ] **Unit 5: Reference pages — api-endpoints, configuration, data-formats**
+- [ ] **Unit 5: Reference pages — api-endpoints, configuration, data-formats** `[Could]`
 
 **Primary persona:** P3 (ontology engineer), P4 (developer)  
 **Goal:** Complete reference tables derived from spec files, with inline examples for every non-obvious entry
@@ -470,7 +491,9 @@ And a failing example (rules_skipped > 0) with explanation comment.
 - Modify: `docs/reference/configuration.md`
 - Modify: `docs/reference/data-formats.md`
 
-**Story outlines:**
+**Authoring method:** Reference pages are lookup targets, not sequential reads. Unit 5 uses **endpoint-inventory-first** instead of story-outline-first: enumerate all endpoints/config keys from the spec, then add one inline example per entry. No narrative arc needed.
+
+**Endpoint/config inventories:**
 
 `api-endpoints.md`:
 ```
@@ -525,7 +548,7 @@ And a failing example (rules_skipped > 0) with explanation comment.
 
 ---
 
-- [ ] **Unit 6: `guides/standalone-apis.md` and `guides/add-a-use-case.md`**
+- [ ] **Unit 6: `guides/standalone-apis.md` and `guides/add-a-use-case.md`** `[Could]`
 
 **Primary persona:** P4 — Developer / integrator  
 **Goal:** Developer can use any microservice without CKAN, and can adapt the pipeline for a new data domain
@@ -596,6 +619,7 @@ And a failing example (rules_skipped > 0) with explanation comment.
 
 | Risk | Mitigation |
 |---|---|
+| Unit 0 live API calls fail during artifact construction | Timebox Unit 0 to 2 hours; if blocked, create placeholder files labeled `# TODO: fetch from live service` and finish before Unit 3 |
 | Live CKAN API returns 503 during Unit 1 research | Fall back to a synthetic 20-line CSVW snippet based on spec; label `# illustrative example` |
 | Public matolab.org service down during Unit 3/5/6 research | Note endpoint shape from spec + OpenAPI JSON; label example as illustrative |
 | Inline examples become stale as services update | Examples are labeled with version comments (e.g., `# CSVToCSVW v1.3.5`); update when specs update |

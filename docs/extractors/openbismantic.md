@@ -7,14 +7,32 @@ title: OpenBISmantic
 FastAPI microservice that exposes an [openBIS](https://openbis.ch/) ELN/LIMS instance as Linked Data. Every openBIS entity — samples, datasets, experiments, projects — becomes a resolvable RDF resource with a stable IRI. It is the Stage 1 extractor for ELN/LIMS data in the Mat-O-Lab pipeline.
 
 **Repo:** https://github.com/Mat-O-Lab/OpenBISmantic  
-**Image:** `ghcr.io/mat-o-lab/openbismantic`  
-**Status:** Demonstrator (no active public deployment)
+**Image:** `ghcr.io/mat-o-lab/openbismantic`
+
+!!! info "Demonstrator — no active public deployment"
+    OpenBISmantic has no hosted instance available for public testing. All curl examples below use a placeholder URL — replace it with the address of your own OpenBISmantic deployment.
 
 ---
 
 ## What it does
 
-openBIS stores experimental metadata, samples, datasets, and file attachments in a hierarchy: Space → Project → Collection → Object (Sample) → Dataset. OpenBISmantic wraps the openBIS server with a FastAPI layer that:
+### The openBIS hierarchy
+
+openBIS organises all experimental data in a five-level hierarchy:
+
+```text
+Space
+└── Project
+    └── Collection (Experiment)
+        └── Object (Sample)
+            └── Dataset
+```
+
+Each level is a named container: a **Space** groups projects by team or topic; a **Project** holds one or more **Collections** (experimental campaigns); each Collection contains **Objects** (individual samples or specimens); and each Object can have multiple **Datasets** — the actual measurement files. OpenBISmantic maps every node in this hierarchy to a resolvable IRI.
+
+### What OpenBISmantic exposes
+
+OpenBISmantic wraps the openBIS server with a FastAPI layer that:
 
 - Assigns **persistent IRIs** to every entity based on openBIS permanent IDs (permIds)
 - Serves each entity as RDF via content negotiation — the same URL returns JSON-LD, Turtle, or HTML depending on the `Accept` header
@@ -45,10 +63,12 @@ The output feeds MapToMethod + RDFConverter for domain-specific ontology mapping
 Content negotiation — same URL, different `Accept` header:
 
 ```bash
+# replace with your OpenBISmantic URL
 # JSON-LD
 curl -H "Accept: application/ld+json" \
   "https://your-openbismantic.example.org/object/20230601123456789-42"
 
+# replace with your OpenBISmantic URL
 # Turtle
 curl -H "Accept: application/x-turtle" \
   "https://your-openbismantic.example.org/object/20230601123456789-42"
@@ -104,6 +124,7 @@ An openBIS sample object expressed as JSON-LD. The `permId` becomes the stable I
 `POST /export_bundle` accepts a JSON-LD graph of selected entities and produces a ZIP containing all referenced dataset files plus a `ro-crate-metadata.json` conforming to the [RO-Crate spec](https://www.researchobject.org/ro-crate/).
 
 ```bash
+# replace with your OpenBISmantic URL
 curl -X POST "https://your-openbismantic.example.org/export_bundle" \
   -H "Content-Type: application/ld+json" \
   -d @selected-objects.json \
@@ -149,7 +170,7 @@ Key environment variables:
 
 ## Pipeline position
 
-```
+```text
 openBIS ELN/LIMS (samples + datasets + files)
   → OpenBISmantic /object, /dataset, /collection, …
   → JSON-LD / RDF (Schema.org + DCAT + PROV-O)

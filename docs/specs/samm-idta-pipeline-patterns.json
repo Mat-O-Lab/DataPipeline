@@ -1,0 +1,112 @@
+{
+  "name": "SAMM/IDTA Pipeline Patterns",
+  "type": "pipeline-pattern",
+  "live_examples": "https://futurecarproduction.materialsdata.space",
+  "related_instance": "https://dataportal.material-digital.de",
+  "context": "The DataStack pipeline handles non-CSV data sources from automotive Industry 4.0 standards. Two patterns are demonstrated: SAMM/Catena-X aspect model JSON payloads and IDTA/AAS submodel JSON. Both follow the same principle: create complete metadata → transform with semantic technologies.",
+  "pattern_a_samm_catena_x": {
+    "name": "SAMM / Catena-X Aspect Models — Two-Stage Transformation",
+    "source_format": "Flat JSON conforming to Eclipse Tractus-X SAMM aspect models (e.g. io.catenax.material_data:1.0.0)",
+    "scale_on_live_instance": "26 SAMM mapping datasets on futurecarproduction.materialsdata.space (pattern: samm-mapping-*)",
+    "domains_covered": ["material properties", "composition", "batch", "sustainability", "recycling", "vehicle information", "component characteristics", "simulation", "homologation", "dismantling", "circular economy strategies", "feedback-to-design"],
+    "stage_1": {
+      "name": "JSON payload → SAMM-aligned intermediate RDF",
+      "tool": "RDFConverter /api/createrdf",
+      "mechanism": "YARRRML mapping with JSONPath iterators traverses flat JSON, produces RDF triples in SAMM/CX namespace with deterministic subject URIs",
+      "inputs": ["Flat JSON payload", "YARRRML .yaml mapping file"],
+      "output": "SAMM-patterned intermediate RDF graph"
+    },
+    "stage_2": {
+      "name": "SAMM RDF → target ontology (SPARQL CONSTRUCT)",
+      "tool": "SPARQL engine (Fuseki)",
+      "mechanism": "CONSTRUCT query with VALUES table mapping SAMM properties to target class, QUDT unit, numeric conversion factor, and semantic role. IRI strategy: SHA256 hash-based deterministic IRIs.",
+      "sparql_architecture": {
+        "values_table_maps": "16 SAMM properties (density, Young's modulus, glass transition temperature, etc.) to target class + QUDT unit + conversion factor + semantic role (quality / identifier / information / temporal_interval / measurement_datum)",
+        "where_clause": "Extracts literals from SAMM entities, applies regex numeric parsing, performs unit conversions",
+        "iri_strategy": "SHA256 hash-based",
+        "construct_clause": "Emits BFO/OBO-grounded triples: qualities bearing on material entities (obo:RO_0000080), part-whole relations (obo:BFO_0000051), scalar value specifications (OBI numeric/categorical)"
+      },
+      "target_ontologies": ["PMDco (PMD Core Ontology)", "AutoMatCE ontology"],
+      "construct_query_files": {
+        "pmdco": "*.samm-to-pmdco.construct.sparql",
+        "automatce": "*.samm-to-automatce.construct.sparql"
+      }
+    },
+    "ckan_dataset_structure": [
+      {"resource": "*.json-to-samm.yaml", "format": "YAML", "role": "Stage 1 YARRRML mapping"},
+      {"resource": "SAMM aspect model", "format": "TTL", "role": "Upstream ontology (external GitHub link)"},
+      {"resource": "*.samm-to-pmdco.construct.sparql", "format": "SPARQL", "role": "Stage 2 CONSTRUCT → PMDco"},
+      {"resource": "*.samm-to-automatce.construct.sparql", "format": "SPARQL", "role": "Stage 2 CONSTRUCT → AutoMatCE"}
+    ]
+  },
+  "pattern_b_idta_aas": {
+    "name": "IDTA / AAS Submodels — Single-Stage YARRRML/RML",
+    "source_format": "Hierarchical JSON (Asset Administration Shell, IEC 63278) with typed submodel elements: SubmodelElementCollection, Property, identified by idShort",
+    "why_single_stage": "AAS JSON is already semantically structured with a standardized metamodel vocabulary — a single YARRRML mapping can navigate the hierarchy and map directly to PMDco without an intermediate ontology stage",
+    "stage_1": {
+      "name": "AAS submodel JSON → PMDco RDF (direct)",
+      "tool": "RDFConverter /api/createrdf",
+      "mechanism": "Multiple JSONPath iterators, each filtering by element type and idShort value, extract individual properties and map directly to PMDco patterns",
+      "outputs_pmdco": {
+        "material": "Central material resource typed as physical material object",
+        "mechanical_properties": "Tensile strength, yield strength, elongation as PMD quality instances with QUDT values in MegaPascals",
+        "composition": "PMD composition specification with 9 element-specific mass fractions (C, Cr, Mn, Mo, Ni, N, P, Si, S) linked via OBO part-of relations"
+      }
+    }
+  },
+  "concrete_example_pa6gf30": {
+    "name": "Cross-Project Use Case (PA6GF30 / Catena-X → PMDco)",
+    "dataset_url": "https://dataportal.material-digital.de/dataset/cross-project-use-case",
+    "material": "PA6GF30 (30% glass-filled polyamide 6)",
+    "source": "Catena-X industrial dataspace via Eclipse Dataspace Connector (EDC)",
+    "notebook": "cross_project_usecase.ipynb (orchestrates all steps end-to-end)",
+    "workflow": [
+      {"step": 1, "name": "Retrieve", "description": "Pull PA6GF30 JSON payload from Catena-X dataspace participant via EDC"},
+      {"step": 2, "name": "JSON → RDF", "tool": "RDFConverter /api/createrdf", "output": "material_data_test_pa6gf30-joined.ttl (96 KB, SAMM-aligned RDF)"},
+      {"step": 3, "name": "RDF → PMDco", "tool": "SPARQL INSERT", "mechanism": "pmdco-mapping-insert.sparql reads from two named graphs in Fuseki: dataGraph (mat:MaterialData instances) + schemaGraph (SAMM aspect model schema)", "output": "named graph <pmdco> inside Fuseki dataset"},
+      {"step": 4, "name": "Export", "output": "pmdco-full.ttl — standalone PMDco knowledge graph"}
+    ],
+    "sparql_insert_structure": {
+      "input_graphs": {
+        "dataGraph": "mat:MaterialData instances with literal property values (from Step 2 joined TTL)",
+        "schemaGraph": "samm:Property definitions with unit and datatype metadata (SAMM aspect model)"
+      },
+      "output_graph": "GRAPH <pmdco>",
+      "nodes_per_property": [
+        {"node": "?material", "type": "obo:BFO_0000040", "role": "Physical material entity"},
+        {"node": "?quality", "type": "PMDco quality class (e.g. pmd:PMD_0000952)", "role": "Quality inhering in the material"},
+        {"node": "?datum", "type": "obo:OBI_0001931", "role": "Scalar measurement datum"},
+        {"node": "?qv", "type": "qudt:QuantityValue", "role": "Numeric value + unit"}
+      ],
+      "linking_properties": ["obo:RO_0000086 (has quality)", "obo:RO_0000052 (characteristic of)", "obo:IAO_0000417 (is quality measured as)", "obo:OBI_0001938 (has value specification)"],
+      "properties_mapped": 13,
+      "properties_list": ["stressAtBreak", "flexuralStrength", "youngsModulus", "flexuralModulus", "strainAtBreak", "impactStrength", "density", "meltingTemperature", "glassTransitionTemperature", "humidity", "waterAbsorption", "linearThermalExpansionCoefficientParallel", "linearThermalExpansionCoefficientTransverse"],
+      "unit_conversion": "mat:kiloJoulePerSquareMeter × 1000 → unit:J-PER-M2; all others 1:1"
+    },
+    "execution_mechanism": {
+      "tool": "pmdco-mapping-insert.html (browser helper stored as CKAN resource)",
+      "automation": "NOT automated — requires human to open HTML in browser, verify endpoint and SPARQL file URL, click Run",
+      "internal_mechanism": "JavaScript fetches .sparql from CKAN, POSTs to Fuseki /$/update with Content-Type: application/sparql-update",
+      "prerequisites": "Both dataGraph and schemaGraph must already be loaded in Fuseki via fuseki_update action"
+    }
+  },
+  "two_path_comparison": {
+    "yarrrml_rml": {
+      "input": "Raw data (JSON, CSV, XML, RDF)",
+      "output": "RDF knowledge graph",
+      "purpose": "Data → RDF lifting",
+      "iri_strategy": "Template-based",
+      "unit_handling": "None (preserves raw values)",
+      "trigger": "RDFConverter API"
+    },
+    "sparql_construct": {
+      "input": "Existing RDF graph",
+      "output": "Reshaped / re-ontologized RDF graph",
+      "purpose": "Ontology → ontology transformation",
+      "iri_strategy": "SHA256 hash-based or concatenation",
+      "unit_handling": "Regex parsing + conversion factors in VALUES table",
+      "trigger": "SPARQL engine (Fuseki, any SPARQL 1.1 endpoint)"
+    },
+    "key_insight": "SPARQL CONSTRUCT is the ontology-translation layer. When source data already has an established ontology (SAMM/CX) but target uses a different one (PMDco), CONSTRUCT handles the bridge without touching the original mapping or data."
+  }
+}

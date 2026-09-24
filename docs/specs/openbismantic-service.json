@@ -1,0 +1,86 @@
+{
+  "name": "OpenBISmantic",
+  "type": "microservice",
+  "status": "demonstrator — no active public deployment",
+  "repo": "https://github.com/Mat-O-Lab/OpenBISmantic",
+  "public_deployment": null,
+  "image": "ghcr.io/mat-o-lab/openbismantic",
+  "framework": "FastAPI 0.114 + Uvicorn 0.30",
+  "language": "Python",
+  "depends_on": ["openBIS server (its own deployment)", "PyBIS client library"],
+  "purpose": "Bridges an openBIS ELN/LIMS instance and the semantic web. Wraps an openBIS server with a FastAPI layer that exposes all openBIS entities (objects, datasets, collections, projects, spaces, users, property types) as resolvable RDF resources via persistent IRIs built from openBIS permanent IDs (permIds). Also produces RO-Crate export bundles for portable archival.",
+  "pipeline_position": "Stage 1 extractor for openBIS ELN/LIMS data",
+  "openbis_hierarchy": "Space → Project → Collection/Experiment → Object/Sample → Dataset",
+  "tech_stack": [
+    {"layer": "Framework", "technology": "FastAPI 0.114 + Uvicorn 0.30"},
+    {"layer": "openBIS client", "technology": "PyBIS 1.36.3"},
+    {"layer": "RDF", "technology": "rdflib + openbis_json_parser (Mat-O-Lab custom library)"},
+    {"layer": "Templating", "technology": "Jinja2"},
+    {"layer": "Infrastructure", "technology": "Docker Compose: nginx + openBIS server + PostgreSQL + API"}
+  ],
+  "content_negotiation": {
+    "description": "Same URL, different Accept header → different RDF format",
+    "formats": ["application/ld+json (default)", "application/x-turtle", "application/n-triples", "application/rdf+xml", "text/html"]
+  },
+  "ontologies_used": [
+    {"name": "Schema.org", "role": "Dataset, File metadata"},
+    {"name": "DCAT", "role": "Distributions, download URLs, byte sizes"},
+    {"name": "PROV-O", "role": "Activities, derivation chains, timestamps"},
+    {"name": "Custom Mat-O-Lab/openBIS namespace", "role": "Dataset codes, datastore relationships"}
+  ],
+  "api_endpoints": [
+    {"method": "GET", "path": "/object/{perm_id}", "summary": "Sample/object as RDF"},
+    {"method": "GET", "path": "/dataset/{perm_id}", "summary": "Dataset + file listing as RDF"},
+    {"method": "GET", "path": "/distribution/{perm_id}/{path}", "summary": "Specific file from a dataset"},
+    {"method": "GET", "path": "/collection/{perm_id}", "summary": "Experiment/collection as RDF"},
+    {"method": "GET", "path": "/project/{perm_id}", "summary": "Project with experiments as RDF"},
+    {"method": "GET", "path": "/space/{perm_id}", "summary": "Space with projects as RDF"},
+    {"method": "GET", "path": "/instance/", "summary": "All spaces (top-level index)"},
+    {"method": "GET", "path": "/user/{user_id}", "summary": "Person/user as RDF"},
+    {"method": "GET", "path": "/class/{object_type_code}", "summary": "Object or collection type definition"},
+    {"method": "GET", "path": "/object_property/{property_type_code}", "summary": "Property type definition"},
+    {"method": "POST", "path": "/export_bundle", "summary": "Accept a JSON-LD graph → produce RO-Crate ZIP with all referenced dataset files", "example_curl": "curl -X POST \"https://your-openbismantic.example.org/export_bundle\" -H \"Content-Type: application/ld+json\" -d @selected-objects.json --output export.zip"},
+    {"method": "GET", "path": "/search/", "summary": "Full-text search"}
+  ],
+  "content_negotiation_example": {
+    "json_ld": "curl -H \"Accept: application/ld+json\" \"https://your-openbismantic.example.org/object/20230601123456789-42\"",
+    "turtle": "curl -H \"Accept: application/x-turtle\" \"https://your-openbismantic.example.org/object/20230601123456789-42\""
+  },
+  "deployment_modes": [
+    {
+      "name": "Full stack",
+      "description": "Includes openBIS server + PostgreSQL + nginx",
+      "commands": ["git clone https://github.com/Mat-O-Lab/OpenBISmantic", "cd OpenBISmantic", "cp .env.example .env  # fill in ADMIN_PASS, HOST_NAME, POSTGRES_PASSWORD", "docker compose up -d"]
+    },
+    {
+      "name": "API only",
+      "description": "Point at an existing openBIS instance",
+      "env_vars": {"OPENBIS_URL": "https://openbis.yourinstitution.org", "BASE_URL": "https://your-openbismantic.example.org"}
+    }
+  ],
+  "configuration": [
+    {"env_var": "OPENBIS_URL", "required": true, "description": "URL of the openBIS server"},
+    {"env_var": "BASE_URL", "required": true, "description": "Public base URL for OpenBISmantic IRIs"},
+    {"env_var": "ADMIN_PASS", "required": true, "description": "openBIS admin password"},
+    {"env_var": "OPENBISMANTIC_URL", "description": "Self-referencing URL for API links"},
+    {"env_var": "HOST_NAME", "description": "Hostname for full-stack deployment"}
+  ],
+  "ro_crate_output": {
+    "description": "POST /export_bundle accepts a JSON-LD graph of selected entities and produces a ZIP containing all referenced openBIS dataset files plus ro-crate-metadata.json conforming to the RO-Crate spec",
+    "spec": "https://www.researchobject.org/ro-crate/",
+    "downstream": "ZIP can feed directly into RDFConverter since RDFConverter accepts JSON-LD input"
+  },
+  "capabilities": [
+    "Exposes entire openBIS hierarchy as Linked Data with stable IRIs from permIds",
+    "Content negotiation — same endpoint, multiple RDF serialization formats",
+    "Portable RO-Crate export with all dataset files and metadata",
+    "End users need no openBIS credentials — service authenticates via configured service account",
+    "No SPARQL knowledge required by end users"
+  ],
+  "limitations": [
+    "Requires an accessible openBIS instance (no standalone operation)",
+    "No active public deployment for testing",
+    "Output uses Schema.org/DCAT/PROV-O — domain-specific ontology mapping (e.g. to MSEO) requires downstream YARRRML mapping via RDFConverter",
+    "PyBIS authentication requires openBIS 20.10+ server"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "name": "DataStack",
+  "type": "docker-compose-stack",
+  "repo": "https://github.com/Mat-O-Lab/DataStack",
+  "role": "Deploys the full Mat-O-Lab PMD-CKAN platform as a containerized stack for FAIR materials-science data management in decentralised linked-data spaces.",
+  "live_instances": [
+    {"url": "https://futurecarproduction.materialsdata.space/", "name": "Future Car Production Materials Data Space"},
+    {"url": "https://dataportal.material-digital.de/", "name": "Material Digital Data Portal"}
+  ],
+  "services": [
+    {"name": "nginx", "image": "nginx:1.27-alpine", "role": "Reverse proxy, TLS termination, internal routing"},
+    {"name": "ckan", "image": "custom build (CKAN 2.10/2.11)", "role": "CKAN data portal with all Mat-O-Lab extensions"},
+    {"name": "db", "image": "custom PostgreSQL", "role": "ckandb + datastore databases"},
+    {"name": "solr", "image": "ckan/ckan-solr", "role": "Full-text search index"},
+    {"name": "redis", "image": "redis:7-alpine", "role": "RQ job queue + session cache"},
+    {"name": "fuseki", "image": "secoresearch/fuseki:4.9.0", "role": "Apache Jena Fuseki triple store (port 3030)"},
+    {"name": "csvtocsvw", "image": "ghcr.io/mat-o-lab/csvtocsvw", "role": "CSV → CSVW metadata (FastAPI, port 6001)"},
+    {"name": "maptomethod", "image": "ghcr.io/mat-o-lab/maptomethod", "role": "YARRRML mapping authoring (FastAPI, port 5005)"},
+    {"name": "yarrrml-parser", "image": "ghcr.io/mat-o-lab/yarrrml-parser", "role": "YARRRML → RML conversion (Node.js, port 3001)"},
+    {"name": "rmlmapper", "image": "ghcr.io/mat-o-lab/rmlmapper-webapi", "role": "RML execution engine (Java, port 4000)"},
+    {"name": "rdfconverter", "image": "ghcr.io/mat-o-lab/rdfconverter", "role": "Orchestrates yarrrml-parser + rmlmapper (FastAPI, port 6003)"},
+    {"name": "sparklis", "image": "sferre/sparklis", "role": "User-friendly faceted SPARQL query UI (port 8080)"}
+  ],
+  "networks": ["datastack_net (internal bridge — all services share this)"],
+  "persistent_volumes": ["ckan_storage", "pg_data", "solr_data", "jena_data"],
+  "config_convention": {
+    "description": "Every .env variable prefixed CKANINI__ is auto-translated to ckan.ini at container start",
+    "transformation_rules": ["prefix CKANINI__ is stripped", "__ (double underscore) is replaced with . (dot)", "result is lowercased"],
+    "example": {"env_var": "CKANINI__CKANEXT__FUSEKI__URL", "ckan_ini_key": "ckanext.fuseki.url"}
+  },
+  "critical_env_vars": [
+    {"var": "BACKGROUNDJOBS_API_TOKEN", "description": "CKAN API token used by ALL background-job extensions (csvtocsvw, csvwmapandtransform, fuseki). Must be created manually after first boot. Stack will NOT auto-process resources without this."},
+    {"var": "SECRET_KEY", "description": "CKAN session secret — must be set before deploy"},
+    {"var": "CKAN_SYSADMIN_PASSWORD", "description": "Admin portal password"},
+    {"var": "CKAN_HOST", "description": "Public hostname for TLS and CKAN_SITE_URL"},
+    {"var": "FUSEKI_JAVA_OPTS", "default": "-Xmx10g -Xms10g", "description": "JVM heap for Fuseki — tune for host memory"},
+    {"var": "CKANINI__CKANEXT__CSVTOCSVW__CSVTOCSVW_URL", "value": "http://csvtocsvw:5000", "description": "Internal URL to csvtocsvw container"},
+    {"var": "CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__RDFCONVERTER_URL", "value": "http://rdfconverter:5000", "description": "Internal URL to rdfconverter container"},
+    {"var": "CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__MAPTOMETHOD_URL", "description": "Public URL for MapToMethod (used in browser iframes — must be publicly accessible)"},
+    {"var": "CKANINI__CKANEXT__FUSEKI__URL", "value": "http://fuseki:3030/", "description": "Internal Fuseki URL"},
+    {"var": "CKANINI__CKANEXT__FUSEKI__SPARKLIS_URL", "description": "Sparklis UI URL — empty uses built-in YASGUI"}
+  ],
+  "post_boot_setup": [
+    "Start: docker compose up",
+    "Create an admin API token at /user/<admin>/api-tokens",
+    "Paste token as BACKGROUNDJOBS_API_TOKEN in .env",
+    "Restart: docker compose restart ckan",
+    "Create a CKAN group named exactly 'mappings' (case-sensitive) — required by ckanext-csvwmapandtransform"
+  ],
+  "most_common_setup_failure": "BACKGROUNDJOBS_API_TOKEN not set — extensions run but background jobs never execute; no CSV annotation, no RDF conversion, no Fuseki sync happens",
+  "capabilities": [
+    "Full FAIR data portal (CKAN 2.10/2.11)",
+    "Automated CSV → semantic data pipeline on upload (via extensions)",
+    "SPARQL query interface (Fuseki + Sparklis/YASGUI)",
+    "Harvestable metadata (DCAT, structured_data plugins)",
+    "All components deploy with a single docker compose up"
+  ],
+  "known_limitations": [
+    "BACKGROUNDJOBS_API_TOKEN is a manual post-boot step — stack will not auto-process resources without it",
+    "Fuseki auto-sync hooks are commented out in ckanext-fuseki — Fuseki upload requires manual trigger via CKAN UI or API",
+    "rmlmapper is hardcoded to port 4000; cannot be changed without rebuilding the image",
+    "Data sources must be publicly accessible URLs for URL-based microservice endpoints (upload endpoints exist as fallback)",
+    "Fuseki JVM heap set to 10 GB by default — tune for host memory"
+  ]
+}

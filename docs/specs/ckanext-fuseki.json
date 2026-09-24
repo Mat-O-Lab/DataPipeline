@@ -1,0 +1,98 @@
+{
+  "name": "ckanext-fuseki",
+  "type": "ckan-extension",
+  "repo": "https://github.com/Mat-O-Lab/ckanext-fuseki",
+  "depends_on": ["Apache Jena Fuseki container"],
+  "purpose": "Integrates Apache Jena Fuseki as a triple store mirror of CKAN datasets. For each RDF resource in a dataset, creates a Fuseki dataset (named by CKAN dataset UUID), uploads resources as named graphs, and creates a SPARQL resource link in CKAN pointing to a CKAN-proxied SPARQL endpoint.",
+  "ckan_interfaces": ["IResourceController (inherit=True)"],
+  "auto_hooks_state": "DISABLED — after_create and after_update hooks are commented out in plugin.py. Fuseki sync is triggered manually via the fuseki_update CKAN action (accessible from dataset UI or API).",
+  "trigger_condition": "resource format (lowercased) must be in ckanext.fuseki.formats",
+  "dataset_naming": "Fuseki dataset name = CKAN package (dataset) UUID directly. No secondary mapping table.",
+  "named_graph_uris": {
+    "without_reasoning": "{resource_url}",
+    "with_reasoning": ["urn:x-arq:InferenceGraph:{resource_url}"]
+  },
+  "upload_flow": [
+    "Delete existing Fuseki dataset for package UUID (if present)",
+    "Poll for confirmed deletion (verify_dataset_deleted, up to 10 retries)",
+    "Re-create dataset via Fuseki Assembly API (Turtle assembler POSTed to $/datasets) — configures TDB2, sets unionDefaultGraph=true, optional OWL/RDFS reasoning",
+    "Upload each RDF resource via Graph Store Protocol PUT to {dataset_url}/data?graph={named_graph_uri} — PUT replaces content, prevents stale triples",
+    "Clean up orphaned named graphs (for removed resources)",
+    "Create or patch a CKAN resource named 'SPARQL' with URL pointing to CKAN proxy endpoint"
+  ],
+  "sparql_link_format": {
+    "sparklis_url_set": "{sparklis_url}?title={dataset_name}&endpoint={sparql_proxy_url}",
+    "sparklis_url_empty": "Built-in YASGUI page at /dataset/{id}/fuseki/sparql"
+  },
+  "sparql_proxy_endpoint": "/dataset/{id}/fuseki/$/sparql — CKAN authenticates before forwarding to Fuseki; users never hit Fuseki directly",
+  "registered_actions": [
+    {"action": "fuseki_update", "purpose": "Upload/sync all RDF resources of a CKAN dataset to Fuseki"},
+    {"action": "fuseki_delete", "purpose": "Delete the Fuseki dataset for a CKAN dataset"}
+  ],
+  "configuration": [
+    {
+      "key": "ckanext.fuseki.url",
+      "env_var": "CKANINI__CKANEXT__FUSEKI__URL",
+      "default": "http://fuseki:3030/",
+      "description": "Fuseki base URL — use internal container URL in DataStack"
+    },
+    {
+      "key": "ckanext.fuseki.internal_url",
+      "env_var": "CKANINI__CKANEXT__FUSEKI__INTERNAL_URL",
+      "default": "",
+      "description": "Optional direct URL bypassing nginx reverse proxy"
+    },
+    {
+      "key": "ckanext.fuseki.username",
+      "env_var": "CKANINI__CKANEXT__FUSEKI__USERNAME",
+      "default": "admin",
+      "description": "Fuseki admin username"
+    },
+    {
+      "key": "ckanext.fuseki.password",
+      "env_var": "CKANINI__CKANEXT__FUSEKI__PASSWORD",
+      "default": "admin",
+      "description": "Fuseki admin password — change before deploying"
+    },
+    {
+      "key": "ckanext.fuseki.ckan_token",
+      "env_var": "CKANINI__CKANEXT__FUSEKI__CKAN_TOKEN",
+      "default": "",
+      "description": "CKAN API token for background job authentication"
+    },
+    {
+      "key": "ckanext.fuseki.formats",
+      "env_var": "CKANINI__CKANEXT__FUSEKI__FORMATS",
+      "default": "turtle text/turtle n3 nt hext trig longturtle xml json-ld ld+json jsonld",
+      "description": "Resource formats that trigger Fuseki upload"
+    },
+    {
+      "key": "ckanext.fuseki.sparklis_url",
+      "env_var": "CKANINI__CKANEXT__FUSEKI__SPARKLIS_URL",
+      "default": "",
+      "description": "Sparklis UI URL (empty = use built-in YASGUI)"
+    },
+    {
+      "key": "ckanext.fuseki.ssl_verify",
+      "env_var": "CKANINI__CKANEXT__FUSEKI__SSL_VERIFY",
+      "default": true,
+      "description": "SSL verification for outbound requests"
+    }
+  ],
+  "capabilities": [
+    "CKAN UUID → Fuseki dataset: stable, predictable naming, no mapping table needed",
+    "Named graph per resource: tracks provenance by resource download URL",
+    "Union default graph: cross-resource SPARQL queries work out of the box",
+    "Optional OWL/RDFS reasoning: inference graphs created automatically",
+    "CKAN proxy: users access SPARQL without direct Fuseki credentials",
+    "Sparklis integration: user-friendly faceted SPARQL UI as alternative to YASGUI",
+    "PUT (replace not append) prevents accumulation of stale triples"
+  ],
+  "limitations": [
+    "Auto-hooks are commented out — Fuseki sync requires manual trigger via CKAN UI or API; does NOT happen automatically on resource upload",
+    "Delete-and-recreate strategy means Fuseki is briefly empty during large dataset re-syncs",
+    "Resource URLs must be publicly accessible for Fuseki to fetch RDF content",
+    "Reasoning adds inference triples — can significantly increase storage for large ontologies",
+    "BACKGROUNDJOBS_API_TOKEN must be set or jobs will not execute"
+  ]
+}

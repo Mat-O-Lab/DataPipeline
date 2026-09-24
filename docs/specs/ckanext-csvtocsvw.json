@@ -1,0 +1,87 @@
+{
+  "name": "ckanext-csvtocsvw",
+  "type": "ckan-extension",
+  "repo": "https://github.com/Mat-O-Lab/ckanext-csvtocsvw",
+  "depends_on": ["csvtocsvw-service", "CKAN background jobs (RQ)"],
+  "purpose": "Automatically converts uploaded CSV/TXT/ASC files into CSVW JSON-LD metadata by calling the CSVToCSVW microservice, then pushes the structured tabular data into the CKAN DataStore — making it queryable via CKAN's Data API. Also renders CSVW as Turtle automatically.",
+  "ckan_interfaces": ["IResourceController", "IResourceUrlChange"],
+  "integration_points": [
+    {"hook": "after_resource_create", "trigger": "New resource uploaded"},
+    {"hook": "after_update", "trigger": "Resource updated"},
+    {"hook": "notify", "trigger": "Resource URL changed"}
+  ],
+  "trigger_condition": "resource format (lowercased) must be in ckanext.csvtocsvw.formats",
+  "processing_paths": [
+    {
+      "name": "Path 1: CSV → CSVW annotation",
+      "trigger": "format in configured formats (default: csv txt asc tsv)",
+      "steps": [
+        "Call CSVToCSVW POST /api/annotate?return_type=json-ld with the CSV URL",
+        "Upload resulting JSON-LD as new resource in same CKAN dataset (extras: hadPrimarySource, wasGeneratedBy)",
+        "Delete any datapusher-created DataStore on original CSV resource (prevents double-import)",
+        "Parse CSVW metadata, extract column headers + rows",
+        "Insert into CKAN DataStore in 250-row chunks via datastore_create"
+      ]
+    },
+    {
+      "name": "Path 2: JSON-LD → Turtle",
+      "trigger": "format = json-ld (triggered by JSON-LD created in Path 1)",
+      "steps": [
+        "Call CSVToCSVW POST /api/rdf?return_type=turtle",
+        "Upload resulting Turtle file as new resource in same dataset"
+      ]
+    }
+  ],
+  "job_queue": {
+    "backend": "CKAN RQ background jobs",
+    "deduplication": "Jobs with same resource ID title pattern are deduplicated automatically",
+    "states": ["submitting", "pending", "running", "complete", "errored"],
+    "state_callback": "csvtocsvw_hook CKAN action"
+  },
+  "registered_actions": [
+    {"action": "csvtocsvw_annotate", "purpose": "Trigger CSV annotation job"},
+    {"action": "csvtocsvw_transform", "purpose": "Trigger JSON-LD → Turtle conversion job"},
+    {"action": "csvtocsvw_hook", "purpose": "Background job status callback"}
+  ],
+  "configuration": [
+    {
+      "key": "ckanext.csvtocsvw.csvtocsvw_url",
+      "env_var": "CKANINI__CKANEXT__CSVTOCSVW__CSVTOCSVW_URL",
+      "default": "https://csvtocsvw.matolab.org",
+      "datastack_value": "http://csvtocsvw:5000",
+      "description": "CSVToCSVW microservice URL (use internal container URL in DataStack)"
+    },
+    {
+      "key": "ckanext.csvtocsvw.formats",
+      "env_var": "CKANINI__CKANEXT__CSVTOCSVW__FORMATS",
+      "default": "csv txt asc tsv",
+      "description": "Space-separated resource formats that trigger annotation (lowercased comparison)"
+    },
+    {
+      "key": "ckanext.csvtocsvw.ckan_token",
+      "env_var": "CKANINI__CKANEXT__CSVTOCSVW__CKAN_TOKEN",
+      "default": "",
+      "description": "CKAN API token for background job authentication — must be set for jobs to execute"
+    },
+    {
+      "key": "ckanext.csvtocsvw.ssl_verify",
+      "env_var": "CKANINI__CKANEXT__CSVTOCSVW__SSL_VERIFY",
+      "default": true,
+      "description": "SSL verification for outbound requests to CSVToCSVW"
+    }
+  ],
+  "capabilities": [
+    "Zero-config for end users — upload a CSV, metadata is created automatically",
+    "CKAN DataStore integration — CSV data becomes queryable via Data API",
+    "Semantic enrichment via QUDT unit annotations (from CSVToCSVW)",
+    "PROV-O provenance on all generated resources",
+    "Works on resource update and URL change, not just initial upload",
+    "250-row chunked DataStore import handles large files without timeout"
+  ],
+  "limitations": [
+    "CSV URL must be publicly accessible from the CKAN server host (for microservice to fetch it)",
+    "QUDT unit matching depends on column header naming conventions in CSVToCSVW",
+    "Only formats listed in ckanext.csvtocsvw.formats trigger processing",
+    "BACKGROUNDJOBS_API_TOKEN must be set or jobs will not execute"
+  ]
+}

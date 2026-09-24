@@ -1,0 +1,131 @@
+{
+  "name": "CSVToCSVW",
+  "type": "microservice",
+  "version": "v1.3.5",
+  "repo": "https://github.com/Mat-O-Lab/CSVToCSVW",
+  "public_deployment": "https://csvtocsvw.matolab.org",
+  "api_docs": "https://csvtocsvw.matolab.org/api/docs",
+  "openapi_json": "https://csvtocsvw.matolab.org/api/openapi.json",
+  "image": "ghcr.io/mat-o-lab/csvtocsvw:latest",
+  "internal_port": 5000,
+  "license": "Apache-2.0",
+  "framework": "FastAPI",
+  "language": "Python",
+  "depends_on": [],
+  "purpose": "Converts raw CSV files into W3C CSVW-compliant JSON-LD metadata. Analyzes experimental/scientific CSV data and annotates its structure, column types, and physical units using QUDT, Open Annotation, and PROV-O. Handles multi-block scientific CSVs (metadata headers + data table separated by blank lines).",
+  "pipeline_position": "Stage 1 (CSV extraction)",
+  "ontologies_used": ["W3C CSVW", "QUDT Units", "PROV-O", "Open Annotation"],
+  "output_formats": ["json-ld", "n3", "nt", "hext", "trig", "turtle", "longturtle", "xml"],
+  "input_encodings": ["auto", "utf-8", "ascii", "iso-8859-1", "iso-8859-2", "iso-8859-3", "iso-8859-4", "iso-8859-5", "iso-8859-6", "iso-8859-7", "iso-8859-8", "iso-8859-9", "iso-8859-10", "iso-8859-11", "iso-8859-13", "iso-8859-14", "iso-8859-15", "iso-8859-16", "windows-1250", "windows-1251", "windows-1252", "windows-1253", "windows-1254", "windows-1255", "windows-1256", "windows-1257", "windows-1258", "koi8-r", "koi8-u", "mac-cyrillic", "mac-roman"],
+  "example_files": {
+    "repo": "https://github.com/Mat-O-Lab/CSVToCSVW/tree/main/examples",
+    "files": [
+      {
+        "csv": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example.csv",
+        "csvw": "https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example-metadata.json",
+        "description": "Multi-block German lab CSV (tensile test, semicolon-separated)"
+      },
+      {
+        "csv": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv",
+        "csvw": "https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example2-metadata.json",
+        "description": "Tab-separated multi-channel INSTRON data (Zeit [s], Maschine [mm], Kraft [kN])"
+      },
+      {
+        "csv": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example3.csv",
+        "csvw": "https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example3-metadata.json",
+        "description": "Comma-separated simple tabular data"
+      },
+      {
+        "csv": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example5.csv",
+        "csvw": "https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example5-metadata.json",
+        "description": "Multi-block variant with different separator and encoding"
+      }
+    ]
+  },
+  "api_endpoints": [
+    {
+      "method": "POST",
+      "path": "/api/annotate",
+      "summary": "Annotate CSV from a public URL → CSVW JSON-LD",
+      "query_params": {
+        "return_type": {"type": "string", "default": "json-ld", "options": ["json-ld", "n3", "nt", "hext", "trig", "turtle", "longturtle", "xml"]}
+      },
+      "request_body": {
+        "content_type": "application/json",
+        "schema": {
+          "data_url": {"type": "string", "format": "uri", "description": "URL to raw CSV file"},
+          "encoding": {"type": "string", "default": "auto", "description": "Character encoding (30 options including auto)"}
+        }
+      },
+      "response": "CSVW/RDF in requested format",
+      "example_curl": "curl -X POST \"https://csvtocsvw.matolab.org/api/annotate?return_type=json-ld\" -H \"Content-Type: application/json\" -d '{\"data_url\": \"https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv\", \"encoding\": \"auto\"}' --output example2-metadata.json"
+    },
+    {
+      "method": "POST",
+      "path": "/api/annotate_upload",
+      "summary": "Annotate CSV from file upload (no public URL required)",
+      "query_params": {
+        "encoding": {"type": "string", "default": "auto"},
+        "return_type": {"type": "string", "default": "json-ld"}
+      },
+      "request_body": {
+        "content_type": "multipart/form-data",
+        "schema": {
+          "file": {"type": "string", "format": "binary", "description": "Binary CSV file"}
+        }
+      },
+      "response": "CSVW/RDF in requested format",
+      "example_curl": "curl -X POST \"https://csvtocsvw.matolab.org/api/annotate_upload?return_type=json-ld\" -F \"file=@/path/to/data.csv\" --output data-metadata.json"
+    },
+    {
+      "method": "POST",
+      "path": "/api/rdf",
+      "summary": "Convert existing CSVW metadata to another RDF serialization",
+      "query_params": {
+        "return_type": {"type": "string", "default": "turtle"}
+      },
+      "request_body": {
+        "content_type": "application/json",
+        "schema": {
+          "metadata_url": {"type": "string", "format": "uri", "description": "URL to existing CSVW JSON-LD"},
+          "csv_url": {"type": "string", "format": "uri", "nullable": true}
+        }
+      },
+      "response": "RDF in requested format",
+      "example_curl": "curl -X POST \"https://csvtocsvw.matolab.org/api/rdf?return_type=turtle\" -H \"Content-Type: application/json\" -d '{\"metadata_url\": \"https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example-metadata.json\"}' --output example.ttl"
+    },
+    {
+      "method": "GET",
+      "path": "/info",
+      "summary": "Service version and configuration",
+      "response": {"app_name": "CSVtoCSVW", "version": "v1.3.5", "config_name": "production", "server": "https://csvtocsvw.matolab.org"}
+    }
+  ],
+  "configuration": [
+    {"env_var": "APP_PORT", "default": "6001", "description": "External port (internal: 5000)"},
+    {"env_var": "APP_SECRET", "default": null, "description": "Application secret key"},
+    {"env_var": "SERVER_URL", "default": "https://csvtocsvw.matolab.org", "description": "Public-facing base URL"},
+    {"env_var": "ADMIN_MAIL", "default": "csvtocsvw@matolab.org", "description": "Admin contact email"},
+    {"env_var": "APP_MODE", "default": "production", "description": "Application mode"},
+    {"env_var": "SSL_VERIFY", "default": "True", "description": "Verify SSL certs when fetching remote CSVs"}
+  ],
+  "qudt_unit_matching": {
+    "bracket_notation": "Column header `Name [unit]` → bracket content looked up in QUDT (e.g. [mm] → unit:MilliM, [kN] → unit:KiloN, [°C] → unit:DEG_C, [s] → unit:SEC)",
+    "suffix_notation": "Name suffix abbreviations (e.g. _MPa → unit:MegaPA)",
+    "note": "Matching is heuristic; unusual or institution-specific abbreviations may not match"
+  },
+  "capabilities": [
+    "Any CSV (including multi-block scientific formats) → W3C CSVW JSON-LD",
+    "Auto-detects 30 character encodings",
+    "Annotates physical units via QUDT ontology from column header names",
+    "Wraps metadata block rows as oa:Annotation entries",
+    "Adds PROV-O provenance automatically",
+    "URL-based and upload-based endpoints",
+    "8 RDF serialization formats"
+  ],
+  "limitations": [
+    "Remote /api/annotate requires CSV URL to be publicly accessible from service host",
+    "QUDT unit matching is heuristic; unusual column naming conventions may not match",
+    "Multi-block CSV parsing targets materials-science lab export formats; other layouts may need preprocessing"
+  ]
+}

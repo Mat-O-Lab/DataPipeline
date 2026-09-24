@@ -1,0 +1,141 @@
+{
+  "name": "MapToMethod",
+  "type": "microservice",
+  "version": "v1.1.5",
+  "repo": "https://github.com/Mat-O-Lab/MapToMethod",
+  "public_deployment": "https://maptomethod.matolab.org",
+  "api_docs": "https://maptomethod.matolab.org/api/docs",
+  "openapi_json": "https://maptomethod.matolab.org/api/openapi.json",
+  "image": "ghcr.io/mat-o-lab/maptomethod",
+  "license": "Apache-2.0",
+  "framework": "FastAPI",
+  "language": "Python",
+  "depends_on": [],
+  "purpose": "Generates YARRRML mapping rules that connect JSON-LD data documents to knowledge graph template patterns without requiring users to write RML directly. Sits at the mapping-authoring stage of the pipeline: once a mapping is authored and stored in CKAN, it can be applied automatically to any compatible future upload by ckanext-csvwmapandtransform.",
+  "pipeline_position": "Stage 2 (mapping authoring — user-facing)",
+  "tech_stack": [
+    {"layer": "Framework", "technology": "FastAPI + Uvicorn"},
+    {"layer": "Templating", "technology": "Jinja2, WTForms, starlette-wtf"},
+    {"layer": "RDF/Semantic", "technology": "rdflib >= 6.2.0, SPARQL"},
+    {"layer": "Config", "technology": "Pydantic >= 2.0, pydantic_settings"},
+    {"layer": "Output", "technology": "YARRRML (YAML via PyYAML)"},
+    {"layer": "Container", "technology": "Docker / Docker Compose"},
+    {"layer": "Middleware", "technology": "CORS (all origins), SessionMiddleware, ProxyHeadersMiddleware"}
+  ],
+  "namespace_prefixes": {
+    "csvw": "http://www.w3.org/ns/csvw#",
+    "oa": "http://www.w3.org/ns/oa#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "obo": "http://purl.obolibrary.org/obo/",
+    "iof": "https://spec.industrialontologies.org/ontology/core/Core/",
+    "qudt": "http://qudt.org/schema/qudt/",
+    "mseo": "https://purl.matolab.org/mseo/mid/"
+  },
+  "example_files": {
+    "repo": "https://github.com/Mat-O-Lab/MapToMethod/tree/main/examples",
+    "worked_examples": [
+      {
+        "name": "IOFMaterialsTutorial (length measurements)",
+        "data_url": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json",
+        "template_url": "https://github.com/Mat-O-Lab/IOFMaterialsTutorial/raw/main/LengthMeasurement.ttl",
+        "mapping_result": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml"
+      },
+      {
+        "name": "CSVToCSVW example → DIN EN ISO 527-3 method",
+        "data_url": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example-metadata.json",
+        "template_url": "https://github.com/Mat-O-Lab/MSEO/raw/main/methods/DIN_EN_ISO_527-3.drawio.ttl",
+        "map_example": {"SpecimenName": "AktuelleProbe0", "StrainMeasurementInformation": "table-1-Dehnung"}
+      }
+    ]
+  },
+  "api_endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/types",
+      "summary": "Get all unique rdf:type IRIs from a semantic document",
+      "query_params": {
+        "url": {"type": "string", "format": "uri", "default": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example-metadata.json", "description": "URL to JSON-LD or RDF document"}
+      },
+      "response_schema": {"type": "array", "items": {"type": "string", "format": "uri"}},
+      "example_curl": "curl \"https://maptomethod.matolab.org/api/types?url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json\"",
+      "example_response": ["http://qudt.org/schema/qudt/DerivedUnit", "http://www.w3.org/ns/csvw#Column", "http://www.w3.org/ns/csvw#TableGroup", "http://www.w3.org/ns/prov#Activity", "http://www.w3.org/ns/prov#SoftwareAgent"]
+    },
+    {
+      "method": "GET",
+      "path": "/api/entities",
+      "summary": "Query named entities of specified types from a semantic document",
+      "query_params": {
+        "url": {"type": "string", "format": "uri", "default": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example-metadata.json"},
+        "types": {"type": "string", "default": "http://www.w3.org/ns/oa#Annotation,http://www.w3.org/ns/csvw#Column", "description": "Comma-separated type URIs"}
+      },
+      "response_schema": {
+        "entities": {"type": "object", "additionalProperties": {"type": "object", "properties": {"uri": {"type": "string"}, "property": {"type": "string"}, "text": {"type": "string"}, "type": {"type": "string"}}}},
+        "base_namespace": {"type": "string"}
+      },
+      "example_curl": "curl \"https://maptomethod.matolab.org/api/entities?url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json\"",
+      "example_response": {
+        "entities": {
+          "table-1-GID": {"uri": "https://github.com/Mat-O-Lab/IOFMaterialsTutorial/raw/main/measurements.csv/table-1-GID", "property": "name", "text": "GID", "type": "http://www.w3.org/ns/csvw#Column"},
+          "table-1-LengthMm": {"uri": "https://github.com/Mat-O-Lab/IOFMaterialsTutorial/raw/main/measurements.csv/table-1-LengthMm", "property": "name", "text": "LengthMm", "type": "http://www.w3.org/ns/csvw#Column"}
+        },
+        "base_namespace": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json/"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/mapping",
+      "summary": "Generate a YARRRML mapping file from data+template+map dict",
+      "request_body": {
+        "content_type": "application/json",
+        "schema": {
+          "data_url": {"type": "string", "format": "uri", "required": true},
+          "template_url": {"type": "string", "format": "uri", "required": true},
+          "predicate": {"type": "string", "format": "uri", "required": true, "description": "RDF property linking data entity → template entity"},
+          "map": {"type": "object", "required": true, "description": "entity-name → entity-IRI dict (keys from /api/entities, values are template individual IRIs)"},
+          "data_types": {"type": "array", "default": ["http://www.w3.org/ns/oa#Annotation", "http://www.w3.org/ns/csvw#Column"]},
+          "template_types": {"type": "array", "description": "RDF types to query from template"},
+          "use_template_rowwise": {"type": "boolean", "default": false}
+        }
+      },
+      "response": "YAML file download (Content-Disposition: attachment) — YARRRML mapping",
+      "example_curl": "curl -X POST \"https://maptomethod.matolab.org/api/mapping\" -H \"Content-Type: application/json\" -d '{\"data_url\": \"https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json\", \"template_url\": \"https://github.com/Mat-O-Lab/IOFMaterialsTutorial/raw/main/LengthMeasurement.ttl\", \"predicate\": \"http://purl.obolibrary.org/obo/RO_0010002\", \"map\": {\"table-1-LengthMm\": \"https://github.com/Mat-O-Lab/IOFMaterialsTutorial/raw/main/LengthMeasurement.ttl/LengthData\"}}' --output my-mapping.yaml"
+    },
+    {
+      "method": "GET",
+      "path": "/info",
+      "summary": "Service version and configuration",
+      "response": {"name": "MapToMethod", "version": "v1.1.5", "contact": "maptomethod@matolab.org", "mode": "development"}
+    }
+  ],
+  "configuration": [
+    {"env_var": "APP_MODE", "default": "development", "description": "Application mode"},
+    {"env_var": "PORT", "default": "5005", "description": "Listen port"},
+    {"env_var": "SERVER_URL", "default": "https://maptomethod.matolab.org", "description": "Base URL for OpenAPI spec"},
+    {"env_var": "SSL_VERIFY", "default": null, "description": "Toggle SSL cert verification for outbound requests"},
+    {"env_var": "APP_SECRET", "default": "changemeNOW", "description": "Session secret key — must be changed in production"}
+  ],
+  "mapping_authoring_workflow": [
+    "GET /api/types on CSVW to identify available entity types",
+    "GET /api/entities on CSVW to enumerate data columns/annotations",
+    "GET /api/types on template to identify named individuals",
+    "Build map dict: entity-name → template-individual-IRI",
+    "POST /api/mapping → download YARRRML file",
+    "Upload YARRRML to CKAN mappings group as YAML resource",
+    "Future CSV uploads with matching structure auto-apply this mapping via ckanext-csvwmapandtransform"
+  ],
+  "capabilities": [
+    "Interactive mapping authoring without writing RML",
+    "Supports any JSON-LD / RDF as data source (not just CSVW)",
+    "Supports any Turtle template graph (any ontology)",
+    "Row-wise template duplication for tabular data patterns",
+    "Output is standard YARRRML — works with any YARRRML-compatible toolchain",
+    "Web UI at / for browser-based mapping authoring"
+  ],
+  "limitations": [
+    "Both data and template URLs must be publicly accessible",
+    "map dict must be pre-built by caller (but /api/entities provides the raw material)",
+    "No built-in mapping validation — validate via RDFConverter /api/checkmapping",
+    "Mapping quality depends on template ontology design"
+  ]
+}

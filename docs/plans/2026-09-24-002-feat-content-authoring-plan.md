@@ -111,7 +111,7 @@ These are well-documented upstream resources. Content pages must **link to them*
 | RDFConverter OpenAPI | https://rdfconverter.matolab.org/api/docs | Primary reference for all RDFConverter endpoints |
 | Hanke et al. 2023 | https://link.springer.com/article/10.1007/s40192-023-00331-5 | Peer-reviewed pipeline description — cite from index.md and default-use-case |
 
-**Authoring rule:** If explaining a concept already covered by one of these resources requires more than 3 sentences, replace it with a one-sentence summary and a link.
+**Authoring rule:** If a concept is didactically necessary for the reader to follow the page, explain it with exactly one annotated example inline — then link to the upstream reference for depth. If the concept is not load-bearing for the page's story, skip the explanation entirely and link only. Never write a full tutorial for something already documented upstream.
 
 ### Existing Patterns to Follow
 
@@ -124,7 +124,7 @@ These are well-documented upstream resources. Content pages must **link to them*
 - **Story outline before writing:** Every unit begins by drafting the narrative arc (what the reader knows → what they learn → how they verify). The outline is written in comments or scratch notes, not committed — it shapes the content but doesn't appear in the final page.
 - **Inline examples are mandatory:** No content page is complete without at least one inline code block showing a real input, a real API response, or a real output artifact. Synthesized examples are acceptable only when live data is unavailable — label them `# illustrative example`.
 - **Persona-matched language:** P1 pages avoid Docker and API terminology. P2 pages use shell commands and env var names directly. P3 pages use precise API contract language. P4 pages assume framework familiarity.
-- **Link upstream docs, don't re-explain them:** YARRRML, RML, CSVW, QUDT, PROV-O, and PMDco are all well-documented externally. Use the External References table. One sentence + a link is always better than a paragraph of re-explanation.
+- **One example inline, upstream docs for depth:** If a concept is load-bearing for the page's story (the reader can't proceed without understanding it), explain it with exactly one annotated inline example, then link to the upstream reference. If the concept is not load-bearing, link only — no inline explanation. Never write a full tutorial for something YARRRML, RML, CSVW, or PMDco docs already cover well.
 - **`mkdocs build --strict` after each unit:** Treats warnings as errors — catches broken links before they accumulate.
 - **`navigation.instant` check:** If Mermaid diagrams break in `mkdocs serve` after writing Unit 1 (which may add a sequence diagram), disable `navigation.instant` in `mkdocs.yml`.
 

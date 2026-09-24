@@ -1,0 +1,99 @@
+site_name: Mat-O-Lab DataStack
+site_description: Documentation for the Mat-O-Lab DataStack pipeline — CSV to FAIR RDF knowledge graphs
+site_url: https://mat-o-lab.github.io/DataPipeline/
+repo_url: https://github.com/Mat-O-Lab/DataStack
+repo_name: Mat-O-Lab/DataStack
+edit_uri: ""
+
+theme:
+  name: material
+  logo: assets/matolab.svg
+  favicon: assets/favicon.svg
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.top
+    - content.code.copy
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - tables
+  - attr_list
+  - def_list
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - exclude:
+      glob:
+        - "brainstorms/*"
+        - "plans/*"
+        - "specs/*"
+        - "plan.md"
+        - "references.md"
+
+nav:
+  - Home: index.md
+  - Pipeline:
+    - pipeline/index.md
+    - Overview: pipeline/overview.md
+    - Default Use Case: pipeline/default-use-case.md
+    - Capability Map: pipeline/capability-map.md
+    - Advanced:
+      - SAMM / Catena-X: pipeline/advanced/samm-catena-x.md
+      - IDTA / AAS: pipeline/advanced/idta-aas.md
+  - Guides:
+    - guides/index.md
+    - Quickstart: guides/quickstart.md
+    - Author a Mapping: guides/author-a-mapping.md
+    - Standalone APIs: guides/standalone-apis.md
+    - Add a Use Case: guides/add-a-use-case.md
+  - Reference:
+    - reference/index.md
+    - API Endpoints: reference/api-endpoints.md
+    - Configuration: reference/configuration.md
+    - Data Formats: reference/data-formats.md
+  - Components:
+    - components/index.md
+    - DataStack: components/datastack.md
+    - MapToMethod: components/maptomethod.md
+    - RDFConverter: components/rdfconverter.md
+    - ckanext-csvtocsvw: components/ckanext-csvtocsvw.md
+    - ckanext-csvwmapandtransform: components/ckanext-csvwmapandtransform.md
+    - ckanext-fuseki: components/ckanext-fuseki.md
+    - Extractors:
+      - extractors/index.md
+      - CSVToCSVW: extractors/csvtocsvw.md
+      - OmeroExtractor: extractors/omeroextractor.md
+      - OpenBISmantic: extractors/openbismantic.md
+      - Ontop: extractors/ontop.md

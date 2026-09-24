@@ -1,0 +1,12 @@
+/* Mat-O-Lab / Fraunhofer brand palette overrides for MkDocs Material */
+:root {
+  --md-primary-fg-color: #005B7F;
+  --md-primary-fg-color--light: #3383a3;
+  --md-primary-fg-color--dark: #003d57;
+  --md-accent-fg-color: #F58220;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #222222;
+  --md-default-fg-color: #A6BBC8;
+}

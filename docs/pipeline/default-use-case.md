@@ -106,31 +106,46 @@ A service called CSVToCSVW reads your CSV and produces a companion metadata docu
 - **Provenance.** A record of which service produced the file, following the [PROV-O](https://www.w3.org/TR/prov-o/) standard. Think of it as a digital audit trail.
 - **Annotation rows.** Any header rows above your data table are preserved as structured annotations.
 
-The CSVW file appears as a new resource in your CKAN dataset. Here is a simplified excerpt showing how the system labels your columns. You do not need to understand this format — it is produced entirely automatically:
+The CSVW file appears as a new resource in your CKAN dataset. The excerpt below is from the real [`example2-metadata.json`](https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example2-metadata.json) produced by CSVToCSVW for a typical lab instrument export — German-language headers, multi-channel measurement data. You do not need to understand this format — it is produced entirely automatically:
 
 ```json
 {
-  "@context": ["http://www.w3.org/ns/csvw", {
-    "qudt": "http://qudt.org/schema/qudt/",
-    "unit": "http://qudt.org/vocab/unit/",
-    "prov": "http://www.w3.org/ns/prov#"
-  }],
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "oa":   "http://www.w3.org/ns/oa#",
+      "qudt": "http://qudt.org/schema/qudt/",
+      "prov": "http://www.w3.org/ns/prov#",
+      "csv":  "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv/"
+    }
+  ],
   "@type": "http://www.w3.org/ns/csvw#TableGroup",
+  "notes": [{
+    "@id": "csv:Probe0",
+    "@type": "oa:Annotation",
+    "label": "Probe",
+    "oa:hasBody": [{ "oa:value": "AWA_3_03_Rz" }]
+  }],
   "tables": [{
     "tableSchema": {
       "columns": [
-        { "name": "temperature_C",        "qudt:unit": { "@id": "unit:DEG_C" } },
-        { "name": "tensile_strength_MPa", "qudt:unit": { "@id": "unit:MegaPA" } },
-        { "name": "yield_strength_MPa",   "qudt:unit": { "@id": "unit:MegaPA" } },
-        { "name": "elongation_pct",       "qudt:unit": { "@id": "unit:PERCENT" } }
+        {
+          "name": "MaschineMm",
+          "titles": ["Maschine [mm]", "MaschineMm"],
+          "qudt:unit": { "@id": "http://qudt.org/vocab/unit/MilliM" }
+        },
+        {
+          "name": "KraftKn",
+          "titles": ["Kraft [kN]", "KraftKn"],
+          "qudt:unit": { "@id": "http://qudt.org/vocab/unit/KiloN" }
+        }
       ]
     }
-  }],
-  "prov:wasGeneratedBy": { "@id": "https://csvtocsvw.matolab.org" }
+  }]
 }
 ```
 
-*Each column now carries a machine-readable unit label — `unit:MegaPA` for megapascals, `unit:DEG_C` for degrees Celsius — plus a provenance link recording which service produced the file.*
+*The original header `"Kraft [kN]"` is preserved alongside the normalised name `"KraftKn"`, and the column now carries `unit:KiloN` — an internationally agreed identifier for kilonewtons. The metadata row `"Probe"` with its specimen identifier is captured as an `oa:Annotation`. Everything is produced automatically from the CSV.*
 
 ---
 
@@ -160,31 +175,27 @@ These rule files are what data engineers author to connect a lab's specific colu
 
 The matching rule file and your data are sent to a transformation service. It applies the rules and produces a **joined linked-data file** — your measurements expressed using a shared materials science vocabulary called [PMDco](https://github.com/materialdigital/core-ontology) (Platform MaterialDigital Core Ontology). This means concepts like "tensile test result" or "yield strength" now carry the same identifier they would in any other dataset that uses PMDco — making your data directly comparable and combinable with other labs' data.
 
-The joined file appears in your CKAN dataset. Here is a simplified excerpt showing what two measurement rows look like in this format — again, produced automatically, not something you write:
+The joined file appears in your CKAN dataset. The excerpt below is from the real [`detection_runs-joined.ttl`](https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-joined.ttl) — a pipeline output from BAMresearch TEM microscopy detection data. The structure is the same regardless of data type: PMDco process and quality nodes, QUDT quantity values, provenance links.
 
 ```turtle
-@prefix pmdco: <https://github.com/materialdigital/core-ontology/tree/main/pmdco#> .
+@prefix co:    <https://w3id.org/pmd/co/> .
 @prefix qudt:  <http://qudt.org/schema/qudt/> .
-@prefix unit:  <http://qudt.org/vocab/unit/> .
+@prefix qunit: <http://qudt.org/vocab/unit/> .
 @prefix prov:  <http://www.w3.org/ns/prov#> .
-@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
-<https://example.org/result_23>
-    a pmdco:TensileTestResult ;
-    pmdco:hasTensileStrength [
-        a qudt:QuantityValue ;
-        qudt:numericValue "180"^^xsd:double ;
-        qudt:unit unit:MegaPA     # QUDT unit annotation
-    ] ;
-    pmdco:hasYieldStrength [
-        a qudt:QuantityValue ;
-        qudt:numericValue "120"^^xsd:double ;
-        qudt:unit unit:MegaPA
-    ] ;
-    prov:wasDerivedFrom <https://example.org/sample.csv> .  # provenance statement
+row0:ArtificalAging a co:AgingProcess ;
+    co:input  row0:specimenAgingTemperature,
+              row0:specimenAgingTime ;
+    co:output row0:transmissionElectronMicroscopeSpecimen ;
+    co:nextProcess row0:darkfieldTransmissionElectronMicroscopyImaging .
+
+ns1:table-1-AgingTempC
+    [ a qudt:QuantityValue ;
+      qudt:unit  qunit:DEG_C ;
+      qudt:value 1.9e+02 ] .
 ```
 
-*Each result row is now labelled with the PMDco concept it represents (`pmdco:TensileTestResult`), its numeric values carry standard unit identifiers, and the file records that the data came from your original CSV.*
+*Each measurement is now a typed PMDco process node (`co:AgingProcess`) with typed inputs and outputs. Numeric values carry QUDT unit identifiers (`qunit:DEG_C`). The same structure applies to tensile tests, composition measurements, or any other data type — only the process class and property IRIs change.*
 
 ---
 

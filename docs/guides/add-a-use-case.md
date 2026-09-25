@@ -1,10 +1,10 @@
 ---
-title: Add a Use Case
+title: Onboard a New Data Type
 ---
 
-# Add a Use Case
+# Onboard a New Data Type
 
-The DataStack pipeline is built around a concept called a **use case**: a specific combination of _where your data comes from_ and _what scientific concepts your data describes_. When you bring a new type of experiment or measurement into the pipeline, you are adding a use case.
+Bringing a new type of experiment, measurement, or process into the DataStack pipeline means two things: making sure the pipeline can read your files, and teaching it what your data means scientifically.
 
 Your data describes a tensile test — but the pipeline needs to know what "yield strength" means in a way any computer can understand. A **mapping file** is the bridge. This guide explains how to extend the pipeline for a new data source or a new kind of measurement, and where to go for each step.
 

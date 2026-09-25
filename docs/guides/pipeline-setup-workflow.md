@@ -8,7 +8,7 @@ This is the complete technical workflow for wiring a new data type into the Data
 
 **Audience:** data engineers and operators setting up a new use case.
 
-**For domain scientists** who want to understand the process conceptually, see [Add a Use Case](add-a-use-case.md) instead.
+**For domain scientists** who want to understand the process conceptually, see [Onboard a New Data Type](add-a-use-case.md) instead.
 
 ---
 

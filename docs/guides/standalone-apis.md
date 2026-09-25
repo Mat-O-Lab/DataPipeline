@@ -21,11 +21,11 @@ No installation. No account. No command-line knowledge needed.
 
 ## The three tools
 
-| Tool | What it does | Web address |
-|---|---|---|
-| **CSVToCSVW** | Reads your CSV and adds structured column descriptions | [csvtocsvw.matolab.org](https://csvtocsvw.matolab.org/) |
-| **MapToMethod** | Generates the mapping file that links your columns to standard concepts | [maptomethod.matolab.org](https://maptomethod.matolab.org/) |
-| **RDFConverter** | Applies the mapping and produces FAIR-compliant output | [rdfconverter.matolab.org](https://rdfconverter.matolab.org/) |
+| Tool | What it does | Web UI | API explorer |
+|---|---|---|---|
+| **CSVToCSVW** | Reads your CSV and adds structured column descriptions | [csvtocsvw.matolab.org](https://csvtocsvw.matolab.org/) | [/api/docs](https://csvtocsvw.matolab.org/api/docs) |
+| **MapToMethod** | Generates the mapping file that links your columns to standard concepts | [maptomethod.matolab.org](https://maptomethod.matolab.org/) | [/api/docs](https://maptomethod.matolab.org/api/docs) |
+| **RDFConverter** | Applies the mapping and produces FAIR-compliant output | [rdfconverter.matolab.org](https://rdfconverter.matolab.org/) | [/api/docs](https://rdfconverter.matolab.org/api/docs) |
 
 Run them in order — CSVToCSVW first, RDFConverter last. MapToMethod is needed only when setting up a new measurement type.
 

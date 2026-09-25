@@ -1,0 +1,76 @@
+{
+  "page": "guides/pipeline-setup-workflow.md",
+  "title": "Pipeline Setup Workflow",
+  "persona": "P3",
+  "narrative_arc": "Complete numbered technical workflow for a data engineer establishing a new DataStack pipeline from scratch — from making raw data accessible through to uploading a tested mapping to CKAN. Bridges the conceptual add-a-use-case guide with the detailed per-tool guides.",
+  "priority": "high",
+  "sections": [
+    {
+      "id": "intro",
+      "heading": "intro",
+      "purpose": "Audience framing — P3 data engineer/operator. Pointer to add-a-use-case.md for P1 readers."
+    },
+    {
+      "id": "step1",
+      "heading": "Step 1 — Make your raw data file accessible",
+      "purpose": "HTTP accessibility requirement for pipeline services. Three cases: CKAN-deployed, public portal, dev/test."
+    },
+    {
+      "id": "step2",
+      "heading": "Step 2 — Generate the metadata file (CSVW)",
+      "purpose": "CKAN auto path vs standalone CSVToCSVW UI. Link to UI and /api/docs. Pointer to csvtocsvw.md."
+    },
+    {
+      "id": "step3",
+      "heading": "Step 3 — (Optional) Make the metadata file accessible",
+      "purpose": "Only needed when CKAN is not hosting the CSVW. Skip condition explicit."
+    },
+    {
+      "id": "step4",
+      "heading": "Step 4 — Create or locate a prototype graph",
+      "purpose": "Reuse from PMDCO library vs author new in Ontosphere. Link to author-a-prototype-graph.md."
+    },
+    {
+      "id": "step5",
+      "heading": "Step 5 — Make the prototype graph accessible",
+      "purpose": "Public URL requirement for MapToMethod/RDFConverter. Options: GitHub raw, CKAN."
+    },
+    {
+      "id": "step6",
+      "heading": "Step 6 — Create the mapping",
+      "purpose": "Two options: MapToMethod UI for standard cases; YARRRML direct authoring (manual or AI) for complex. Links to UI, /api/docs, author-a-mapping.md, Matey editor."
+    },
+    {
+      "id": "step7",
+      "heading": "Step 7 — Test the mapping",
+      "purpose": "checkmapping (rules_skipped == 0 gate) + api/test for triple count and per-rule stats. Link to RDFConverter UI and /api/docs."
+    },
+    {
+      "id": "step8",
+      "heading": "Step 8 — Verify the output graph",
+      "purpose": "Produce joined TTL. Two verification paths: Ontosphere (OWL 2 DL reasoning + SHACL) or manual TTL inspection."
+    },
+    {
+      "id": "step9",
+      "heading": "Step 9 — Upload the mapping to CKAN",
+      "purpose": "YAML upload to mappings group. Explains automatic trigger behaviour once mapping is in the group."
+    },
+    {
+      "id": "quick-reference",
+      "heading": "Quick reference — all service UIs and API explorers",
+      "purpose": "Single table: all four services with Web UI and /api/docs links."
+    }
+  ],
+  "real_examples": [
+    "checkmapping curl command with placeholder URLs",
+    "api/test curl command",
+    "api/createrdf curl command"
+  ],
+  "cross_links": [
+    "add-a-use-case.md",
+    "author-a-prototype-graph.md",
+    "author-a-mapping.md",
+    "extractors/csvtocsvw.md",
+    "guides/standalone-apis.md"
+  ]
+}

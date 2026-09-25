@@ -80,6 +80,7 @@ nav:
     - Author a Prototype Graph: guides/author-a-prototype-graph.md
     - Author a Mapping: guides/author-a-mapping.md
     - Standalone APIs: guides/standalone-apis.md
+    - Pipeline Setup Workflow: guides/pipeline-setup-workflow.md
     - Add a Use Case: guides/add-a-use-case.md
   - Reference:
     - reference/index.md

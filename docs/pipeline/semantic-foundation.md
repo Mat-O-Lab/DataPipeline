@@ -24,18 +24,20 @@ The diagram shows how DataStack implements this in practice. Data uploaded to th
 
 A URI identifies *what* a thing is, but doesn't define *what that means*. That definition lives in an **ontology** — a structured dictionary that specifies concepts and their relationships. Think of it as a shared glossary that every system in a community agrees to use.
 
-DataStack uses a layered set of ontologies designed for industrial and scientific data:
+Ontologies used in materials science follow a layered structure, shown in the diagram below. DataStack is designed to work with any community's ontology stack — it is not tied to a specific set.
 
-![Industrial Ontology Stack — from BFO upper ontology to application-level deployment](../assets/fig1-ontology-stack.svg)
+![Industrial Ontology Stack — layers from universal concepts down to domain application](../assets/fig1-ontology-stack.svg)
 
-| Layer | Name | What it covers |
+| Layer | Role | What it covers |
 |-------|------|---------------|
-| Top | **BFO** (Basic Formal Ontology) | Universal concepts: objects, processes, time, qualities |
-| Mid | **PMDCO** (PMD Core Ontology) | Materials science: specimens, tests, processes, measurements |
-| Domain | e.g. CHAMEO, EMMO modules | Specific domains: microscopy, electrochemistry, mechanical testing |
-| Application | Local extensions | Institution- or dataset-specific terms |
+| **Upper / Universal** | Shared across all domains | Fundamental concepts: objects, processes, time, qualities, relationships |
+| **Mid / Core** | Shared across a scientific community | Domain-specific shared vocabulary: specimens, measurements, processes |
+| **Domain** | Specific to a field or method | Microscopy, mechanical testing, electrochemistry, specific measurement types |
+| **Application** | Local | Institution- or dataset-specific individuals and extensions |
 
-You do not need to understand these layers to use DataStack. What matters is the outcome: when your tensile test result for steel S355 is published through DataStack, it uses the same vocabulary as every other materials science dataset in the network — making your data findable and comparable by anyone using the same standard.
+Multiple community ontology stacks are in active use in materials science — the Materials Platform Digital (PMDCO), the Mechanical Testing Ontology (MTO), EMMO-based stacks, and others. DataStack can connect to whichever vocabulary your community uses.
+
+You do not need to understand these layers to use DataStack. What matters is the outcome: when your tensile test result for steel S355 is published through DataStack, it uses the same vocabulary as every other materials science dataset that shares your community's standard — making your data findable and comparable by anyone in that network.
 
 ---
 
@@ -57,7 +59,7 @@ You may have encountered FAIR data principles (Findable, Accessible, Interoperab
 |-----------|---------------------|
 | **Findable** | Every dataset is published in CKAN with searchable metadata, following the DCAT standard for data catalogues |
 | **Accessible** | Data is available through a SPARQL query interface — a standard protocol any software can use to retrieve it |
-| **Interoperable** | Data is annotated using PMDCO and domain ontologies, so any system using the same vocabulary can interpret it without human translation |
+| **Interoperable** | Data is annotated using shared community ontologies, so any system using the same vocabulary can interpret it without human translation |
 | **Reusable** | Datasets carry persistent URIs and open ontology links — meaning the data remains interpretable years later, even without the original author |
 
 At [dataportal.material-digital.de](https://dataportal.material-digital.de/), you can see these principles applied to real materials science datasets — tensile tests, microstructure measurements, and synthesis records — shared across institutions using this infrastructure.

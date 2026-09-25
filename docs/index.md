@@ -50,6 +50,8 @@ The same pipeline handles different scientific and industrial data formats:
 | Microscopy imaging | OMERO image archive | Image metadata linked to instrument, acquisition parameters, and sample context | [BAMresearch DF-TEM-PAW](https://github.com/BAMresearch/DF-TEM-PAW) |
 | Automotive supply chain | SAMM / Catena-X product data | Machine-readable records linked to shared automotive industry vocabularies | [futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space) |
 
+The pipeline does not need to be told which row applies to a given upload. When data arrives, CKAN tests it against its library of mapping rule files. The file that matches *identifies* what the data is about — a tensile test, a TEM detection run, a Catena-X material record — and simultaneously provides the enrichment rules. No manual classification step, no format-specific pipeline branch.
+
 ---
 
 ## In production today

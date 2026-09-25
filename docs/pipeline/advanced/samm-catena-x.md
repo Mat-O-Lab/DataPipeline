@@ -4,24 +4,24 @@ title: SAMM / Catena-X Pipeline Pattern
 
 # SAMM / Catena-X Pipeline Pattern
 
-Two-stage transformation for automotive supply-chain data: flat JSON payloads conforming to Catena-X SAMM aspect models → SAMM-aligned intermediate RDF → PMDco / AutoMatCE knowledge graph.
+The DataStack pipeline enriches data by filling prototype graphs. For Catena-X data, the **SAMM aspect model schema is the prototype graph**: it defines the semantic structure of the payload — the entities, their types, relationships, units, and datatypes — and the pipeline instantiates that structure with real data values to produce a self-contained, queryable knowledge graph.
 
 This pattern is used for all 26 `samm-mapping-*` datasets on [futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space) and covers domains from material properties and composition through sustainability, recycling, and circular economy strategies.
 
 ---
 
-## Why two stages?
+## Two enrichment stages
 
-Direct YARRRML-to-PMDco is straightforward when source data has no established domain ontology — you map literals directly to your target classes. SAMM aspect models break this assumption: the source JSON already conforms to a published, versioned ontology (`io.catenax.material_data:1.0.0` and siblings) with its own class hierarchy, property names, and unit vocabulary.
-
-Trying to produce PMDco triples in a single YARRRML pass would mean embedding the entire ontology translation logic inside JSONPath expressions. The two-stage pattern separates the concerns cleanly:
+A Catena-X JSON payload already conforms to a published SAMM aspect model (`io.catenax.material_data:1.0.0` and siblings). Enrichment proceeds in two stages that keep concerns separate:
 
 | Stage | What it does | Tool |
 |---|---|---|
-| 1 | Lift flat JSON to SAMM-aligned intermediate RDF (preserves source semantics) | RDFConverter `/api/createrdf` + YARRRML |
-| 2 | Translate intermediate RDF to target ontology (PMDco / AutoMatCE) | SPARQL CONSTRUCT/INSERT on Fuseki |
+| 1 | Lift flat JSON to SAMM-aligned RDF — the payload enriched by its SAMM prototype graph | RDFConverter `/api/createrdf` + YARRRML |
+| 2 | Translate SAMM RDF to target ontology (PMDco / AutoMatCE) for cross-domain interoperability | SPARQL CONSTRUCT/INSERT on Fuseki |
 
-For the single-stage contrast — when AAS JSON maps directly to PMDco without an intermediate ontology step — see [IDTA / AAS Submodel Pipeline](idta-aas.md).
+Stage 1 produces a self-contained graph: the JSON values are now linked to the SAMM schema context that defines their meaning. Stage 2 bridges that graph into broader cross-community vocabularies.
+
+For the single-stage variant — when AAS JSON maps directly to PMDco without an intermediate schema step — see [IDTA / AAS Submodel Pipeline](idta-aas.md).
 
 ---
 
@@ -198,19 +198,18 @@ Stage 1 (YARRRML → intermediate RDF → Fuseki load) is fully automated by the
 
 ---
 
-## When to use this pattern vs. direct YARRRML
+## When to use the two-stage variant
 
-| Criterion | Direct YARRRML/RML | Two-stage SAMM/SPARQL CONSTRUCT |
+| Criterion | Single-stage (CSV / AAS → target ontology) | Two-stage (SAMM/CX → SAMM RDF → target ontology) |
 |---|---|---|
-| **Input** | Raw data (JSON, CSV, XML, RDF) | Existing RDF graph |
-| **Output** | RDF knowledge graph | Reshaped / re-ontologized RDF graph |
-| **Purpose** | Data → RDF lifting | Ontology → ontology transformation |
-| **IRI strategy** | Template-based | SHA256 hash-based or concatenation |
-| **Unit handling** | None (preserves raw values) | Regex parsing + conversion factors in VALUES table |
-| **Trigger** | RDFConverter API (automated) | SPARQL engine — Fuseki or any SPARQL 1.1 endpoint |
-| **When source already has an ontology** | Not ideal — must embed translation in JSONPath | Use this — CONSTRUCT handles the bridge cleanly |
+| **Source** | Raw data with no established ontology | Data conforming to a published schema (SAMM, OPC UA, etc.) |
+| **Prototype graph** | Custom prototype graph authored for your data | The SAMM aspect model schema is the prototype graph |
+| **Stage 1 output** | — (goes directly to target ontology) | Self-contained SAMM-enriched RDF graph |
+| **Stage 2** | — | SPARQL CONSTRUCT bridges to cross-community vocabulary |
+| **IRI strategy** | Template-based | SHA256 hash-based for full determinism |
+| **When to choose** | Your data has no existing schema vocabulary | Source data already conforms to a published aspect model |
 
-**Key insight:** SPARQL CONSTRUCT is the ontology-translation layer. When source data already has an established ontology (SAMM/CX) but your target uses a different one (PMDco), CONSTRUCT handles the bridge without touching the original mapping or data. The source YARRRML mapping stays clean and portable; the ontology mapping lives in a separate, inspectable `.sparql` file.
+**Key insight:** when source data already comes with a schema that acts as its prototype graph, honour that structure in Stage 1 — produce a self-contained enriched graph first. Stage 2 then bridges vocabularies without touching the original data or mapping. The YARRRML mapping stays clean and portable; the ontology bridge lives in a separate, inspectable `.sparql` file.
 
 ---
 

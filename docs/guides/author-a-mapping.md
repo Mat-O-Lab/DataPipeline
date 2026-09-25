@@ -6,20 +6,47 @@ title: Author a Mapping
 
 This guide walks through the complete mapping authoring workflow using real, publicly accessible files you can use immediately. Every API call here is reproducible — copy the curl commands as-is and you will get real responses back.
 
-**What you will build:** A YARRRML mapping that links the column structure of a CSV CSVW metadata file to a target ontology pattern, then validate it produces correct RDF triples.
+**What you will build:** A YARRRML mapping that links the column structure of a CSVW metadata file to a target ontology pattern, then validate it produces correct RDF output.
 
 **Worked example:** The [IOFMaterialsTutorial](https://github.com/Mat-O-Lab/IOFMaterialsTutorial) — five length measurements connected to an IOF ontology pattern for a measurement process.
+
+---
+
+## Background: three concepts you need before the first step
+
+This workflow sits at the intersection of REST APIs (familiar territory) and the semantic web (probably not). Three terms appear throughout — here is what each one means in plain engineering terms.
+
+**RDF and triples**
+
+RDF (Resource Description Framework) is a data model where every fact is expressed as a three-part statement called a **triple**:
+
+```
+subject  —  predicate  —  object
+```
+
+For example: `sample-001  hasYieldStrength  450MPa` is one triple. Think of it as a row in a key-value store where the key itself is also a named relationship, not just a string. A set of triples is a graph: nodes are subjects and objects, edges are predicates.
+
+**IRIs**
+
+Every subject, predicate, and object in RDF is identified by an **IRI** (Internationalized Resource Identifier) — essentially a URL used as a globally unique name. `http://qudt.org/schema/qudt/DerivedUnit` is the IRI for the QUDT DerivedUnit concept. IRIs look like web addresses but are primarily used as stable, universal identifiers, not necessarily as clickable links.
+
+**YARRRML**
+
+YARRRML is a YAML-based mapping language — think of it as a Jinja template, but instead of rendering HTML from a data context, it renders **RDF statements from CSV rows**. Each mapping rule says: "for each row where column X equals Y, emit a triple connecting this data IRI to that ontology concept IRI." You never write YARRRML by hand in this workflow — MapToMethod generates it for you from the API calls below.
 
 ---
 
 ## Prerequisites
 
 - A CSVW JSON-LD document at a **publicly accessible URL**
-- A pattern (template graph) in Turtle at a **publicly accessible URL**
+- A pattern (template graph) in Turtle format at a **publicly accessible URL**
 - `curl` installed (or use the [interactive API docs](https://maptomethod.matolab.org/api/docs))
 
 !!! note "Local or intranet URLs"
     MapToMethod and RDFConverter fetch both documents directly over HTTP. Files on your laptop or an internal network are not reachable. Serve them via a public file host (e.g. GitHub raw, a public S3 bucket, or your institution's web server) before proceeding.
+
+!!! info "What is Turtle?"
+    Turtle (`.ttl`) is a compact text format for writing RDF triples, similar to how JSON is a format for structured data. Ontology patterns are distributed as Turtle files because the format is human-readable and widely supported.
 
 ---
 
@@ -44,11 +71,15 @@ id;length [mm]
 
 CSVToCSVW already processed it and produced the CSVW JSON-LD. The metadata file encodes each column with its IRI and QUDT unit annotation — this is what MapToMethod reads.
 
+The ontology pattern (`LengthMeasurement.ttl`) is a reusable template graph: a small RDF document that describes how a length measurement *should* look in semantic terms — what entities exist, what their types are, and how they relate to each other. The mapping you author will wire your CSV columns into that template.
+
 ---
 
 ## Step 1 — Understand what types your CSVW exposes
 
-`GET /api/types` returns every unique `rdf:type` IRI present in the document. Run it against the CSVW:
+`GET /api/types` returns every unique type IRI present in the document. In RDF, every entity has a type — its class — and the type is just another IRI. Think of it as the `__class__` of each node in the graph.
+
+Run it against the CSVW:
 
 ```bash
 curl "https://maptomethod.matolab.org/api/types?url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json"
@@ -66,7 +97,7 @@ curl "https://maptomethod.matolab.org/api/types?url=https://raw.githubuserconten
 ]
 ```
 
-`csvw#Column` is what you want to map from — those are the data column entities.
+`csvw#Column` is what you want to map from — those are the data column entities. (The `csvw#` prefix is shorthand for the CSVW vocabulary IRI `http://www.w3.org/ns/csvw#`.)
 
 Now run the same call against the template pattern:
 
@@ -89,13 +120,13 @@ curl "https://maptomethod.matolab.org/api/types?url=https://github.com/Mat-O-Lab
 ]
 ```
 
-`owl:NamedIndividual` — the named individuals in the pattern are the entities you map *to*.
+`owl:NamedIndividual` entries are what you map *to*. A **named individual** in an ontology pattern is a specific, uniquely named entity — like a singleton object in a config file that represents a concept (e.g. `LengthData`). These are the target "slots" in the template that your CSV columns will fill.
 
 ---
 
 ## Step 2 — List the data entities (columns)
 
-`GET /api/entities` returns a dict of named entities by type. By default it queries for `oa:Annotation` and `csvw:Column`.
+`GET /api/entities` returns a dict of named entities grouped by type. By default it queries for `oa:Annotation` and `csvw:Column` — the two entity types that typically represent mappable data columns.
 
 ```bash
 curl "https://maptomethod.matolab.org/api/entities?url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json"
@@ -131,25 +162,29 @@ curl "https://maptomethod.matolab.org/api/entities?url=https://raw.githubusercon
 
 Three columns: `GID` (row identifier, suppress output), `Unnamed0` (row index), and **`table-1-LengthMm`** — the measurement column we want to map.
 
-The key to use in the `map` dict is the entity name: **`table-1-LengthMm`**.
+The key to use in the `map` dict is the entity name: **`table-1-LengthMm`**. The `uri` field is the full IRI for that column — its globally unique identity in the graph.
 
 ---
 
 ## Step 3 — List the template entities
 
-Run `/api/entities` on the pattern with `owl:NamedIndividual` as the type filter to see what named individuals the template exposes:
+Run `/api/entities` on the pattern with `owl:NamedIndividual` as the type filter to see which named slots the template exposes:
 
 ```bash
 curl "https://maptomethod.matolab.org/api/entities?url=https://github.com/Mat-O-Lab/IOFMaterialsTutorial/raw/main/LengthMeasurement.ttl&types=http://www.w3.org/2002/07/owl%23NamedIndividual"
 ```
 
-The template defines a `Specimen` with a `SpecimenLength` quality connected to a `LengthMeasurementProcess`. The named individual for the length data output is `LengthData` — this is the entity IRI the mapping will link to.
+The template defines a `Specimen` with a `SpecimenLength` quality connected to a `LengthMeasurementProcess`. The named individual for the length data output is `LengthData` — this is the IRI the mapping will link your column to.
+
+In other words: after the mapping runs, every row in your CSV will produce a triple connecting that row's column IRI to the `LengthData` concept defined in the ontology pattern.
 
 ---
 
 ## Step 4 — Build the `map` dict
 
-The `map` dict pairs each data column name to the IRI of the template individual it should map to. For the length measurement example:
+The `map` dict pairs each data column name to the IRI of the template slot it should fill. This is the core of the mapping: "column X in my CSV corresponds to concept Y in the ontology pattern."
+
+For the length measurement example:
 
 ```json
 {
@@ -167,7 +202,9 @@ The `map` dict pairs each data column name to the IRI of the template individual
 
 ## Step 5 — Generate the YARRRML mapping
 
-`POST /api/mapping` with the full request body:
+Recall from the background section: YARRRML is a YAML recipe that tells RDFConverter how to convert each CSV column into an RDF statement. You do not write it by hand — `POST /api/mapping` generates it from your `map` dict.
+
+The `predicate` field in the request body is the **relationship IRI** — the middle part of the triple (`subject — predicate — object`). It specifies *how* the column connects to the template individual (e.g. "is a resource of", "measures", "is part of"). In this example, `RO_0010002` (`isResourceOf` from the BFO relations ontology) means "this column data is a resource of the LengthData process output."
 
 ```bash
 curl -X POST "https://maptomethod.matolab.org/api/mapping" \
@@ -212,6 +249,8 @@ mappings:
       - ['http://purl.obolibrary.org/obo/RO_0010002', 'template:LengthData~iri']
 ```
 
+Reading this like a Jinja template: for each column object in the JSON where `name == "table-1-LengthMm"`, emit one triple: `<column IRI>  isResourceOf  <template:LengthData>`. The `po:` block is the predicate-object pair — the last two thirds of the triple.
+
 For the full [YARRRML specification](https://rml.io/yarrrml/spec/), and to create or edit mappings interactively, use the [Matey online editor](https://rml.io/yarrrml/matey/). The [YARRRML tutorial](https://rml.io/yarrrml/tutorial/) covers source types, iterators, and condition functions.
 
 ---
@@ -236,7 +275,7 @@ curl -X POST "https://rdfconverter.matolab.org/api/checkmapping" \
 }
 ```
 
-`rules_skipped == 0` is the quality gate. Every rule found a matching column. If `rules_skipped > 0`, see [Troubleshooting](#troubleshooting) below.
+`rules_skipped == 0` is the quality gate. Every mapping rule found a matching column in the data. If `rules_skipped > 0`, at least one column name in the `map` dict did not match any column in the CSVW — see [Troubleshooting](#troubleshooting) below.
 
 ---
 
@@ -251,7 +290,7 @@ curl -X POST "https://rdfconverter.matolab.org/api/test" \
   --data-urlencode "data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json"
 ```
 
-The response includes `triple_count`, per-rule statistics, and a preview of the first triples produced. You should see one triple per measurement row linking the column IRI to `template:LengthData`.
+The response includes a `triple_count` (how many RDF statements were produced), per-rule statistics, and a preview of the first statements produced. You should see one triple per measurement row linking the column IRI to `template:LengthData`.
 
 ---
 
@@ -282,7 +321,7 @@ The resulting Turtle (from the real IOFMaterialsTutorial run):
     prov:wasDerivedFrom <…/measurements-metadata.json> .
 ```
 
-Each measurement column is now linked to the `LengthData` individual in the IOF pattern graph via the `iof:isResourceOf` relation (BFO `RO_0010002`).
+Reading this as plain English: the `table-1-LengthMm` column entity **is a resource of** the `LengthData` concept in the IOF pattern, and it **was derived from** the CSVW metadata file. Two triples — each with a subject (the column IRI), a predicate (the relationship), and an object (the target IRI). This is what the mapping produced.
 
 ---
 
@@ -310,7 +349,7 @@ These are complete, working pipeline outputs you can inspect directly:
 
 ## Troubleshooting {#troubleshooting}
 
-`rules_skipped > 0` means one or more conditions in the mapping did not find a match in the data.
+`rules_skipped > 0` means one or more conditions in the mapping did not find a match in the data. In YARRRML terms: the `equal` condition in the mapping rule compared the column name against a string and found no row where they matched.
 
 **Step 1 — compare entity names exactly**
 

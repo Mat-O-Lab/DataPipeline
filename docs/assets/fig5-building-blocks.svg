@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 520" font-family="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif">
+  <defs>    <marker id="arr" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+    <filter id="sh" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.145"/></filter>
+      <polygon points="0,0 10,4 0,8" fill="#adb5bd"/>
+    </marker>
+    <marker id="arr-ai" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0,0 10,4 0,8" fill="#7a9a00"/>
+    </marker>
+    <marker id="arr-fb" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0,0 9,3.5 0,7" fill="#4a8fa8"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="860" height="520" fill="#f0f4f7" rx="12"/>
+
+  <!-- Title — centered over content area (x=122 to x=840, center=481) -->
+  <text x="481" y="32" text-anchor="middle" font-size="17" font-weight="700" fill="#005b7f">Building Block Dependency Graph</text>
+  <text x="481" y="50" text-anchor="middle" font-size="12" fill="#6c757d">Deploy in order — each block unlocks the next · AI integration available from Block 1</text>
+
+  <!-- ===== TIER BACKGROUND BANDS ===== -->
+  <rect x="120" y="56"  width="722" height="68"  rx="8" fill="#64788c" opacity="0.06"/>
+  <rect x="120" y="128" width="722" height="72"  rx="8" fill="#005b7f" opacity="0.07"/>
+  <rect x="120" y="204" width="722" height="70"  rx="8" fill="#005b7f" opacity="0.04"/>
+  <rect x="120" y="278" width="722" height="72"  rx="8" fill="#179c7d" opacity="0.05"/>
+  <rect x="120" y="354" width="722" height="82"  rx="8" fill="#b2d235" opacity="0.09"/>
+
+  <!-- ===== TIER LABELS (left side) ===== -->
+  <text x="14" y="93"  font-size="9" font-weight="700" fill="#a6bbc8" letter-spacing="1">ORIGIN</text>
+  <text x="14" y="166" font-size="9" font-weight="700" fill="#a6bbc8" letter-spacing="1">STANDARDISE</text>
+  <text x="14" y="241" font-size="9" font-weight="700" fill="#a6bbc8" letter-spacing="1">PUBLISH</text>
+  <text x="14" y="316" font-size="9" font-weight="700" fill="#a6bbc8" letter-spacing="1">PARTICIPATE</text>
+  <text x="14" y="397" font-size="9" font-weight="700" fill="#a6bbc8" letter-spacing="1">OPTIMISE</text>
+
+  <!-- ===== BASE LAYER (ORIGIN) ===== -->
+  <rect x="122" y="62" width="718" height="54" rx="8" fill="#dde8f0" stroke="#adb5bd" stroke-width="1"/>
+  <text x="481" y="80" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3d5a70">Experimental characterization · Computational simulation · Manufacturing &amp; processing</text>
+  <text x="481" y="96" text-anchor="middle" font-size="10" fill="#4a6070">Quality assurance · Lifecycle assessment · Technical documents · Data science</text>
+  <text x="481" y="110" text-anchor="middle" font-size="9" fill="#7a90a0" font-style="italic">Raw data origin — feeds Blocks 1 and 2</text>
+
+  <!-- Fan arrows: base → Block 1 (left), base → Block 2 (right) -->
+  <path d="M 286,116 L 286,134" fill="none" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M 675,116 L 675,134" fill="none" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ===== BLOCK 1 — Semantic Vocabulary ===== -->
+  <rect x="122" y="134" width="329" height="56" rx="10" fill="#005b7f" filter="url(#sh)"/>
+  <text x="286" y="157" text-anchor="middle" font-size="13" font-weight="700" fill="white">1 · Semantic Vocabulary</text>
+  <text x="286" y="174" text-anchor="middle" font-size="10" fill="#ffffff" opacity="0.7">BFO · <tspan font-weight="700" fill="white">PMDCO</tspan> · IOF · domain ontologies</text>
+
+  <!-- ===== BLOCK 2 — Reproducible Data Generation ===== -->
+  <rect x="511" y="134" width="329" height="56" rx="10" fill="#005b7f" filter="url(#sh)"/>
+  <rect x="516" y="139" width="319" height="46" rx="7" fill="none" stroke-width="1" stroke="#ffffff" stroke-opacity="0.15"/>
+  <text x="675" y="157" text-anchor="middle" font-size="13" font-weight="700" fill="white">2 · Reproducible Data Generation</text>
+  <text x="675" y="174" text-anchor="middle" font-size="10" fill="#ffffff" opacity="0.7">Pyiron · SimStack · <tspan font-weight="700" fill="white">Semantikon</tspan> · WfMS</text>
+
+  <!-- Arrow: ORIGIN → Block 3 (documents / records feed directly into linked data layer) -->
+  <path d="M 481,116 L 481,210" fill="none" stroke="#bfccd4" stroke-width="1.3" marker-end="url(#arr)"/>
+
+  <!-- Feedback arrow: Block 2 → Block 1 (Semantikon vocab annotations inform vocabulary needs) -->
+  <path d="M 511,162 C 511,138 451,138 451,162" fill="none" stroke="#4a8fa8" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arr-fb)"/>
+  <text x="467" y="130" text-anchor="middle" font-size="8" fill="#4a8fa8" font-style="italic">vocab feedback</text>
+
+  <!-- Converging arrows: Block 1 → Block 3 (arrives at left third), Block 2 → Block 3 (arrives at right third) -->
+  <path d="M 286,190 L 286,200 L 350,200 L 350,210" fill="none" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M 675,190 L 675,200 L 612,200 L 612,210" fill="none" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ===== BLOCK 3 — Linked Data Foundation (hub) ===== -->
+  <rect x="122" y="210" width="718" height="56" rx="10" fill="#005b7f" filter="url(#sh)"/>
+  <rect x="127" y="215" width="708" height="46" rx="7" fill="none" stroke-width="1" stroke="#ffffff" stroke-opacity="0.15"/>
+  <text x="481" y="233" text-anchor="middle" font-size="13" font-weight="700" fill="white">3 · Linked Data Foundation</text>
+  <text x="481" y="250" text-anchor="middle" font-size="10" fill="#ffffff" opacity="0.7">DataPortal · doc linking · Workflow Store · SPARQL · semantic layer</text>
+
+  <!-- Fan arrows: Block 3 → Block 4 (departs left third), Block 3 → Block 5 (departs right third) -->
+  <path d="M 350,266 L 350,274 L 286,274 L 286,284" fill="none" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M 612,266 L 612,274 L 675,274 L 675,284" fill="none" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ===== BLOCK 4 — Dataspace Participation ===== -->
+  <rect x="122" y="284" width="329" height="56" rx="10" fill="#179C7d" filter="url(#sh)"/>
+  <text x="286" y="307" text-anchor="middle" font-size="12" font-weight="700" fill="white">4 · Dataspace Participation</text>
+  <text x="286" y="324" text-anchor="middle" font-size="10" fill="#ffffff" opacity="0.72">AAS · Eclipse EDC · Gaia-X · VC</text>
+
+  <!-- ===== BLOCK 5 — DPP Compliance ===== -->
+  <rect x="511" y="284" width="329" height="56" rx="10" fill="#f58220" filter="url(#sh)"/>
+  <text x="675" y="307" text-anchor="middle" font-size="12" font-weight="700" fill="white">5 · DPP Compliance</text>
+  <text x="675" y="324" text-anchor="middle" font-size="10" fill="#ffffff" opacity="0.8">JSON-LD · GS1 Digital Link · Feb 2027</text>
+
+  <!-- Converging arrows: Block 4 → Block 6 (arrives at left third), Block 5 → Block 6 (arrives at right third) -->
+  <path d="M 286,340 L 286,350 L 350,350 L 350,360" fill="none" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M 675,340 L 675,350 L 612,350 L 612,360" fill="none" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ===== BLOCK 6 — AI-Enabled Operations ===== -->
+  <rect x="122" y="360" width="718" height="68" rx="10" fill="#b2d235" filter="url(#sh)"/>
+  <text x="481" y="384" text-anchor="middle" font-size="13" font-weight="700" fill="#2d3c00">6 · AI-Enabled Operations</text>
+  <text x="481" y="401" text-anchor="middle" font-size="10" fill="#5a7600">Tier 1: now  ·  Tier 2: 1–2 yrs</text>
+  <text x="481" y="416" text-anchor="middle" font-size="9" fill="#5a7600">LLM grounding · Semantic search · Graph reasoning</text>
+
+  <!-- ===== AI FAST-PATH ARROWS (dashed, run outside the stack) ===== -->
+  <!-- Tier 1: Block 1 → Block 6 (left outer arc) -->
+  <path d="M 122,162 C 56,162 56,394 122,394" fill="none" stroke="#7a9a00" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arr-ai)" opacity="0.85"/>
+  <text x="62" y="274" text-anchor="middle" font-size="8" fill="#7a9a00" font-style="italic">AI Tier 1</text>
+  <text x="62" y="286" text-anchor="middle" font-size="8" fill="#7a9a00" font-style="italic">immediate</text>
+
+  <!-- Tier 2: Block 3 → Block 6 (right outer arc) -->
+  <path d="M 840,238 C 858,238 858,394 840,394" fill="none" stroke="#7a9a00" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#arr-ai)" opacity="0.65"/>
+  <text x="853" y="316" text-anchor="middle" font-size="8" fill="#7a9a00" font-style="italic">AI Tier 2</text>
+  <text x="853" y="328" text-anchor="middle" font-size="8" fill="#7a9a00" font-style="italic">1–2 yrs</text>
+
+  <!-- ===== LEGEND — Row 1: Arrow types ===== -->
+  <text x="128" y="450" font-size="9" font-weight="700" fill="#8c9aaa" letter-spacing="0.5">ARROWS</text>
+  <line x1="190" y1="447" x2="216" y2="447" stroke="#adb5bd" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="222" y="451" font-size="10" fill="#495057">requires / unlocks next block</text>
+  <line x1="436" y1="447" x2="462" y2="447" stroke="#7a9a00" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-ai)"/>
+  <text x="468" y="451" font-size="10" fill="#495057">AI fast-path (bypasses full stack)</text>
+  <line x1="672" y1="447" x2="698" y2="447" stroke="#4a8fa8" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arr-fb)"/>
+  <text x="704" y="451" font-size="10" fill="#495057">vocab feedback</text>
+
+  <!-- ===== LEGEND — Row 2: Block categories ===== -->
+  <text x="128" y="472" font-size="9" font-weight="700" fill="#8c9aaa" letter-spacing="0.5">BLOCKS</text>
+  <rect x="188" y="462" width="12" height="12" rx="2" fill="#005b7f"/>
+  <text x="206" y="473" font-size="10" fill="#495057">Semantic foundation</text>
+  <rect x="356" y="462" width="12" height="12" rx="2" fill="#179C7d"/>
+  <text x="374" y="473" font-size="10" fill="#495057">Dataspace</text>
+  <rect x="456" y="462" width="12" height="12" rx="2" fill="#f58220"/>
+  <text x="474" y="473" font-size="10" fill="#495057">Compliance</text>
+  <rect x="564" y="462" width="12" height="12" rx="2" fill="#b2d235"/>
+  <text x="582" y="473" font-size="10" fill="#495057">Intelligence</text>
+  <rect x="658" y="462" width="12" height="12" rx="2" fill="#dde8f0" stroke="#adb5bd" stroke-width="1"/>
+  <text x="676" y="473" font-size="10" fill="#495057">Data origin</text>
+
+  <!-- Footer -->
+  <text x="481" y="498" text-anchor="middle" font-size="11" fill="#6c757d">Tier 1 AI accelerates from Block 1 immediately · Tier 2 AI unlocks as linked data layer matures (Block 3+)</text>
+</svg>

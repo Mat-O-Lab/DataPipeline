@@ -4,173 +4,152 @@ title: Add a Use Case
 
 # Add a Use Case
 
-Extend the DataStack pipeline for a new data domain. Two independent dimensions to adapt: the **source type** (what data you bring in) and the **target ontology** (what knowledge graph you produce).
+The DataStack pipeline is built around a concept called a **use case**: a specific combination of _where your data comes from_ and _what scientific concepts your data describes_. When you bring a new type of experiment or measurement into the pipeline, you are adding a use case.
+
+Your data describes a tensile test — but the pipeline needs to know what "yield strength" means in a way any computer can understand. A **mapping file** is the bridge. This guide explains how to extend the pipeline for a new data source or a new kind of measurement, and where to go for each step.
 
 ---
 
-## Decision tree
+## Two questions that define your use case
+
+Every new use case comes down to two independent questions:
+
+1. **Where does the data come from?** — which instrument, software, or system produces it?
+2. **What does the data describe?** — which scientific concepts (test types, measured properties, material classes) should the pipeline capture?
+
+You can answer these questions independently and combine the results later. Most new use cases involve both.
+
+---
+
+## Decision map
 
 ```mermaid
 flowchart TD
-    UC[New use case] --> SA[Path A: new source type]
-    UC --> SB[Path B: new target ontology]
+    UC[New use case] --> SA[Path A: new data source]
+    UC --> SB[Path B: new measurement type or ontology]
 
-    SA --> SA1[Option 1 — deploy existing extractor]
-    SA --> SA2[Option 2 — extend existing extractor]
-    SA --> SA3[Option 3 — write new FastAPI service]
-    SA --> SA4[Option 4 — use RDFConverter direct]
+    SA --> SA1[Option 1 — use an existing connector]
+    SA --> SA2[Option 2 — adapt an existing connector]
+    SA --> SA3[Option 3 — build a new connector service]
+    SA --> SA4[Option 4 — map structured data directly]
 
-    SA1 --> JSONLD[Extractor produces JSON-LD ✓]
-    SA2 --> JSONLD
-    SA3 --> JSONLD
-    SA4 --> JSONLD
+    SA1 --> OUT1[Pipeline reads your data ✓]
+    SA2 --> OUT1
+    SA3 --> OUT1
+    SA4 --> OUT1
 
-    JSONLD --> CHAIN[ckanext-csvwmapandtransform picks up JSON-LD\nand applies standard mapping → transform chain]
+    SB --> SB1[Design the concept pattern in OntosphereIO]
+    SB1 --> SB2[Generate mapping rules with MapToMethod]
+    SB2 --> SB3[Your data engineer authors the mapping file]
 
-    SB --> SB1[Design pattern in OntosphereIO]
-    SB1 --> SB2[MapToMethod generates YARRRML mapping]
-    SB2 --> CHAIN
+    OUT1 --> CHAIN[Pipeline applies mapping → produces linked data]
+    SB3 --> CHAIN
 
-    CHAIN --> OUT[Joined Turtle in CKAN dataset]
+    CHAIN --> OUT[Your data appears in CKAN as FAIR-linked records]
 ```
-
-Most new use cases involve both dimensions — a new instrument format and a new ontology structure. They can be worked on independently and combined at the end.
 
 ---
 
-## Path A — New Source Type
+## Path A — New data source
 
-The pipeline accepts anything that produces JSON-LD or RDF. Four options are available depending on the situation:
+The pipeline needs to read your raw files and convert them into a form it can work with. This conversion step is handled by a **connector** (sometimes called an extractor). If a connector already exists for your instrument or software, you do not need to write any code.
 
-**Option 1: Deploy an existing extractor**
+### Option 1: Use an existing connector
 
-If a Mat-O-Lab extractor already handles your instrument or data source, deploy it as a sidecar service and register its CKAN plugin.
+Check whether a connector already exists for your data source:
 
-| Data source | Extractor | Status |
+| Data source | Connector | Status |
 |---|---|---|
-| CSV / ASC / TSV | CSVToCSVW (included in DataStack) | Production |
+| CSV, ASC, TSV files (from most instruments) | CSVToCSVW — included in DataStack | Production |
 | OMERO microscopy server | [OmeroExtractor](https://github.com/Mat-O-Lab/OmeroExtractor) | Early stage |
-| OpenBIS ELN/LIMS | [OpenBISmantic](https://github.com/Mat-O-Lab/OpenBISmantic) | Demonstrator |
+| OpenBIS electronic lab notebook / LIMS | [OpenBISmantic](https://github.com/Mat-O-Lab/OpenBISmantic) | Demonstrator |
 
-Deploy the extractor service separately and add the respective `ckanext-*` plugin name to `CKAN__PLUGINS` in `.env`.
+If your data source is on this list, ask your data engineer or system administrator to enable the connector. You do not need to do anything in the pipeline itself — once the connector is active, your files will be processed automatically when you upload them to CKAN.
 
----
+### Option 2: Adapt an existing connector
 
-**Option 2: Extend an existing extractor**
+If your instrument is _similar_ to one on the list above — for example, a different version of OMERO or an OpenBIS instance with a custom schema — a data engineer can adapt the existing connector rather than building a new one. Share a sample file and a description of your instrument's export format with your data engineer.
 
-If your data source is structurally similar to one of the above (e.g. a different OMERO version or a different OpenBIS schema), fork the existing extractor repo, adjust the parsing logic, and rebuild the Docker image. The external API contract the extractor must honour is:
+### Option 3: Build a new connector service
 
-- Accept a source URL (or file upload) as input
-- Return JSON-LD at a publicly accessible URL
+For an entirely new instrument or software system with no existing connector, a developer can build a dedicated conversion service. The only requirement is that the service reads your raw files and converts them to a standard linked-data format. Once it does that, the rest of the pipeline works unchanged.
 
-No changes to CKAN extensions or the rest of the pipeline are needed.
+Share example output files from your instrument and a description of the measurement fields they contain. A developer or data engineer will handle the implementation.
 
----
+### Option 4: Map structured data directly
 
-**Option 3: Write a new FastAPI service**
+If your data is already in a well-structured format — such as JSON or XML with clearly named fields — it may be possible to write a mapping file that reads it directly, without a separate connector step.
 
-For entirely new instrument types, implement a FastAPI service that converts the raw file format to JSON-LD. Minimal interface:
-
-```python
-# Minimal contract: GET /api/convert?url=<source_url> → JSON-LD response
-@app.get("/api/convert")
-def convert(url: str) -> dict:
-    # parse raw data at `url`, return as JSON-LD
-    ...
-```
-
-Once the service returns JSON-LD, `ckanext-csvwmapandtransform` picks it up automatically — the rest of the pipeline is unchanged. Add a CKAN extension that calls your service `after_resource_create` (follow the same pattern as `ckanext-csvtocsvw`).
+In this case, the data engineer authors a mapping file that points to your JSON or XML source. See [Author a Mapping](author-a-mapping.md) for what that process looks like.
 
 ---
 
-**Option 4: Use RDFConverter direct (no extractor step)**
+## Path B — New measurement type or target ontology
 
-If the source is already JSON or XML, write a YARRRML mapping that reads it directly using a JSONPath or XPath iterator. No extractor service is needed.
+Even if the pipeline can already read your files (Path A is covered), it may not yet _understand_ what your data means scientifically. Teaching the pipeline what "yield strength" or "crystallite size" means requires two things: a **concept pattern** and a **mapping file**.
 
-```yaml
-# YARRRML mapping reading from a JSON source with a JSONPath iterator
-mappings:
-  MaterialData:
-    sources:
-      - ["https://example.org/data.json~jsonpath", "$.measurements[*]"]
-    subjects: "ex:measurement_$(id)"
-    predicates-objects:
-      - predicates: pmdco:hasValue
-        objects: "$(tensile_strength)"
-```
+**What is a concept pattern?**
+A concept pattern is a small formal description of how the scientific concepts in your data relate to each other — for example, that a tensile test produces a specimen, that a specimen has a measured yield strength, and that yield strength is expressed in megapascals. The pattern is not about your specific CSV file; it is about the structure of the measurement type itself.
 
-Upload this mapping to the CKAN `mappings` group and add `json` to `CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__FORMATS` so the extension processes JSON resources. See the [YARRRML tutorial](https://rml.io/yarrrml/tutorial/) for iterator syntax.
+**What is a mapping file?**
+A mapping file connects the column names in your CSV to the concepts in the pattern. It tells the pipeline: "the column labelled `ys_MPa` in this file represents yield strength of the specimen described in column `sample_id`."
 
----
+You do not write either of these yourself. Here is how the process works:
 
-## Path B — New Target Ontology
+### Step 1: Describe your measurement to your data engineer
 
-The target ontology lives entirely in the YARRRML mapping and the pattern (template graph). The pipeline infrastructure is never touched.
+Give your data engineer a sample CSV and a plain-language description of what each column means — in the vocabulary you use in the lab. For example:
 
-**Step 1: Design a pattern in OntosphereIO**
+> "Column A is the specimen ID. Column B is maximum force in Newtons. Column C is yield strength in MPa. The test is a DIN EN ISO 6892-1 tensile test."
 
-[OntosphereIO](https://github.com/ThHanke/ontosphere) is the recommended pattern authoring tool — browser-based, AI-assisted, full OWL2DL reasoning and PMDCO autoshapes (SHACL). The [PMDCO pattern library](https://github.com/materialdigital/core-ontology/tree/main/patterns/) has reusable reference patterns.
+This description, not the CSV itself, is the starting point for building the pattern.
 
-Patterns are Turtle RDF files. A minimal pattern defines:
+### Step 2: Pattern design in OntosphereIO
 
-- The target ontology class (e.g., `pmdco:TensileTestResult`)
-- Named individuals for each measured property
-- QUDT unit annotations where applicable
+Your data engineer or ontology specialist will use [OntosphereIO](https://github.com/ThHanke/ontosphere) — a browser-based tool — to draw the concept structure for your measurement type. The [PMDCO pattern library](https://github.com/materialdigital/core-ontology/tree/main/patterns/) contains reference patterns for common materials science measurements that can be reused or extended.
 
-**Step 2: Generate a YARRRML mapping with MapToMethod**
+You may be asked to review the pattern to confirm it correctly represents the scientific concepts in your data.
 
-Use MapToMethod with your CSVW JSON-LD and new pattern Turtle — it generates the YARRRML rules automatically. See [Author a Mapping](author-a-mapping.md) for the step-by-step workflow.
+### Step 3: Mapping file authoring
 
-**Step 3: Choose the right transformation path**
+Once the pattern is in place, a data engineer will author the mapping file that connects your CSV columns to the concept pattern. The mapping file is the technical artifact that drives the transformation.
 
-| Situation | Transformation path |
-|---|---|
-| Source data maps directly to target ontology | YARRRML/RML (direct) — default for CSV |
-| Source has its own ontology (e.g. SAMM/Catena-X) that differs structurally from target | YARRRML/RML → intermediate Fuseki graph → SPARQL CONSTRUCT |
+**This step is handled by your data engineer — see [Author a Mapping](author-a-mapping.md) for the full workflow.** You do not need to understand the mapping syntax to participate in this step, but your data engineer will need your domain expertise to get the column meanings right.
 
-Use SPARQL CONSTRUCT only when the intermediate ontology is complex enough that mapping rules alone cannot bridge the gap. It requires authoring a SPARQL CONSTRUCT query stored as a CKAN resource. See [SAMM / Catena-X two-stage pipeline](../pipeline/advanced/samm-catena-x.md) for a worked example.
+### Choosing the right transformation approach
+
+Most measurements map directly from CSV columns to concept patterns. For more complex cases — such as data that already arrives with its own ontology structure (for example, data from Catena-X or SAMM-based systems) — a two-stage approach is used where the data is first converted to an intermediate form, then aligned to the target concepts. Your data engineer will advise which approach fits your data source. See [SAMM / Catena-X two-stage pipeline](../pipeline/advanced/samm-catena-x.md) for an example.
 
 ---
 
-## Configuration changes
+## What your data engineer will configure
 
-Each path requires different configuration keys. Use this table to identify what to set in your `.env`:
+Each new use case typically requires a small number of configuration changes to the running DataStack instance. Your data engineer or operator will handle these. The table below lists the common changes so you can have an informed conversation:
 
-| Path | Config key (`CKANINI__` prefix) | What to change | Default |
-|---|---|---|---|
-| Path A (new source type, Option 1–3) | `CKAN__PLUGINS` | Add the new extractor plugin name | (core plugins only) |
-| Path A (any option) | `CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__FORMATS` | Add the extractor's output format if not already listed (e.g. `json json-ld`) | `json json-ld turtle n3 nt hext trig longturtle xml ld+json` |
-| Path A (Option 4, CSV/ASC sources) | `CKANINI__CKANEXT__CSVTOCSVW__FORMATS` | Add the new source file extension | (csv, asc, tsv) |
-| Both paths (development) | `CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__MAPPING_STRATEGY` | Set to `best_match` while iterating — switch to `exact` for production | `exact` |
+| What changes | When it is needed | Who makes the change |
+|---|---|---|
+| Enable a new connector plugin | When adding an extractor for a new data source (Option 1–3) | Operator / data engineer |
+| Register a new file type with the pipeline | When the pipeline should process a new file extension | Operator / data engineer |
+| Switch matching strategy to `best_match` during development | While iterating on a new mapping before it is finalised | Data engineer |
+| Switch matching strategy back to `exact` for production | When the mapping is complete and validated | Data engineer |
 
-Configuration snippet for enabling a new extractor plugin and a new format:
-
-```bash
-# .env
-CKAN__PLUGINS=... ckanext_myextractor
-CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__FORMATS=json json-ld turtle n3 nt hext trig longturtle xml ld+json myformat
-CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__MAPPING_STRATEGY=best_match
-```
-
-Switch `MAPPING_STRATEGY` back to `exact` once `rules_skipped == 0` for all your mappings.
-
-See [Configuration Reference](../reference/configuration.md) for all keys and their `CKANINI__` env forms.
+If you are a data engineer or operator making these changes yourself, see the [Configuration Reference](../reference/configuration.md) for the exact environment variable names and values.
 
 ---
 
 ## Done checklist
 
-When extending the pipeline for a new use case, verify all three before declaring it complete:
+A new use case is complete when these three things are true:
 
-- [ ] **Extractor produces JSON-LD** — call the extractor service directly and confirm the response is valid JSON-LD with an `@context` block.
-- [ ] **`rules_skipped == 0`** — run `/api/checkmapping` against your CSVW and mapping; both `rules_applicable > 0` and `rules_skipped == 0` must hold.
-- [ ] **Joined Turtle visible in CKAN** — upload a test CSV to CKAN and confirm a `*-joined.ttl` resource appears in the same dataset within a few seconds (background job execution time).
+- [ ] **The pipeline reads your files** — upload a sample file to CKAN and confirm the pipeline processes it without errors.
+- [ ] **The mapping covers all fields** — your data engineer confirms the mapping has no skipped rules; every column you care about is represented.
+- [ ] **Linked data appears in CKAN** — after uploading a test file, a linked-data record (shown as a `.ttl` resource) appears in the same CKAN dataset within a few seconds.
 
 ---
 
 ## Next steps
 
-- **Author a mapping for your new pattern:** [Author a Mapping](author-a-mapping.md)
-- **Two-stage SPARQL CONSTRUCT pipeline:** [SAMM / Catena-X](../pipeline/advanced/samm-catena-x.md)
+- **Author a mapping for your measurement type:** [Author a Mapping](author-a-mapping.md)
+- **Two-stage pipeline for data with its own ontology structure:** [SAMM / Catena-X](../pipeline/advanced/samm-catena-x.md)
 - **Use the microservices without CKAN:** [Standalone APIs](standalone-apis.md)
 - **Reference all configuration keys:** [Configuration Reference](../reference/configuration.md)

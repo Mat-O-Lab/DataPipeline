@@ -68,6 +68,7 @@ nav:
   - Pipeline:
     - pipeline/index.md
     - Overview: pipeline/overview.md
+    - Semantic Foundation: pipeline/semantic-foundation.md
     - Default Use Case: pipeline/default-use-case.md
     - Capability Map: pipeline/capability-map.md
     - Advanced:

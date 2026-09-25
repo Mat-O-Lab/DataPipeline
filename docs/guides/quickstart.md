@@ -55,11 +55,14 @@ CKAN_DB_PASSWORD=<strong_password>
 DATASTORE_READONLY_PASSWORD=<strong_password>
 
 # Extension: CSVToCSVW — internal container URL (default is correct for docker compose)
-CKANINI__CKANEXT__CSVTOCSVW__CSVTOCSVW_URL=http://csvtocsvw:5001
+CKANINI__CKANEXT__CSVTOCSVW__CSVTOCSVW_URL=http://csvtocsvw:5000
 
 # Extension: CSVW Map & Transform — internal RDFConverter URL and public MapToMethod URL
-CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__RDFCONVERTER_URL=http://rdfconverter:5003
+CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__RDFCONVERTER_URL=http://rdfconverter:5000
 CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__MAPTOMETHOD_URL=${CKAN_SITE_URL}/maptomethod
+
+# Fuseki — JVM heap (default 10 GB; lower this on machines with less RAM)
+FUSEKI_JAVA_OPTS=-Xmx10g -Xms10g
 
 # Fuseki credentials
 CKANINI__CKANEXT__FUSEKI__PASSWORD=<strong_password>
@@ -166,21 +169,13 @@ Watch the **Resources** tab over the next 60 seconds:
 
 ---
 
-## Step 8 — (Optional) Trigger Fuseki and open SPARQL
+## Step 8 — (Optional) Trigger Fuseki
 
-Fuseki upload is a manual step (auto-sync hooks are commented out by default).
+Fuseki upload is a manual step — auto-sync is disabled by default. In the dataset view, click the **Fuseki** action button and a SPARQL endpoint resource will appear in the dataset.
 
-1. In the dataset view, click the **Fuseki** action button, or call the CKAN API action `fuseki_update`
-2. A SPARQL endpoint resource appears in the dataset
-3. Click the Sparklis link to open the faceted SPARQL UI, or use the built-in YASGUI interface
+For what Fuseki stores and how to query it, see [Semantic Foundation](../pipeline/semantic-foundation.md).
 
-Run a quick sanity query:
-
-```sparql
-SELECT * WHERE { ?s ?p ?o } LIMIT 10
-```
-
-✓ **Verify:** The query returns triples from your dataset in the Sparklis or YASGUI interface.
+✓ **Verify:** A new resource named after your dataset appears in the **Resources** tab with a Sparklis or YASGUI link.
 
 ---
 

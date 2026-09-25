@@ -4,76 +4,69 @@ title: Mat-O-Lab DataStack
 
 # Mat-O-Lab DataStack
 
-> **Create complete, consistent metadata for a non-semantic resource — then use semantic technologies (RML/YARRRML) to transform that further.**
+**DataStack turns your research data files into FAIR-compliant, publishable datasets — without writing any code.**
 
-The Mat-O-Lab DataStack is a production-proven pipeline that turns raw laboratory and industrial data files into FAIR, queryable RDF knowledge graphs — without requiring researchers to write ontology code.
+Upload a CSV, a microscopy export, or a structured data file. The pipeline enriches your data with structured metadata, links it to shared scientific vocabularies, and publishes it to a data portal where it is searchable, downloadable, and citable.
+
+> Create complete, consistent metadata for a non-semantic resource — then use semantic technologies to transform that further.
+
+The result: data that meets FAIR principles (Findable, Accessible, Interoperable, Reusable) by design, not as an afterthought.
 
 ---
 
 ## Where do you want to start?
 
 === "I'm a researcher or data manager"
-    **→ [Pipeline](pipeline/index.md)**
+    **→ [What the pipeline does](pipeline/index.md)**
 
-    Understand what happens to your data, what outputs you get, and how the pipeline handles different resource types.
+    Learn what happens to your data, what outputs you receive, and how to interpret the results. No technical background needed.
 
-=== "I'm a data engineer or DevOps"
-    **→ [Guides](guides/index.md)**
+    For a deeper look at how semantic enrichment works, see [Semantic Foundation](pipeline/semantic-foundation.md).
 
-    Deploy and configure the stack. Create mappings. Use the microservices standalone.
+=== "I need to deploy and run this"
+    **→ [Quickstart](guides/quickstart.md)**
 
-=== "I'm an ontology engineer"
-    **→ [Reference](reference/index.md)**
+    Get the stack running with Docker Compose. Configure data sources and connect your storage backend.
 
-    API contracts, configuration options, and data format specifications.
+=== "I'm connecting data sources or writing mappings"
+    **→ [Author a Mapping](guides/author-a-mapping.md)**
 
-=== "I'm a developer or integrator"
-    **→ [Components](components/index.md)**
+    Learn how to describe your data structure so the pipeline can enrich it automatically.
 
-    Deep-dive into individual services, their repos, images, and integration points.
+=== "I want to use the tools standalone"
+    **→ [Standalone APIs](guides/standalone-apis.md)**
+
+    Run individual pipeline components without deploying the full stack.
 
 ---
 
-## Real-world examples
+## Three domains — one pipeline
 
-Three domains — one pipeline pattern:
+The same pipeline handles different scientific and industrial data formats:
 
-| Domain | Source format | Output | Real example |
+| Domain | Source | What you get | Live example |
 |---|---|---|---|
-| Lab / materials science | CSV measurement file (tensile test, spectroscopy) | PMDco-aligned RDF knowledge graph | [IOFMaterialsTutorial](https://github.com/Mat-O-Lab/IOFMaterialsTutorial) |
-| Microscopy imaging | OMERO server metadata (OME-XML) | OME-ontology RDF, SPARQL-queryable | [BAMresearch DF-TEM-PAW](https://github.com/BAMresearch/DF-TEM-PAW) |
-| Automotive supply chain | SAMM / Catena-X JSON payload | SAMM-aligned RDF, PMDco cross-walk | [futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space) |
+| Lab / materials science | CSV measurement file (tensile test, spectroscopy) | A structured, standards-aligned metadata record — searchable and citable | [IOFMaterialsTutorial](https://github.com/Mat-O-Lab/IOFMaterialsTutorial) |
+| Microscopy imaging | OMERO image archive | Image metadata linked to instrument, acquisition parameters, and sample context | [BAMresearch DF-TEM-PAW](https://github.com/BAMresearch/DF-TEM-PAW) |
+| Automotive supply chain | SAMM / Catena-X product data | Machine-readable records linked to shared automotive industry vocabularies | [futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space) |
 
 ---
 
-## What the pipeline does
+## In production today
 
-The DataStack handles three distinct resource types through one consistent pattern:
+DataStack runs at two public data portals:
 
-| Pipeline step | CSV lab data | OMERO microscopy | SAMM / Catena-X |
-|---|---|---|---|
-| **Metadata creation** | CSVToCSVW annotates CSV with CSVW JSON-LD | OmeroExtractor extracts OME metadata | Flat JSON payload from Catena-X dataspace |
-| **YARRRML mapping** | MapToMethod + OntosphereIO pattern | MapToMethod + OME ontology pattern | YARRRML with JSONPath iterators |
-| **RDF output** | RDFConverter executes RML → knowledge graph | RDFConverter executes RML → knowledge graph | RDFConverter → SAMM-aligned intermediate RDF |
-| **SPARQL endpoint** | Fuseki (auto-loaded via ckanext-fuseki) | Fuseki (auto-loaded via ckanext-fuseki) | Fuseki + SPARQL CONSTRUCT → PMDco graph |
+- **[futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space/)** — 26 Catena-X datasets published with automatically generated semantic metadata
+- **[dataportal.material-digital.de](https://dataportal.material-digital.de/)** — Cross-project materials data, including PA6GF30 / Catena-X use cases
 
-The pipeline is **ontology-agnostic**: the same infrastructure handles materials science (PMDco), automotive supply chains (SAMM/CX), and digital twin metadata (IDTA/AAS).
-
----
-
-## Live instances
-
-The pipeline runs in production at two public portals:
-
-- **[futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space/)** — Future Car Production Materials Data Space (26 Catena-X SAMM mapping datasets)
-- **[dataportal.material-digital.de](https://dataportal.material-digital.de/)** — Material Digital Data Portal (cross-project use case, PA6GF30 / Catena-X → PMDco)
-
----
-
-## Publication
-
-The microscopy pipeline path is described in a peer-reviewed paper:
+The microscopy pipeline path is described in a peer-reviewed publication:
 
 > Hanke et al. (2023). *FAIR microscopy data via the Mat-O-Lab pipeline.*
-> Scientific Data (Nature).
-> [doi:10.1038/s41597-023-02244-6](https://doi.org/10.1038/s41597-023-02244-6)
+> Scientific Data (Nature). [doi:10.1038/s41597-023-02244-6](https://doi.org/10.1038/s41597-023-02244-6)
+
+---
+
+## Ready to explore?
+
+- **For researchers and data managers:** [Read how the pipeline works →](pipeline/index.md)
+- **For data engineers and operators:** [Follow the quickstart →](guides/quickstart.md)

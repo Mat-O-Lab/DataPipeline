@@ -8,9 +8,21 @@ title: Default Use Case — CSV Lab Data
 
 ---
 
+## Where this fits
+
+This page describes the **core transformation path** in Block 2 — Semantic Data Foundation. DataStack takes a plain CSV file and turns it into a richly described, machine-readable dataset that meets FAIR data principles — without you writing any code.
+
+If you are new to what "semantic" or "linked data" means and why it matters, start with [Semantic Foundation](semantic-foundation.md) first. This page focuses on what happens step by step, and what you end up with.
+
+---
+
 ## Pipeline Overview
 
-The DataStack pipeline has three parallel swim lanes. The microservice lane is the semantic core. The data source lane shows the different ingress routes. The CKAN lane shows how CKAN automates the microservice calls and stores every artifact.
+The DataStack pipeline has three parallel lanes working together. The diagram below shows the full picture; the rest of this page walks through the **CSV path** in detail.
+
+- **Data Sources lane** (left): the file types the system can ingest — CSV lab files, microscopy images, database entries
+- **Processing lane** (centre): the automated services that read, annotate, and transform your data
+- **CKAN lane** (right): CKAN orchestrates the services automatically and stores every output as a resource in your dataset
 
 ```mermaid
 graph LR
@@ -62,35 +74,39 @@ graph LR
   ext3 --> Fuseki
 ```
 
-The page below details the **CSV lab data path** — the default and most automated route.
+The rest of this page details the **CSV lab data path** — the default and most automated route.
 
 ---
 
 ## What is the "default use case"?
 
-You have a CSV file from a lab instrument — tensile test results, spectroscopy measurements, material property tables. The file sits on a network drive. The DataStack turns it into a queryable, FAIR knowledge graph.
+You have a CSV file from a lab instrument — tensile test results, spectroscopy measurements, material property tables. The file sits on a network drive. DataStack turns it into a queryable, FAIR dataset that other researchers and systems can understand.
 
-The pipeline runs **automatically** after upload. You do not write any code.
+The pipeline runs **automatically** after upload. You do not write any code. The only step that requires a manual action is loading the final dataset into the query database (Step 7 below), and even that is a single button click.
 
 ---
 
 ## The Automation Chain
 
-Upload your CSV to CKAN and the following happens:
+Upload your CSV to CKAN and the following seven steps happen:
+
+---
 
 **Step 1 — CKAN detects the format**
 
-The file extension (`csv`, `asc`, `tsv`, `txt`) triggers the pipeline automatically. Any other format is ignored.
+The file extension (`.csv`, `.asc`, `.tsv`, `.txt`) tells CKAN to start the pipeline. Any other format is ignored. No configuration is needed on your part.
 
-**Step 2 — CKAN creates a CSVW metadata file**
+---
 
-The CSVToCSVW service reads your CSV and produces a [W3C CSVW](https://www.w3.org/TR/tabular-data-primer/) JSON-LD metadata document. It annotates every column with:
+**Step 2 — CKAN creates a column-description file**
 
-- A [QUDT](https://qudt.org/) unit term (e.g., `unit:MegaPA` for columns named `tensile_strength_MPa`)
-- Provenance via [PROV-O](https://www.w3.org/TR/prov-o/) — recording which service produced the metadata
-- Open Annotation entries for metadata rows above the data table
+A service called CSVToCSVW reads your CSV and produces a companion metadata document. This file — called a **CSVW file** (short for "CSV on the Web", a [W3C standard](https://www.w3.org/TR/tabular-data-primer/)) — annotates every column with:
 
-The new CSVW JSON-LD file appears as an additional resource in your CKAN dataset.
+- **Standard unit labels.** Column names like `tensile_strength_MPa` are matched to internationally recognised measurement unit identifiers from [QUDT](https://qudt.org/) — a public vocabulary of physical quantities and units. This makes the column machine-readable to any system that understands units.
+- **Provenance.** A record of which service produced the file, following the [PROV-O](https://www.w3.org/TR/prov-o/) standard. Think of it as a digital audit trail.
+- **Annotation rows.** Any header rows above your data table are preserved as structured annotations.
+
+The CSVW file appears as a new resource in your CKAN dataset. Here is a simplified excerpt showing how the system labels your columns. You do not need to understand this format — it is produced entirely automatically:
 
 ```json
 {
@@ -114,25 +130,37 @@ The new CSVW JSON-LD file appears as an additional resource in your CKAN dataset
 }
 ```
 
-*The full `sample.csvw.json` example with annotations is in `docs/examples/`.*
+*Each column now carries a machine-readable unit label — `unit:MegaPA` for megapascals, `unit:DEG_C` for degrees Celsius — plus a provenance link recording which service produced the file.*
 
-**Step 3 — The data table becomes queryable**
+---
 
-CKAN imports the CSV rows into the DataStore — the same tabular data is now accessible via CKAN's Data API and the table preview in the browser.
+**Step 3 — The data table becomes browsable**
 
-**Step 4 — CKAN converts CSVW to Turtle**
+CKAN imports the CSV rows into its built-in data store. Your measurements are now accessible through a table preview in the browser — you can sort, filter, and explore the numbers without downloading anything.
 
-The JSON-LD metadata is converted to [Turtle](https://www.w3.org/TR/turtle/) RDF serialization. A second resource appears in the dataset.
+---
 
-**Step 5 — CKAN scans the `mappings` group**
+**Step 4 — CKAN converts the column-description file to linked-data format**
 
-CKAN searches its `mappings` group for YAML mapping files and tests each one against your new Turtle resource. If a mapping's rules match your column structure exactly (`exact` strategy), it is selected automatically.
+The column-description file is converted into a format called **Turtle** — a compact notation for linked data (structured information where every concept and relationship has a stable, web-addressable identifier). A second resource file appears in the dataset. This file is the input for the mapping step.
 
-See [Author a Mapping](../guides/author-a-mapping.md) to learn how to create a mapping for your data.
+You do not need to work with this file directly.
 
-**Step 6 — CKAN produces the joined knowledge graph**
+---
 
-The selected YARRRML mapping and your Turtle data are sent to the RDFConverter service. It executes the RML rules and produces a **joined Turtle** file — your data expressed in the target ontology (e.g., [PMDco](https://github.com/materialdigital/core-ontology)):
+**Step 5 — CKAN finds a matching rule file**
+
+CKAN searches its `mappings` group — a library of rule files that describe how to translate your column structure into a shared scientific vocabulary. It tests each rule file against your data. If one matches your column names exactly, it is selected automatically.
+
+These rule files are what data engineers author to connect a lab's specific column naming conventions to common ontology terms. See [Author a Mapping](../guides/author-a-mapping.md) if your data needs a custom rule file.
+
+---
+
+**Step 6 — CKAN produces the linked dataset**
+
+The matching rule file and your data are sent to a transformation service. It applies the rules and produces a **joined linked-data file** — your measurements expressed using a shared materials science vocabulary called [PMDco](https://github.com/materialdigital/core-ontology) (Platform MaterialDigital Core Ontology). This means concepts like "tensile test result" or "yield strength" now carry the same identifier they would in any other dataset that uses PMDco — making your data directly comparable and combinable with other labs' data.
+
+The joined file appears in your CKAN dataset. Here is a simplified excerpt showing what two measurement rows look like in this format — again, produced automatically, not something you write:
 
 ```turtle
 @prefix pmdco: <https://github.com/materialdigital/core-ontology/tree/main/pmdco#> .
@@ -156,16 +184,18 @@ The selected YARRRML mapping and your Turtle data are sent to the RDFConverter s
     prov:wasDerivedFrom <https://example.org/sample.csv> .  # provenance statement
 ```
 
-The joined Turtle resource appears in your CKAN dataset alongside the original CSV and CSVW metadata.
+*Each result row is now labelled with the PMDco concept it represents (`pmdco:TensileTestResult`), its numeric values carry standard unit identifiers, and the file records that the data came from your original CSV.*
 
-**Step 7 — Fuseki upload (manual)**
+---
+
+**Step 7 — Load into the query database (manual)**
 
 !!! warning "Manual step"
-    The Fuseki triplestore upload is **not automatic**. Automatic sync hooks exist in the code but are currently disabled. You trigger it manually via the ckanext-fuseki button in the dataset view, or via the CKAN API.
+    Loading your linked dataset into the query database is **not automatic**. Automatic sync is implemented in the code but currently disabled. You trigger it with a single button in the CKAN dataset view — no commands or technical steps needed.
 
     This is a known limitation — see [Capability Map](capability-map.md) for context.
 
-Once triggered, the joined Turtle is loaded into a Fuseki dataset (identified by a UUID matching your CKAN dataset). CKAN adds a SPARQL resource link so you and your collaborators can query the data via Sparklis or YASGUI directly in the browser.
+Once triggered, your linked dataset is loaded into **Fuseki** — a dedicated query database for linked data. CKAN then adds a query-interface link to your dataset so you and your collaborators can search and explore the data directly in a browser, using tools like Sparklis or YASGUI, without downloading or installing anything.
 
 ---
 
@@ -175,22 +205,23 @@ After the full pipeline runs, your CKAN dataset contains four resources:
 
 | Resource | Format | What it is |
 |---|---|---|
-| `yourfile.csv` | CSV | Original measurement file |
-| `yourfile.csvw.json` | JSON-LD | CSVW metadata with QUDT unit annotations and PROV-O provenance |
-| `yourfile.ttl` | Turtle | RDF serialization of the CSVW metadata |
-| `yourfile-joined.ttl` | Turtle | Knowledge graph aligned to your target ontology |
+| `yourfile.csv` | CSV | Your original measurement file, unchanged |
+| `yourfile.csvw.json` | CSVW (JSON-LD) | Column-description file: every column annotated with standard unit identifiers and provenance |
+| `yourfile.ttl` | Turtle | The column descriptions in linked-data notation — input for the mapping step |
+| `yourfile-joined.ttl` | Turtle | Your measurements expressed in the shared PMDco vocabulary — the FAIR output |
 
-Plus, after Fuseki upload:
-- A SPARQL endpoint scoped to your dataset
-- A Sparklis or YASGUI query link in the CKAN resource list
+Plus, after loading into the query database:
+
+- A live query interface scoped to your dataset
+- A browser link in the CKAN resource list — click it to start exploring your data with Sparklis or YASGUI
 
 ---
 
 ## Where to go next
 
 - **Deploy the stack yourself:** [Quickstart](../guides/quickstart.md)
-- **Create a mapping for your data:** [Author a Mapping](../guides/author-a-mapping.md)
-- **See what resource types the pipeline supports:** [Capability Map](capability-map.md)
+- **Create a mapping rule file for your data:** [Author a Mapping](../guides/author-a-mapping.md)
+- **See what data types and sources the pipeline supports:** [Capability Map](capability-map.md)
 
 ---
 

@@ -38,17 +38,17 @@ graph LR
 
   subgraph Microservices ["Microservices"]
     direction TB
-    CSVTOCSVW["CSVToCSVW v1.3.5\nFastAPI · port 6001"]
-    MAPTOMETHOD["MapToMethod v1.1.5\nFastAPI · port 5005"]
+    CSVTOCSVW["csvtocsvw\nFastAPI · port 6001"]
+    MAPTOMETHOD["maptomethod\nFastAPI · port 5005"]
     YARRRML["yarrrml-parser\nNode.js · port 3001"]
     RMLMAPPER["rmlmapper-webapi\nJava · port 4000"]
-    RDFCONVERTER["RDFConverter v1.3.3\nFastAPI · port 6003"]
+    RDFCONVERTER["rdfconverter\nFastAPI · port 6003"]
   end
 
   subgraph QueryLayer ["Query Layer"]
     direction TB
-    FUSEKI[(Fuseki 4.9.0\nApache Jena · port 3030)]
-    SPARKLIS["Sparklis\nSPARQL UI · port 8080"]
+    FUSEKI[(fuseki\nApache Jena · port 3030)]
+    SPARKLIS["sparklis\nQuery UI · port 8080"]
     FUSEKI --> SPARKLIS
   end
 
@@ -57,12 +57,12 @@ graph LR
   NGINX --> SPARKLIS
 
   EXT1 -. "auto — CSV upload" .-> CSVTOCSVW
-  CSVTOCSVW -. "CSVW artifact" .-> CKAN
+  CSVTOCSVW -. "annotated metadata" .-> CKAN
 
-  EXT2 -. "auto — CSVW ready" .-> RDFCONVERTER
+  EXT2 -. "auto — metadata ready" .-> RDFCONVERTER
   RDFCONVERTER --> YARRRML
   RDFCONVERTER --> RMLMAPPER
-  RDFCONVERTER -. "RDF artifact" .-> CKAN
+  RDFCONVERTER -. "output file" .-> CKAN
 
   EXT3 -->|"manual trigger"| FUSEKI
 ```
@@ -74,84 +74,81 @@ Persistent volumes: `ckan_storage`, `pg_data`, `solr_data`, `jena_data`.
 
 ## Component Table
 
-| Service | Docker Image | Role | Public URL |
+| Service | Docker Image | Role | Port / Access |
 |---|---|---|---|
-| `nginx` | `nginx:1.27-alpine` | Reverse proxy, TLS termination, internal routing | deployment hostname |
-| `ckan` | custom build (CKAN 2.10/2.11) | Data portal with all Mat-O-Lab extensions | deployment hostname |
+| `nginx` | `nginx:1.27-alpine` | Reverse proxy, TLS termination, internal routing | public (deployment hostname) |
+| `ckan` | custom build (CKAN 2.10/2.11) | Data portal with all Mat-O-Lab extensions | public (deployment hostname) |
 | `db` | custom PostgreSQL | `ckandb` + `datastore` databases | internal only |
 | `solr` | `ckan/ckan-solr` | Full-text search index | internal only |
 | `redis` | `redis:7-alpine` | RQ job queue + session cache | internal only |
-| `fuseki` | `secoresearch/fuseki:4.9.0` | Apache Jena Fuseki SPARQL triplestore (port 3030) | internal only |
-| `csvtocsvw` | `ghcr.io/mat-o-lab/csvtocsvw` | CSV → CSVW metadata annotation (FastAPI, port 6001) — v1.3.5 | [csvtocsvw.matolab.org](https://csvtocsvw.matolab.org) |
-| `maptomethod` | `ghcr.io/mat-o-lab/maptomethod` | YARRRML mapping authoring UI (FastAPI, port 5005) — v1.1.5 | [maptomethod.matolab.org](https://maptomethod.matolab.org) |
-| `yarrrml-parser` | `ghcr.io/mat-o-lab/yarrrml-parser` | YARRRML → RML conversion (Node.js, port 3001) | internal only |
-| `rmlmapper` | `ghcr.io/mat-o-lab/rmlmapper-webapi` | RML execution engine (Java, port 4000) | internal only |
-| `rdfconverter` | `ghcr.io/mat-o-lab/rdfconverter` | Orchestrates yarrrml-parser + rmlmapper (FastAPI, port 6003) — v1.3.3 | [rdfconverter.matolab.org](https://rdfconverter.matolab.org) |
-| `sparklis` | `sferre/sparklis` | User-friendly faceted SPARQL query UI (port 8080) | deployment hostname |
+| `fuseki` | `secoresearch/fuseki:4.9.0` | Graph database for linked data storage and querying (port 3030) | internal only |
+| `csvtocsvw` | `ghcr.io/mat-o-lab/csvtocsvw` | Annotates CSV files with column metadata (FastAPI, port 6001) | [csvtocsvw.matolab.org](https://csvtocsvw.matolab.org) |
+| `maptomethod` | `ghcr.io/mat-o-lab/maptomethod` | Web UI for authoring mapping files (FastAPI, port 5005) | [maptomethod.matolab.org](https://maptomethod.matolab.org) |
+| `yarrrml-parser` | `ghcr.io/mat-o-lab/yarrrml-parser` | Mapping format converter (Node.js, port 3001) | internal only |
+| `rmlmapper` | `ghcr.io/mat-o-lab/rmlmapper-webapi` | Data transformation engine (Java, port 4000) | internal only |
+| `rdfconverter` | `ghcr.io/mat-o-lab/rdfconverter` | Orchestrates yarrrml-parser + rmlmapper (FastAPI, port 6003) | [rdfconverter.matolab.org](https://rdfconverter.matolab.org) |
+| `sparklis` | `sferre/sparklis` | Faceted query UI for the graph database (port 8080) | public (deployment hostname) |
 
-Version numbers sourced from the live `/info` endpoints (fetched 2026-09-24).
+Version numbers are available at each service's `/info` endpoint.
 
 ---
 
 ## Two Transformation Paths
 
-The pipeline supports two strategies for lifting raw data into an RDF knowledge graph. Choose based on how structurally different the source and target ontologies are.
+The pipeline converts uploaded data into a structured linked data output file (`.ttl`). The output format is called RDF — for what that means and why it exists, see [Semantic Foundation](semantic-foundation.md). From an operator's perspective, what matters is which services are involved and what triggers what.
 
-### Path 1 — Direct YARRRML / RML
+### Path 1 — Single-stage mapping
 
-**When to use:** CSV lab data, OMERO microscopy images, OpenBIS ELN entries, IDTA/AAS submodels — any source where a single YARRRML mapping can span source fields to target ontology terms directly.
-
-```
-Raw data (CSV, JSON, XML, RDF)
-  → Extractor service            CSV → CSVW · OMERO → OME JSON-LD · openBIS → Schema.org JSON-LD
-  → MapToMethod + OntosphereIO  YARRRML mapping authoring
-  → RDFConverter                YARRRML → RML (yarrrml-parser) + RML execution (rmlmapper)
-  → RDF knowledge graph         target-ontology aligned (e.g. PMDco)
-  → Fuseki                      SPARQL endpoint (manual trigger)
-```
-
-The YARRRML file maps source data fields directly to target ontology classes and properties. One transformation hop from raw data to FAIR RDF.
-
-**CKAN automation level:** Steps 1–3 (CSV upload through RDF artifact creation) run automatically. Fuseki upload requires a manual trigger.
-
-### Path 2 — Two-Stage YARRRML + SPARQL CONSTRUCT
-
-**When to use:** Catena-X / SAMM aspect model payloads where the source JSON follows a domain-specific intermediate ontology (SAMM) that must be re-ontologized to a target ontology (PMDco, AutoMatCE). A single YARRRML mapping would require mapping every property individually; a SPARQL CONSTRUCT query with a `VALUES` table handles this in bulk.
+**When to use:** CSV lab data, OMERO microscopy images, OpenBIS ELN entries, IDTA/AAS submodels — any source where one mapping file covers the translation in a single step.
 
 ```
-Flat JSON (Catena-X / SAMM payload)
-  Stage 1 — Data lifting
-    → RDFConverter + YARRRML mapping    JSON → SAMM-aligned intermediate RDF
-    → Fuseki                            Intermediate named graph loaded
-
-  Stage 2 — Ontology translation
-    → SPARQL CONSTRUCT query            SAMM RDF → PMDco / AutoMatCE
-    (parameterized with VALUES table for unit conversions and property mappings)
-    → Named graph <pmdco>               Target-ontology knowledge graph
+Raw data file (CSV, JSON, XML)
+  → Extractor service          Annotates data with column metadata and schema
+  → MapToMethod               Mapping file applied (defines how fields are translated)
+  → RDFConverter              Runs the mapping → produces a structured output file (.ttl)
+  → Fuseki                    Loads the output for querying (manual trigger required)
 ```
 
-| Aspect | Stage 1 — YARRRML/RML | Stage 2 — SPARQL CONSTRUCT |
+**CKAN automation level:** Steps 1–3 (upload through output file creation) run automatically. Fuseki load requires a manual trigger.
+
+### Path 2 — Two-stage mapping
+
+**When to use:** Catena-X / SAMM JSON payloads where the source data already follows an intermediate schema. A single mapping file would not be enough — the data is first converted, then reshaped in a second pass.
+
+```
+JSON data (Catena-X / SAMM format)
+  Stage 1 — Convert
+    → RDFConverter + mapping file    JSON → intermediate output file (.ttl)
+    → Fuseki                         Intermediate file loaded into graph database
+
+  Stage 2 — Reshape
+    → SPARQL CONSTRUCT query         Reshapes the intermediate data to the target schema
+    (run manually against Fuseki)
+    → Named graph                    Final output in target schema, stored in Fuseki
+```
+
+| Aspect | Stage 1 | Stage 2 |
 |---|---|---|
-| Input | Raw data (JSON, CSV, XML) | Existing RDF graph in Fuseki |
-| Output | RDF knowledge graph | Reshaped / re-ontologized RDF |
-| Primary purpose | Data → RDF lifting | Ontology → ontology translation |
-| Trigger | RDFConverter API | SPARQL engine (Fuseki) |
-| Automation | Auto via ckanext-csvwmapandtransform | Manual CONSTRUCT execution |
+| Input | Raw data file (JSON, CSV) | Intermediate file already loaded in Fuseki |
+| Output | Intermediate output file | Final reshaped output file |
+| Primary purpose | Data → linked data conversion | Schema → schema translation |
+| Trigger | RDFConverter API | Manual query against Fuseki |
+| Automation | Auto via ckanext-csvwmapandtransform | Manual |
 
-For full details and an example CONSTRUCT query see [SAMM / Catena-X](advanced/samm-catena-x.md).
+For a worked example see [SAMM / Catena-X](advanced/samm-catena-x.md).
 
 ---
 
 ## Entry Points by Resource Type
 
-| Resource type | Extractor | Mapping tool | Transformation path |
+| Resource type | Extractor | Mapping tool | Path |
 |---|---|---|---|
-| CSV lab data | [CSVToCSVW](../extractors/csvtocsvw.md) | MapToMethod + OntosphereIO | Path 1 — direct YARRRML/RML |
-| OMERO microscopy | [OmeroExtractor](../extractors/omeroextractor.md) | MapToMethod + OME ontology | Path 1 — direct YARRRML/RML |
-| OpenBIS ELN | [OpenBISmantic](../extractors/openbismantic.md) | YARRRML mapping | Path 1 — direct YARRRML/RML |
-| SQL database | [Ontop](../extractors/ontop.md) | R2RML mapping | Path 1 — direct YARRRML/RML |
-| SAMM / Catena-X JSON | — (direct input) | YARRRML (JSONPath) | Path 2 — two-stage with CONSTRUCT |
-| IDTA / AAS submodel | — (direct input) | YARRRML (JSONPath) | Path 1 — direct YARRRML/RML |
+| CSV lab data | [CSVToCSVW](../extractors/csvtocsvw.md) | MapToMethod | Path 1 — single-stage |
+| OMERO microscopy | [OmeroExtractor](../extractors/omeroextractor.md) | MapToMethod | Path 1 — single-stage |
+| OpenBIS ELN | [OpenBISmantic](../extractors/openbismantic.md) | MapToMethod | Path 1 — single-stage |
+| SQL database | [Ontop](../extractors/ontop.md) | R2RML mapping | Path 1 — single-stage |
+| SAMM / Catena-X JSON | — (direct input) | MapToMethod (JSONPath) | Path 2 — two-stage |
+| IDTA / AAS submodel | — (direct input) | MapToMethod (JSONPath) | Path 1 — single-stage |
 
 ---
 
@@ -165,10 +162,10 @@ All of the following happen automatically after a CSV (or `.asc`, `.tsv`, `.txt`
 
 | Step | Extension | Service called |
 |---|---|---|
-| CSV → CSVW JSON-LD annotation | [ckanext-csvtocsvw](../components/ckanext-csvtocsvw.md) | [CSVToCSVW](../extractors/csvtocsvw.md) |
-| CSVW → Turtle RDF serialization | [ckanext-csvtocsvw](../components/ckanext-csvtocsvw.md) | internal conversion |
-| Mapping selection from `mappings` group | [ckanext-csvwmapandtransform](../components/ckanext-csvwmapandtransform.md) | CKAN group API |
-| YARRRML/RML execution → joined Turtle | [ckanext-csvwmapandtransform](../components/ckanext-csvwmapandtransform.md) | [RDFConverter](../components/rdfconverter.md) |
+| CSV → annotated metadata file | [ckanext-csvtocsvw](../components/ckanext-csvtocsvw.md) | [CSVToCSVW](../extractors/csvtocsvw.md) |
+| Metadata → structured output file | [ckanext-csvtocsvw](../components/ckanext-csvtocsvw.md) | internal conversion |
+| Mapping file selection from `mappings` group | [ckanext-csvwmapandtransform](../components/ckanext-csvwmapandtransform.md) | CKAN group API |
+| Mapping execution → final output file | [ckanext-csvwmapandtransform](../components/ckanext-csvwmapandtransform.md) | [RDFConverter](../components/rdfconverter.md) |
 
 ### What is manual
 
@@ -176,12 +173,12 @@ All of the following happen automatically after a CSV (or `.asc`, `.tsv`, `.txt`
 |---|---|
 | Set `BACKGROUNDJOBS_API_TOKEN` after first boot | Token does not exist until CKAN creates it — see [Quickstart](../guides/quickstart.md) |
 | Create the `mappings` CKAN group (exact case) | Required by ckanext-csvwmapandtransform; not created automatically |
-| Author a YARRRML mapping in MapToMethod | Domain-specific knowledge required — see [Author a Mapping](../guides/author-a-mapping.md) |
-| Upload joined Turtle to Fuseki | Auto-sync hooks exist in ckanext-fuseki but are currently disabled; trigger via CKAN UI or API |
-| Stage 2 SPARQL CONSTRUCT (Path 2) | Must be run manually against Fuseki after Stage 1 RDF is loaded |
+| Author a mapping file in MapToMethod | Domain-specific knowledge required — see [Author a Mapping](../guides/author-a-mapping.md) |
+| Load output file into Fuseki | Auto-sync hooks exist in ckanext-fuseki but are currently disabled; trigger via CKAN UI or API |
+| Stage 2 schema translation (Path 2) | Must be run manually against Fuseki after Stage 1 output is loaded |
 
 !!! warning "Most common setup failure"
-    `BACKGROUNDJOBS_API_TOKEN` not set — all three background-job extensions run but their jobs never execute. No CSV annotation, no RDF conversion, no mapping selection happens. See [Configuration](../reference/configuration.md) for the full `.env` variable list.
+    `BACKGROUNDJOBS_API_TOKEN` not set — all three background-job extensions run but their jobs never execute. No CSV annotation, no mapping execution, no output file is produced. See [Configuration](../reference/configuration.md) for the full `.env` variable list.
 
 ---
 
@@ -204,6 +201,7 @@ See [Configuration Reference](../reference/configuration.md) for all critical va
 - **Deploy the stack:** [Quickstart](../guides/quickstart.md)
 - **Understand the default CSV path step by step:** [Default Use Case](default-use-case.md)
 - **See what resource types are supported:** [Capability Map](capability-map.md)
-- **Author a mapping:** [Author a Mapping](../guides/author-a-mapping.md)
+- **Author a mapping file:** [Author a Mapping](../guides/author-a-mapping.md)
+- **Understand what linked data and RDF are:** [Semantic Foundation](semantic-foundation.md)
 - **Component deep-dives:** [DataStack](../components/datastack.md) · [MapToMethod](../components/maptomethod.md) · [RDFConverter](../components/rdfconverter.md)
 - **All configuration variables:** [Configuration](../reference/configuration.md)

@@ -72,7 +72,24 @@ mappings:
       - [mat:youngsModulus, $(youngsModulus), xsd:decimal]
 ```
 
-Every property name in the `po` block matches the SAMM aspect model schema exactly — this is what lets Stage 2 join the data graph with the schema graph.
+Every property name in the `po` block matches the SAMM aspect model schema exactly. The SAMM schema is encoded directly in the YARRRML prefixes and property names — not loaded as a separate file at runtime. The real `material.json-to-samm.yaml` (published on [futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space/dataset/a7f7e9d6-d3c6-4c41-840d-ea61c636f8e7)) shows this clearly:
+
+```yaml
+prefixes:
+  cx:   urn:samm:io.catenax.material_accounting:1.0.0#
+  ext1: urn:samm:io.catenax.shared.material_classification:1.0.0#
+  ext2: urn:samm:io.catenax.shared.industry_core.common:1.0.0#
+
+mappings:
+  Material:
+    s: MaterialMaterial:$(globalAssetId)
+    po:
+      - [a, cx:Material]
+      - [cx:thermalCharacterization, $(thermalCharacterization)]
+      - [cx:chemicalCharacterization, $(chemicalCharacterization)]
+```
+
+The `cx:`, `ext1:`, `ext2:` namespace URIs are the SAMM aspect model version — pinned in the YARRRML. This is what lets Stage 2 join the data graph with the schema graph without any runtime schema resolution.
 
 ---
 

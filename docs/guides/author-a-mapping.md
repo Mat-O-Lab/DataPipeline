@@ -8,12 +8,12 @@ This guide walks through the complete mapping authoring workflow using real, pub
 
 **What you will build:** A YARRRML mapping that links the column structure of a CSVW metadata file to a target ontology pattern, then validate it produces correct RDF output.
 
-**Worked example:** The [IOFMaterialsTutorial](https://github.com/Mat-O-Lab/IOFMaterialsTutorial) — five length measurements connected to an IOF ontology pattern for a measurement process. This tutorial uses an older pattern format; treat it as illustrative for the API mechanics. For current pattern examples, see the [OntosphereIO benchmark tasks](https://github.com/ThHanke/ontosphere/tree/main/benchmarks/ontoauthor-mat/).
+**Worked example:** The [IOFMaterialsTutorial](https://github.com/Mat-O-Lab/IOFMaterialsTutorial) — five length measurements connected to an IOF ontology pattern for a measurement process. This tutorial uses an older pattern format; treat it as illustrative for the API mechanics. For current pattern examples, see the [Ontosphere benchmark tasks](https://github.com/ThHanke/ontosphere/tree/main/benchmarks/ontoauthor-mat/).
 
 !!! info "Where do ontology patterns come from?"
     A pattern is a small Turtle file that describes the semantic structure of a measurement type — the entities involved, their types, and how they relate. You do not write patterns during the mapping workflow; you *use* them. Patterns are authored separately using a graph editor:
 
-    - **[OntosphereIO](https://thhanke.github.io/ontosphere)** (recommended) — browser-based RDF/OWL editor with built-in OWL 2 DL reasoning, SHACL validation, and a drag-and-drop workflow template catalog. No install required. See the [materials science benchmark tasks](https://github.com/ThHanke/ontosphere/tree/main/benchmarks/ontoauthor-mat/) for worked examples (steel alloy classification, composite materials, mechanical testing patterns).
+    - **[Ontosphere](https://thhanke.github.io/ontosphere)** (recommended) — browser-based RDF/OWL editor with built-in OWL 2 DL reasoning, SHACL validation, and a drag-and-drop workflow template catalog. No install required. See the [materials science benchmark tasks](https://github.com/ThHanke/ontosphere/tree/main/benchmarks/ontoauthor-mat/) for worked examples (steel alloy classification, composite materials, mechanical testing patterns).
     - **[Ontopanel](https://github.com/yuechenbam/yuechenbam.github.io)** — Draw.io plugin for graphical ontology authoring; established alternative, used in published DataStack workflows ([Nasrabadi et al., 2023](https://doi.org/10.1016/j.compind.2023.104016)).
 
     If a pattern for your measurement type already exists in your community's ontology library (e.g. the [PMDCO pattern library](https://github.com/materialdigital/core-ontology/tree/main/patterns/)), you can use it directly — no authoring needed. If you need a new pattern, see [Add a Use Case](add-a-use-case.md) for the pattern design step.

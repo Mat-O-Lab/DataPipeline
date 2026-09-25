@@ -65,7 +65,7 @@ A **pattern** (the [PMDCO](https://github.com/materialdigital/core-ontology) ter
 
 | Tool | Status | Notes |
 |---|---|---|
-| [OntosphereIO](https://github.com/ThHanke/ontosphere) | **Recommended** | Browser-based, AI-assisted, supports OWL2DL reasoning and PMDCO autoshapes (SHACL) |
+| [Ontosphere](https://github.com/ThHanke/ontosphere) | **Recommended** | Browser-based, AI-assisted, supports OWL2DL reasoning and PMDCO autoshapes (SHACL) |
 | [PMDCO pattern library](https://github.com/materialdigital/core-ontology/tree/main/patterns/) | Reference | Reusable patterns for common materials science measurement types |
 | IOFMaterialsTutorial | Outdated | Uses draw.io and old terminology — concepts only, not current tooling |
 

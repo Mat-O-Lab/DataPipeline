@@ -38,7 +38,7 @@ flowchart TD
     SA3 --> OUT1
     SA4 --> OUT1
 
-    SB --> SB1[Design the concept pattern in OntosphereIO]
+    SB --> SB1[Design the concept pattern in Ontosphere]
     SB1 --> SB2[Generate mapping rules with MapToMethod]
     SB2 --> SB3[Your data engineer authors the mapping file]
 
@@ -104,9 +104,9 @@ Give your data engineer a sample CSV and a plain-language description of what ea
 
 This description, not the CSV itself, is the starting point for building the pattern.
 
-### Step 2: Pattern design in OntosphereIO
+### Step 2: Pattern design in Ontosphere
 
-Your data engineer or ontology specialist will use [OntosphereIO](https://github.com/ThHanke/ontosphere) — a browser-based tool — to draw the concept structure for your measurement type. The [PMDCO pattern library](https://github.com/materialdigital/core-ontology/tree/main/patterns/) contains reference patterns for common materials science measurements that can be reused or extended.
+Your data engineer or ontology specialist will use [Ontosphere](https://github.com/ThHanke/ontosphere) — a browser-based tool — to draw the concept structure for your measurement type. The [PMDCO pattern library](https://github.com/materialdigital/core-ontology/tree/main/patterns/) contains reference patterns for common materials science measurements that can be reused or extended.
 
 You may be asked to review the pattern to confirm it correctly represents the scientific concepts in your data.
 

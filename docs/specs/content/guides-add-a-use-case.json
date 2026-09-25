@@ -3,7 +3,9 @@
   "title": "Add a Use Case",
   "status": "partial",
   "primary_persona": "P4",
-  "secondary_personas": ["P3"],
+  "secondary_personas": [
+    "P3"
+  ],
   "narrative_arc": {
     "enters_knowing": "They want to extend the pipeline for a new data source or target ontology.",
     "leaves_knowing": "Two adaptation paths (new source type vs. new target ontology), what to change in each, configuration table.",
@@ -54,5 +56,33 @@
     "Done checklist at end",
     "mkdocs build --strict exits 0"
   ],
-  "notes": "Page is partial. Main gap: source-type options need more concrete guidance (which existing extractor to reuse, minimal interface a new extractor must satisfy — produces JSON-LD as output). Check omeroextractor-service.json and openbismantic-service.json for extractor interface description."
+  "notes": "Page is partial. Main gap: source-type options need more concrete guidance (which existing extractor to reuse, minimal interface a new extractor must satisfy — produces JSON-LD as output). Check omeroextractor-service.json and openbismantic-service.json for extractor interface description.",
+  "audience": {
+    "primary": {
+      "code": "P4",
+      "name": "Domain Scientist",
+      "knows": [
+        "Their scientific domain deeply (materials science, microscopy, lab procedures)",
+        "CSV and spreadsheet data",
+        "Measurement concepts and experimental workflows they consider universal",
+        "Domain-specific tools (OMERO, ELN systems, instrument software)"
+      ],
+      "does_not_know": [
+        "Ontology terms like PMDCO, CHAMEO, EMMO even if these describe their own work",
+        "How ontologies model domain concepts — that this modeling discipline exists at all",
+        "SPARQL, RDF, or any semantic technology",
+        "Docker, APIs, or configuration"
+      ],
+      "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results.",
+      "key_gap": "Double gap: (1) no semantic web knowledge whatsoever, and (2) domain experts frequently assume their concepts are universal common knowledge when they are not — documentation must not assume shared domain vocabulary and must explain what gets modeled and why, not just how."
+    },
+    "secondary": [
+      {
+        "code": "P3",
+        "name": "Data Engineer",
+        "goal": "Connect data sources, author mappings, and query transformation results."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
 }

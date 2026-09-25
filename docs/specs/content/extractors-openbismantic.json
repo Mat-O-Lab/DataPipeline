@@ -3,7 +3,9 @@
   "title": "OpenBISmantic",
   "status": "partial",
   "primary_persona": "P4",
-  "secondary_personas": ["P3"],
+  "secondary_personas": [
+    "P3"
+  ],
   "narrative_arc": {
     "enters_knowing": "They have an openBIS ELN/LIMS instance and want to expose it as Linked Data.",
     "leaves_knowing": "What OpenBISmantic provides, how content negotiation works, the RO-Crate export feature, deployment options, limitations.",
@@ -58,5 +60,33 @@
     "Downstream path to RDFConverter described",
     "mkdocs build --strict exits 0"
   ],
-  "notes": "Page is partial. openbismantic-service.json has full content. No public deployment — all curls use placeholder. Requires openBIS 20.10+ server (PyBIS auth requirement). Output uses Schema.org/DCAT/PROV-O — domain-specific mapping needs downstream YARRRML via RDFConverter."
+  "notes": "Page is partial. openbismantic-service.json has full content. No public deployment — all curls use placeholder. Requires openBIS 20.10+ server (PyBIS auth requirement). Output uses Schema.org/DCAT/PROV-O — domain-specific mapping needs downstream YARRRML via RDFConverter.",
+  "audience": {
+    "primary": {
+      "code": "P4",
+      "name": "Domain Scientist",
+      "knows": [
+        "Their scientific domain deeply (materials science, microscopy, lab procedures)",
+        "CSV and spreadsheet data",
+        "Measurement concepts and experimental workflows they consider universal",
+        "Domain-specific tools (OMERO, ELN systems, instrument software)"
+      ],
+      "does_not_know": [
+        "Ontology terms like PMDCO, CHAMEO, EMMO even if these describe their own work",
+        "How ontologies model domain concepts — that this modeling discipline exists at all",
+        "SPARQL, RDF, or any semantic technology",
+        "Docker, APIs, or configuration"
+      ],
+      "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results.",
+      "key_gap": "Double gap: (1) no semantic web knowledge whatsoever, and (2) domain experts frequently assume their concepts are universal common knowledge when they are not — documentation must not assume shared domain vocabulary and must explain what gets modeled and why, not just how."
+    },
+    "secondary": [
+      {
+        "code": "P3",
+        "name": "Data Engineer",
+        "goal": "Connect data sources, author mappings, and query transformation results."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
 }

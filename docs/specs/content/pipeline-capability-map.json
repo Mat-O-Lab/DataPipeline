@@ -3,7 +3,9 @@
   "title": "Capability Map",
   "status": "authored",
   "primary_persona": "P1",
-  "secondary_personas": ["P3"],
+  "secondary_personas": [
+    "P3"
+  ],
   "narrative_arc": {
     "enters_knowing": "They have a data source and want to know if the pipeline supports it.",
     "leaves_knowing": "Whether their use case is supported, what extractor handles it, what limitations to plan around.",
@@ -49,5 +51,33 @@
     "OntosphereIO linked as recommended tool (not draw.io)",
     "mkdocs build --strict exits 0"
   ],
-  "notes": "Page is substantially authored. Verify 8-row count matches plan.md. Confirm 'pattern' terminology used throughout (PMDCO term per memory)."
+  "notes": "Page is substantially authored. Verify 8-row count matches plan.md. Confirm 'pattern' terminology used throughout (PMDCO term per memory).",
+  "audience": {
+    "primary": {
+      "code": "P1",
+      "name": "Evaluator",
+      "knows": [
+        "Spreadsheets and tabular data",
+        "Research data management concepts at a high level",
+        "What 'FAIR data' means in principle",
+        "Their institution's data workflows"
+      ],
+      "does_not_know": [
+        "Docker or any container technology",
+        "RDF, triples, ontologies, or the semantic web",
+        "REST APIs or any coding",
+        "How the pipeline works internally"
+      ],
+      "goal": "Assess whether DataStack fits their lab or institution — understand outputs and find the right entry point.",
+      "key_gap": "No technical background assumed. Needs concept-first explanations with real-world outcomes before any system detail."
+    },
+    "secondary": [
+      {
+        "code": "P3",
+        "name": "Data Engineer",
+        "goal": "Connect data sources, author mappings, and query transformation results."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
 }

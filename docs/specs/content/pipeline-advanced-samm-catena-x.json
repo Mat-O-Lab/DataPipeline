@@ -3,7 +3,9 @@
   "title": "SAMM / Catena-X Pipeline Pattern",
   "status": "stub",
   "primary_persona": "P3",
-  "secondary_personas": ["P4"],
+  "secondary_personas": [
+    "P4"
+  ],
   "narrative_arc": {
     "enters_knowing": "They know RML/YARRRML and want to understand the two-stage SPARQL CONSTRUCT pattern used for Catena-X.",
     "leaves_knowing": "Why two stages are needed for SAMM models, how the SPARQL INSERT pattern works, how to replicate it for their domain.",
@@ -65,5 +67,35 @@
     "When-to-use-this-vs-direct comparison present",
     "mkdocs build --strict exits 0"
   ],
-  "notes": "samm-idta-pipeline-patterns.json has concrete_example_pa6gf30.sparql_insert_structure with 4 node types per property and 13 properties mapped — use as primary inline source. Two-path comparison table is in spec as two_path_comparison. Execution mechanism: NOT automated — browser helper page."
+  "notes": "samm-idta-pipeline-patterns.json has concrete_example_pa6gf30.sparql_insert_structure with 4 node types per property and 13 properties mapped — use as primary inline source. Two-path comparison table is in spec as two_path_comparison. Execution mechanism: NOT automated — browser helper page.",
+  "audience": {
+    "primary": {
+      "code": "P3",
+      "name": "Data Engineer",
+      "knows": [
+        "Python or similar scripting language",
+        "REST APIs and HTTP concepts",
+        "YAML and JSON authoring",
+        "General software engineering practices",
+        "Tabular data and data transformation concepts"
+      ],
+      "does_not_know": [
+        "RDF, triples, or the semantic web stack",
+        "YARRRML, RML, or any mapping language",
+        "SPARQL query language",
+        "Ontologies, reasoning, or OWL",
+        "What a named graph or blank node is"
+      ],
+      "goal": "Connect data sources, author mappings, and query transformation results.",
+      "key_gap": "Solid general engineering skills but semantic web is completely foreign. Every RDF/SPARQL/YARRRML concept must be explained from first principles — do not assume any prior semantic knowledge."
+    },
+    "secondary": [
+      {
+        "code": "P4",
+        "name": "Domain Scientist",
+        "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results."
+      }
+    ]
+  },
+  "building_block": "Block 3 — Dataspace Participation"
 }

@@ -75,5 +75,27 @@
     "Fuseki step explicitly marked optional",
     "mkdocs build --strict exits 0"
   ],
-  "notes": "Page is partial — most steps are roughed in. Main gaps: real .env variable names (fetch from DataStack repo), docker compose log output description, exact CKAN UI paths for API token creation. datastack.json post_boot_setup section has the 5-step sequence to follow."
+  "notes": "Page is partial — most steps are roughed in. Main gaps: real .env variable names (fetch from DataStack repo), docker compose log output description, exact CKAN UI paths for API token creation. datastack.json post_boot_setup section has the 5-step sequence to follow.",
+  "audience": {
+    "primary": {
+      "code": "P2",
+      "name": "Operator",
+      "knows": [
+        "Docker Compose and container concepts",
+        "Linux CLI and shell basics",
+        ".env files and environment variable configuration",
+        "Basic networking: ports, URLs, reverse proxies",
+        "Reading and editing YAML and JSON"
+      ],
+      "does_not_know": [
+        "RDF, SPARQL, or ontologies",
+        "What a triple store is or why it exists",
+        "Materials science domain concepts",
+        "Mapping or transformation logic"
+      ],
+      "goal": "Get the stack deployed, configured, and running reliably.",
+      "key_gap": "Strong on infrastructure, zero on semantics. Semantic explanations should be deferred or skipped — ops context only."
+    }
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
 }

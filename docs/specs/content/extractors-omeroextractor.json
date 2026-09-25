@@ -3,7 +3,9 @@
   "title": "OmeroExtractor",
   "status": "partial",
   "primary_persona": "P3",
-  "secondary_personas": ["P1"],
+  "secondary_personas": [
+    "P1"
+  ],
   "narrative_arc": {
     "enters_knowing": "They have OMERO microscopy data and want to understand how to extract it into the pipeline.",
     "leaves_knowing": "What OmeroExtractor does, what its JSON-LD output looks like, the DF-TEM-PAW real-world example, current maturity status.",
@@ -60,5 +62,35 @@
     "Note: no public deployment for live testing",
     "mkdocs build --strict exits 0"
   ],
-  "notes": "Local test fixtures at /home/hanke/OmeroExtractor/tests/ are the authoritative source for inline examples — use them directly. No public OMERO deployment available. omeroextractor-service.json has test_fixtures paths and real_world_example section."
+  "notes": "Local test fixtures at /home/hanke/OmeroExtractor/tests/ are the authoritative source for inline examples — use them directly. No public OMERO deployment available. omeroextractor-service.json has test_fixtures paths and real_world_example section.",
+  "audience": {
+    "primary": {
+      "code": "P3",
+      "name": "Data Engineer",
+      "knows": [
+        "Python or similar scripting language",
+        "REST APIs and HTTP concepts",
+        "YAML and JSON authoring",
+        "General software engineering practices",
+        "Tabular data and data transformation concepts"
+      ],
+      "does_not_know": [
+        "RDF, triples, or the semantic web stack",
+        "YARRRML, RML, or any mapping language",
+        "SPARQL query language",
+        "Ontologies, reasoning, or OWL",
+        "What a named graph or blank node is"
+      ],
+      "goal": "Connect data sources, author mappings, and query transformation results.",
+      "key_gap": "Solid general engineering skills but semantic web is completely foreign. Every RDF/SPARQL/YARRRML concept must be explained from first principles — do not assume any prior semantic knowledge."
+    },
+    "secondary": [
+      {
+        "code": "P1",
+        "name": "Evaluator",
+        "goal": "Assess whether DataStack fits their lab or institution — understand outputs and find the right entry point."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
 }

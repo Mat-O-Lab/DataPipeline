@@ -66,5 +66,26 @@
     "All three 'Where to go next' links resolve",
     "mkdocs build --strict exits 0"
   ],
-  "notes": "Page is substantially authored. Main gap: CSVW and Turtle examples are illustrative. Attempt to fetch real examples from dataportal.material-digital.de and replace if available. If live fetch fails, keep illustrative examples with explicit label."
+  "notes": "Page is substantially authored. Main gap: CSVW and Turtle examples are illustrative. Attempt to fetch real examples from dataportal.material-digital.de and replace if available. If live fetch fails, keep illustrative examples with explicit label.",
+  "audience": {
+    "primary": {
+      "code": "P1",
+      "name": "Evaluator",
+      "knows": [
+        "Spreadsheets and tabular data",
+        "Research data management concepts at a high level",
+        "What 'FAIR data' means in principle",
+        "Their institution's data workflows"
+      ],
+      "does_not_know": [
+        "Docker or any container technology",
+        "RDF, triples, ontologies, or the semantic web",
+        "REST APIs or any coding",
+        "How the pipeline works internally"
+      ],
+      "goal": "Assess whether DataStack fits their lab or institution — understand outputs and find the right entry point.",
+      "key_gap": "No technical background assumed. Needs concept-first explanations with real-world outcomes before any system detail."
+    }
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
 }

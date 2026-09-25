@@ -3,7 +3,10 @@
   "title": "Pipeline Overview",
   "status": "partial",
   "primary_persona": "P2",
-  "secondary_personas": ["P3", "P4"],
+  "secondary_personas": [
+    "P3",
+    "P4"
+  ],
   "narrative_arc": {
     "enters_knowing": "They want to understand the full system topology before deploying or integrating.",
     "leaves_knowing": "Every component, its role, its connection to adjacent components, and which are automated vs. manual.",
@@ -56,5 +59,39 @@
     "All component cross-links resolve",
     "mkdocs build --strict exits 0"
   ],
-  "notes": "Fetch real /info responses from public services to get accurate version numbers for component table."
+  "notes": "Fetch real /info responses from public services to get accurate version numbers for component table.",
+  "audience": {
+    "primary": {
+      "code": "P2",
+      "name": "Operator",
+      "knows": [
+        "Docker Compose and container concepts",
+        "Linux CLI and shell basics",
+        ".env files and environment variable configuration",
+        "Basic networking: ports, URLs, reverse proxies",
+        "Reading and editing YAML and JSON"
+      ],
+      "does_not_know": [
+        "RDF, SPARQL, or ontologies",
+        "What a triple store is or why it exists",
+        "Materials science domain concepts",
+        "Mapping or transformation logic"
+      ],
+      "goal": "Get the stack deployed, configured, and running reliably.",
+      "key_gap": "Strong on infrastructure, zero on semantics. Semantic explanations should be deferred or skipped — ops context only."
+    },
+    "secondary": [
+      {
+        "code": "P3",
+        "name": "Data Engineer",
+        "goal": "Connect data sources, author mappings, and query transformation results."
+      },
+      {
+        "code": "P4",
+        "name": "Domain Scientist",
+        "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
 }

@@ -3,7 +3,9 @@
   "title": "CSVToCSVW",
   "status": "authored",
   "primary_persona": "P3",
-  "secondary_personas": ["P4"],
+  "secondary_personas": [
+    "P4"
+  ],
   "narrative_arc": {
     "enters_knowing": "They want to understand what CSVToCSVW does, how it annotates columns, what the output looks like.",
     "leaves_knowing": "The multi-block CSV format, how unit annotations work from bracket notation, the 4 endpoints, real CSVW output for a known example.",
@@ -70,5 +72,35 @@
     "W3C CSVW primer linked",
     "mkdocs build --strict exits 0"
   ],
-  "notes": "Page is substantially authored. Main gap: verify CSVW snippet uses correct column names from example2.csv (MaschineMm, KraftKn, Mx840A0Ch5C, ZeitS) and correct unit IRIs. Fetch live to confirm accuracy."
+  "notes": "Page is substantially authored. Main gap: verify CSVW snippet uses correct column names from example2.csv (MaschineMm, KraftKn, Mx840A0Ch5C, ZeitS) and correct unit IRIs. Fetch live to confirm accuracy.",
+  "audience": {
+    "primary": {
+      "code": "P3",
+      "name": "Data Engineer",
+      "knows": [
+        "Python or similar scripting language",
+        "REST APIs and HTTP concepts",
+        "YAML and JSON authoring",
+        "General software engineering practices",
+        "Tabular data and data transformation concepts"
+      ],
+      "does_not_know": [
+        "RDF, triples, or the semantic web stack",
+        "YARRRML, RML, or any mapping language",
+        "SPARQL query language",
+        "Ontologies, reasoning, or OWL",
+        "What a named graph or blank node is"
+      ],
+      "goal": "Connect data sources, author mappings, and query transformation results.",
+      "key_gap": "Solid general engineering skills but semantic web is completely foreign. Every RDF/SPARQL/YARRRML concept must be explained from first principles — do not assume any prior semantic knowledge."
+    },
+    "secondary": [
+      {
+        "code": "P4",
+        "name": "Domain Scientist",
+        "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
 }

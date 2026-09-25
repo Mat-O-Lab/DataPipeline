@@ -3,7 +3,9 @@
   "title": "Data Formats",
   "status": "partial",
   "primary_persona": "P3",
-  "secondary_personas": ["P4"],
+  "secondary_personas": [
+    "P4"
+  ],
   "narrative_arc": {
     "enters_knowing": "They want to understand what format flows between stages — reference lookup.",
     "leaves_knowing": "The input format, tool, output format, and available serializations at each of the 4 pipeline stages. One short inline snippet per stage.",
@@ -65,5 +67,35 @@
     "W3C CSVW primer linked when CSVW first introduced",
     "mkdocs build --strict exits 0"
   ],
-  "notes": "Page has the 4-row table. Main gap: no inline format examples yet. Fetch first 10 lines of each format from real GitHub raw URLs. The CSVW snippet from example2-metadata.json will show column annotations with qudt:unit — a good concrete format example."
+  "notes": "Page has the 4-row table. Main gap: no inline format examples yet. Fetch first 10 lines of each format from real GitHub raw URLs. The CSVW snippet from example2-metadata.json will show column annotations with qudt:unit — a good concrete format example.",
+  "audience": {
+    "primary": {
+      "code": "P3",
+      "name": "Data Engineer",
+      "knows": [
+        "Python or similar scripting language",
+        "REST APIs and HTTP concepts",
+        "YAML and JSON authoring",
+        "General software engineering practices",
+        "Tabular data and data transformation concepts"
+      ],
+      "does_not_know": [
+        "RDF, triples, or the semantic web stack",
+        "YARRRML, RML, or any mapping language",
+        "SPARQL query language",
+        "Ontologies, reasoning, or OWL",
+        "What a named graph or blank node is"
+      ],
+      "goal": "Connect data sources, author mappings, and query transformation results.",
+      "key_gap": "Solid general engineering skills but semantic web is completely foreign. Every RDF/SPARQL/YARRRML concept must be explained from first principles — do not assume any prior semantic knowledge."
+    },
+    "secondary": [
+      {
+        "code": "P4",
+        "name": "Domain Scientist",
+        "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
 }

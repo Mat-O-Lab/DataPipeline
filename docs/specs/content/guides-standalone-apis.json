@@ -3,7 +3,9 @@
   "title": "Standalone APIs",
   "status": "authored",
   "primary_persona": "P4",
-  "secondary_personas": ["P3"],
+  "secondary_personas": [
+    "P3"
+  ],
   "narrative_arc": {
     "enters_knowing": "They want to use the microservices without CKAN — scripted pipelines, CI/CD, batch processing.",
     "leaves_knowing": "One working curl per service, a chaining shell script for full CSV→RDF pipeline, upload endpoint for private data.",
@@ -81,5 +83,33 @@
     "Real-world examples table (IOFMaterialsTutorial + BAMresearch)",
     "mkdocs build --strict exits 0"
   ],
-  "notes": "Page is fully authored. All curl commands use real IOFMaterialsTutorial URLs and are reproducible. RDFConverter response shows correct field names (num_mappings_applied, num_mappings_skipped, graph). No issues found in prior session."
+  "notes": "Page is fully authored. All curl commands use real IOFMaterialsTutorial URLs and are reproducible. RDFConverter response shows correct field names (num_mappings_applied, num_mappings_skipped, graph). No issues found in prior session.",
+  "audience": {
+    "primary": {
+      "code": "P4",
+      "name": "Domain Scientist",
+      "knows": [
+        "Their scientific domain deeply (materials science, microscopy, lab procedures)",
+        "CSV and spreadsheet data",
+        "Measurement concepts and experimental workflows they consider universal",
+        "Domain-specific tools (OMERO, ELN systems, instrument software)"
+      ],
+      "does_not_know": [
+        "Ontology terms like PMDCO, CHAMEO, EMMO even if these describe their own work",
+        "How ontologies model domain concepts — that this modeling discipline exists at all",
+        "SPARQL, RDF, or any semantic technology",
+        "Docker, APIs, or configuration"
+      ],
+      "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results.",
+      "key_gap": "Double gap: (1) no semantic web knowledge whatsoever, and (2) domain experts frequently assume their concepts are universal common knowledge when they are not — documentation must not assume shared domain vocabulary and must explain what gets modeled and why, not just how."
+    },
+    "secondary": [
+      {
+        "code": "P3",
+        "name": "Data Engineer",
+        "goal": "Connect data sources, author mappings, and query transformation results."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
 }

@@ -106,5 +106,28 @@
     "Real-world examples table at end (IOFMaterialsTutorial + BAMresearch DF-TEM-PAW)",
     "mkdocs build --strict exits 0"
   ],
-  "notes": "Page is fully authored. Primary risk: API responses become stale as services update. Version comment added to YARRRML example. Verify anchor #troubleshooting resolves (was fixed in prior session)."
+  "notes": "Page is fully authored. Primary risk: API responses become stale as services update. Version comment added to YARRRML example. Verify anchor #troubleshooting resolves (was fixed in prior session).",
+  "audience": {
+    "primary": {
+      "code": "P3",
+      "name": "Data Engineer",
+      "knows": [
+        "Python or similar scripting language",
+        "REST APIs and HTTP concepts",
+        "YAML and JSON authoring",
+        "General software engineering practices",
+        "Tabular data and data transformation concepts"
+      ],
+      "does_not_know": [
+        "RDF, triples, or the semantic web stack",
+        "YARRRML, RML, or any mapping language",
+        "SPARQL query language",
+        "Ontologies, reasoning, or OWL",
+        "What a named graph or blank node is"
+      ],
+      "goal": "Connect data sources, author mappings, and query transformation results.",
+      "key_gap": "Solid general engineering skills but semantic web is completely foreign. Every RDF/SPARQL/YARRRML concept must be explained from first principles — do not assume any prior semantic knowledge."
+    }
+  },
+  "building_block": "Block 1 — Semantic Vocabulary"
 }

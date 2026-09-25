@@ -1,24 +1,24 @@
 ---
-title: Author an Ontology Pattern
+title: Author a Prototype Graph
 ---
 
-# Author an Ontology Pattern
+# Author a Prototype Graph
 
-Before you can map a CSV to a shared vocabulary, you need a **pattern** — a small Turtle file that defines the semantic structure for your measurement type: what entities exist, their types, and how they relate.
+Before you can map a CSV to a shared vocabulary, you need a **prototype graph** — a small Turtle file that defines the semantic structure for your measurement type: what entities exist, their types, and how they relate.
 
 This page shows how to create one using [Ontosphere](https://thhanke.github.io/ontosphere), a browser-based RDF/OWL 2 DL editor. No installation required.
 
-If a pattern for your measurement type already exists in your community's ontology library (e.g. the [PMDCO pattern library](https://github.com/materialdigital/core-ontology/tree/main/patterns/)), you can skip directly to [Author a Mapping](author-a-mapping.md).
+If a prototype graph for your measurement type already exists in your community's ontology library (e.g. the [PMDCO pattern library](https://github.com/materialdigital/core-ontology/tree/main/patterns/)), you can skip directly to [Author a Mapping](author-a-mapping.md).
 
 ---
 
-## What is a pattern?
+## What is a prototype graph?
 
-A pattern is a reusable Turtle file that encodes one semantic concept — for example, "a tensile test result has a yield strength quality inhering in a specimen, measured as a scalar value in MPa."
+A prototype graph is a reusable Turtle file that encodes one semantic concept — for example, "a tensile test result has a yield strength quality inhering in a specimen, measured as a scalar value in MPa."
 
-In the mapping workflow it serves as the **template graph**: MapToMethod wires your CSV columns into the named slots the pattern defines. Every row in your CSV produces a new set of connected entities shaped like the pattern.
+In the mapping workflow it serves as the **template**: MapToMethod wires your CSV columns into the named slots the prototype graph defines. Every row in your CSV produces a new set of connected entities shaped like the prototype.
 
-A minimal pattern for a length measurement looks like this:
+A minimal prototype graph for a length measurement looks like this:
 
 ```turtle
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
@@ -36,7 +36,7 @@ A minimal pattern for a length measurement looks like this:
     qudt:unit unit:MilliM .
 ```
 
-The `owl:NamedIndividual` entries are the **named slots** that MapToMethod links your CSV columns to.
+The `owl:NamedIndividual` entries are the **named slots** that MapToMethod links your CSV columns to. The mapping you author later defines the rules between these slots and the resource metadata (CSVW).
 
 ---
 
@@ -55,7 +55,7 @@ For a 3-minute walkthrough of all features:
 
 ## Authoring workflow
 
-The standard pattern authoring sequence:
+The standard prototype graph authoring sequence:
 
 ```
 Load base ontology → Add nodes → Add links → Run layout →
@@ -74,7 +74,7 @@ You can also load from a SPARQL endpoint if your ontology is published there.
 
 ### 2 — Build the graph: add nodes and links
 
-Switch to the **Authoring** tab. For each entity in your pattern:
+Switch to the **Authoring** tab. For each entity in your prototype graph:
 
 1. **Add a node** — drag a class from the ontology panel onto the canvas, or use **New Node** and set its type IRI manually
 2. **Name it** — give it a local name (e.g. `Specimen`, `YieldStrengthDatum`) — this becomes the named individual IRI slot MapToMethod links to
@@ -96,36 +96,36 @@ Use the **TBox / ABox toggle** to switch between the ontology class hierarchy (T
 
 ### 4 — Run OWL 2 DL reasoning
 
-Click **Run Reasoning**. Konclude checks your pattern for OWL 2 DL consistency and adds any entailed relationships as **amber dashed edges** — these are inferred triples not present in your source, derived from the ontology axioms. If a node is unsatisfiable (contradictory classification), the reasoner flags it here.
+Click **Run Reasoning**. Konclude checks your prototype graph for OWL 2 DL consistency and adds any entailed relationships as **amber dashed edges** — these are inferred triples not present in your source, derived from the ontology axioms. If a node is unsatisfiable (contradictory classification), the reasoner flags it here.
 
 <video controls width="100%">
   <source src="https://thhanke.github.io/ontosphere/demo-videos/feat-reasoning.mp4" type="video/mp4">
 </video>
 
-Fix any unsatisfiabilities before exporting — an inconsistent pattern will produce incorrect RDF downstream.
+Fix any unsatisfiabilities before exporting — an inconsistent prototype graph will produce incorrect RDF downstream.
 
 ### 5 — SHACL validation (optional)
 
-If your community provides SHACL shapes (e.g. PMDCO ships shapes for its core patterns), load them in the **Validation** panel. Ontosphere runs the shapes against your graph and highlights which nodes fail which constraints, with repair suggestions.
+If your community provides SHACL shapes (e.g. PMDCO ships shapes for its core prototype graphs), load them in the **Validation** panel. Ontosphere runs the shapes against your graph and highlights which nodes fail which constraints, with repair suggestions.
 
 <video controls width="100%">
   <source src="https://thhanke.github.io/ontosphere/demo-videos/feat-shacl.mp4" type="video/mp4">
 </video>
 
-### 6 — Export the pattern TTL
+### 6 — Export the TTL
 
 **Export Graph** → **Turtle** (`.ttl`). The export uses W3C RDFC-1.0 canonicalization — the output is deterministic and diff-friendly.
 
-Upload the exported TTL to a publicly accessible URL (GitHub, public S3, institution web server). MapToMethod fetches the pattern by URL — it must be reachable over HTTP.
+Upload the exported TTL to a publicly accessible URL (GitHub, public S3, institution web server). MapToMethod fetches the prototype graph by URL — it must be reachable over HTTP.
 
 ---
 
 ## Materials science benchmark tasks
 
-The [OntoAuthor-Mat benchmark](https://github.com/ThHanke/ontosphere/tree/main/benchmarks/ontoauthor-mat/) provides six materials science pattern tasks with reference solutions, SHACL shapes, and SPARQL competency questions. Use them to learn the core OWL 2 DL patterns before authoring your own:
+The [OntoAuthor-Mat benchmark](https://github.com/ThHanke/ontosphere/tree/main/benchmarks/ontoauthor-mat/) provides six materials science prototype graph tasks with reference solutions, SHACL shapes, and SPARQL competency questions. Use them to learn the core OWL 2 DL structures before authoring your own:
 
-| Task | OWL pattern | Scenario |
-|------|-------------|----------|
+| Task | OWL construct | Scenario |
+|------|--------------|----------|
 | [T1](https://github.com/ThHanke/ontosphere/tree/main/benchmarks/ontoauthor-mat/T1) | `rdfs:subClassOf` | Steel alloy classification hierarchy |
 | [T2](https://github.com/ThHanke/ontosphere/tree/main/benchmarks/ontoauthor-mat/T2) | `owl:someValuesFrom` | Composite materials and their constituents |
 | [T3](https://github.com/ThHanke/ontosphere/tree/main/benchmarks/ontoauthor-mat/T3) | `owl:allValuesFrom` | Certified material supplier constraints |
@@ -133,18 +133,18 @@ The [OntoAuthor-Mat benchmark](https://github.com/ThHanke/ontosphere/tree/main/b
 | [T5](https://github.com/ThHanke/ontosphere/tree/main/benchmarks/ontoauthor-mat/T5) | `owl:sameAs` | Consolidating duplicate material entries |
 | [T6](https://github.com/ThHanke/ontosphere/tree/main/benchmarks/ontoauthor-mat/T6) | Unsatisfiability | Contradictory classification detection |
 
-Each task directory contains a natural-language brief, the reference OWL 2 DL solution, SHACL shapes (`shapes.ttl`), and SPARQL competency questions. Work through T1 and T2 first — they cover the two patterns that appear in most materials science measurement patterns.
+Each task directory contains a natural-language brief, the reference OWL 2 DL solution, SHACL shapes (`shapes.ttl`), and SPARQL competency questions. Work through T1 and T2 first — they cover the two structures that appear in most materials science measurement prototype graphs.
 
 ---
 
-## What the exported pattern must contain
+## What the exported TTL must contain
 
-For MapToMethod to use your pattern, the exported TTL must include:
+For MapToMethod to use your prototype graph, the exported TTL must include:
 
 | Requirement | Why |
 |---|---|
 | At least one `owl:NamedIndividual` | These are the link targets — MapToMethod binds CSV columns to named individual IRIs |
-| A `qudt:unit` annotation on quantity nodes | CSVToCSVW's unit detection aligns with QUDT; the pattern must agree |
+| A `qudt:unit` annotation on quantity nodes | CSVToCSVW's unit detection aligns with QUDT; the prototype graph must agree |
 | Publicly accessible URL | MapToMethod fetches the TTL over HTTP — local or intranet files are not reachable |
 
 The named individual IRI is the **slot key**: in the mapping step you will pair your CSV column name to this IRI.
@@ -153,6 +153,6 @@ The named individual IRI is the **slot key**: in the mapping step you will pair 
 
 ## Next step
 
-Once your pattern TTL is at a public URL:
+Once your prototype graph TTL is at a public URL:
 
-→ [Author a Mapping](author-a-mapping.md) — wire your CSVW columns to the pattern's named individual slots using MapToMethod.
+→ [Author a Mapping](author-a-mapping.md) — define the rules between your resource metadata (CSVW) and the prototype graph's named individual slots using MapToMethod.

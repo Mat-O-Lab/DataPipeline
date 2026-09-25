@@ -16,7 +16,7 @@ This guide walks through the complete mapping authoring workflow using real, pub
     - **[Ontosphere](https://thhanke.github.io/ontosphere)** (recommended) — browser-based RDF/OWL editor with built-in OWL 2 DL reasoning, SHACL validation, and a drag-and-drop workflow template catalog. No install required. See the [materials science benchmark tasks](https://github.com/ThHanke/ontosphere/tree/main/benchmarks/ontoauthor-mat/) for worked examples (steel alloy classification, composite materials, mechanical testing patterns).
     - **[Ontopanel](https://github.com/yuechenbam/yuechenbam.github.io)** — Draw.io plugin for graphical ontology authoring; established alternative, used in published DataStack workflows ([Nasrabadi et al., 2023](https://doi.org/10.1016/j.compind.2023.104016)).
 
-    If a pattern for your measurement type already exists in your community's ontology library (e.g. the [PMDCO pattern library](https://github.com/materialdigital/core-ontology/tree/main/patterns/)), you can use it directly — no authoring needed. If you need a new pattern, see [Author an Ontology Pattern](author-a-pattern.md) for the full Ontosphere workflow.
+    If a prototype graph for your measurement type already exists in your community's ontology library (e.g. the [PMDCO pattern library](https://github.com/materialdigital/core-ontology/tree/main/patterns/)), you can use it directly — no authoring needed. If you need a new prototype graph, see [Author a Prototype Graph](author-a-prototype-graph.md) for the full Ontosphere workflow.
 
 ---
 

@@ -77,7 +77,7 @@ nav:
   - Guides:
     - guides/index.md
     - Quickstart: guides/quickstart.md
-    - Author an Ontology Pattern: guides/author-a-pattern.md
+    - Author a Prototype Graph: guides/author-a-prototype-graph.md
     - Author a Mapping: guides/author-a-mapping.md
     - Standalone APIs: guides/standalone-apis.md
     - Add a Use Case: guides/add-a-use-case.md

@@ -49,7 +49,9 @@ The `owl:NamedIndividual` entries are the **named slots** — the data entry poi
 
 ## Ontosphere
 
-[Ontosphere](https://thhanke.github.io/ontosphere) is a zero-install, browser-based RDF/OWL 2 DL editor. It combines a visual graph canvas (Reactodia), an in-browser triple store (N3.js), and a full OWL 2 DL reasoner compiled to WebAssembly (Konclude). No backend, no account.
+[Ontosphere](https://thhanke.github.io/ontosphere) is a zero-install, browser-based RDF/OWL 2 DL editor. It works with any RDF — loading ontologies, exploring knowledge graphs, running inference, validating shapes. Here we use it specifically for authoring prototype graphs; its scope is broader than that.
+
+It combines a visual graph canvas (Reactodia), an in-browser triple store (N3.js), and a full OWL 2 DL reasoner compiled to WebAssembly (Konclude). No backend, no account.
 
 ### Overview video
 

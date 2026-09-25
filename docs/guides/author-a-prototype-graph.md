@@ -4,19 +4,26 @@ title: Author a Prototype Graph
 
 # Author a Prototype Graph
 
-Before you can map a CSV to a shared vocabulary, you need a **prototype graph** — a small Turtle file that defines the semantic structure for your measurement type: what entities exist, their types, and how they relate.
+**DataStack enriches data by filling prototype graphs.** A prototype graph is a semantic template — a Turtle file that describes the structure of any process, experiment, analysis routine, or workflow. When real data flows through the pipeline, DataStack instantiates that template: every data row becomes a concrete set of connected entities shaped like the prototype.
 
-This page shows how to create one using [Ontosphere](https://thhanke.github.io/ontosphere), a browser-based RDF/OWL 2 DL editor. No installation required.
+This page shows how to author prototype graphs using [Ontosphere](https://thhanke.github.io/ontosphere), a browser-based RDF/OWL 2 DL editor. No installation required.
 
-If a prototype graph for your measurement type already exists in your community's ontology library (e.g. the [PMDCO pattern library](https://github.com/materialdigital/core-ontology/tree/main/patterns/)), you can skip directly to [Author a Mapping](author-a-mapping.md).
+If a prototype graph for your use case already exists in your community's ontology library (e.g. the [PMDCO pattern library](https://github.com/materialdigital/core-ontology/tree/main/patterns/)), you can skip directly to [Author a Mapping](author-a-mapping.md).
 
 ---
 
 ## What is a prototype graph?
 
-A prototype graph is a reusable Turtle file that encodes one semantic concept — for example, "a tensile test result has a yield strength quality inhering in a specimen, measured as a scalar value in MPa."
+A prototype graph is a reusable Turtle file that defines the semantic structure of a real-world process or concept — an experiment, a measurement, an analysis routine, a script workflow, a material characterisation step. It specifies what entities are involved, what their types are, and how they relate to each other.
 
-In the mapping workflow it serves as the **template**: MapToMethod wires your CSV columns into the named slots the prototype graph defines. Every row in your CSV produces a new set of connected entities shaped like the prototype.
+The pipeline uses prototype graphs as **enrichment templates**: the mapping rules (authored in MapToMethod) connect your resource metadata (CSVW) to the named slots in the prototype. When RDFConverter runs, every row in your data fills those slots with real values — producing a knowledge graph where each data point is connected to the semantic context the prototype graph defines.
+
+A prototype graph can represent anything where you have a repeating structure that real data should fill:
+
+- a tensile test (specimen → measurement process → yield strength value)
+- a microscopy acquisition (instrument → settings → image → sample)
+- an analysis script run (input dataset → algorithm → output result)
+- a material composition (alloy → constituent elements → weight fractions)
 
 A minimal prototype graph for a length measurement looks like this:
 
@@ -36,7 +43,7 @@ A minimal prototype graph for a length measurement looks like this:
     qudt:unit unit:MilliM .
 ```
 
-The `owl:NamedIndividual` entries are the **named slots** that MapToMethod links your CSV columns to. The mapping you author later defines the rules between these slots and the resource metadata (CSVW).
+The `owl:NamedIndividual` entries are the **named slots** — the data entry points of the prototype. The mapping you author later defines the rules between these slots and the resource metadata (CSVW): which column fills which slot.
 
 ---
 

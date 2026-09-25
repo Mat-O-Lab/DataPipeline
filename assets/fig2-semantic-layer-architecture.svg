@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" font-family="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif">
+  <defs>
+    <linearGradient id="sem-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#005b7f"/>
+      <stop offset="100%" stop-color="#206b82"/>
+    </linearGradient>
+    <linearGradient id="ext-0" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#005b7f"/>
+      <stop offset="100%" stop-color="#03455f"/>
+    </linearGradient>
+    <linearGradient id="ext-1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#179C7d"/>
+      <stop offset="100%" stop-color="#0e7258"/>
+    </linearGradient>
+    <linearGradient id="ext-2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f58220"/>
+      <stop offset="100%" stop-color="#c96808"/>
+    </linearGradient>    <marker id="arr" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0,0 10,4 0,8" fill="#a6bbc8"/>
+    </marker>
+    <marker id="arr-up" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0,0 10,4 0,8" fill="#6c757d"/>
+    </marker>
+    <marker id="arr-rev" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="8" refX="0" refY="4" orient="auto">
+      <polygon points="10,0 0,4 10,8" fill="#a6bbc8"/>
+    </marker>
+    <marker id="arr-up-rev" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="8" refX="0" refY="4" orient="auto">
+      <polygon points="10,0 0,4 10,8" fill="#6c757d"/>
+    </marker>
+    <filter id="card-shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.145"/>
+    </filter>
+    <filter id="hero-shadow" x="-5%" y="-10%" width="110%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#005b7f" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="520" fill="#f0f4f7" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="34" text-anchor="middle" font-size="17" font-weight="700" fill="#005b7f">Semantic Layer Architecture</text>
+  <text x="450" y="52" text-anchor="middle" font-size="12" fill="#6c757d">The semantic layer bridges legacy systems to dataspace participation, DPP compliance, and AI</text>
+
+  <!-- ========== EXTERNAL SYSTEMS (top row, above company) ========== -->
+  <!-- Dataspace / Partners -->
+  <rect x="50" y="72" width="215" height="50" rx="10" fill="url(#ext-0)" filter="url(#card-shadow)"/>
+  <text x="157" y="93" text-anchor="middle" font-size="12" font-weight="700" fill="white">Dataspace</text>
+  <text x="157" y="109" text-anchor="middle" font-size="10" fill="#ffffff" opacity="0.7">Partners · suppliers · customers</text>
+
+  <!-- EU DPP Registry -->
+  <rect x="340" y="72" width="220" height="50" rx="10" fill="url(#ext-1)" filter="url(#card-shadow)"/>
+  <text x="450" y="93" text-anchor="middle" font-size="12" font-weight="700" fill="white">EU DPP Registry</text>
+  <text x="450" y="109" text-anchor="middle" font-size="10" fill="#ffffff" opacity="0.72">Central registry · live July 2026</text>
+
+  <!-- R&D / Certification -->
+  <rect x="635" y="72" width="215" height="50" rx="10" fill="url(#ext-2)" filter="url(#card-shadow)"/>
+  <text x="742" y="93" text-anchor="middle" font-size="12" font-weight="700" fill="white">R&amp;D · Certification</text>
+  <text x="742" y="109" text-anchor="middle" font-size="10" fill="#ffffff" opacity="0.8">Cross-company collaboration</text>
+
+  <!-- ========== COMPANY BOUNDARY ========== -->
+  <rect x="15" y="133" width="870" height="352" rx="12" fill="none" stroke="#c8d8e4" stroke-width="1.5" stroke-dasharray="8,5"/>
+  <text x="30" y="150" font-size="9" font-weight="700" fill="#a6bbc8" letter-spacing="1.5">COMPANY BOUNDARY</text>
+
+  <!-- Vertical arrows: App layer ↔ External (through company boundary) -->
+  <line x1="157" y1="190" x2="157" y2="122" stroke="#6c757d" stroke-width="1.5" marker-end="url(#arr-up)" marker-start="url(#arr-up-rev)"/>
+  <line x1="450" y1="190" x2="450" y2="122" stroke="#6c757d" stroke-width="1.5" marker-end="url(#arr-up)"/>
+  <line x1="742" y1="190" x2="742" y2="122" stroke="#6c757d" stroke-width="1.5" marker-end="url(#arr-up)" marker-start="url(#arr-up-rev)"/>
+
+  <!-- ========== APPLICATION LAYER ========== -->
+  <!-- Data Catalog (CKAN) -->
+  <rect x="45" y="160" width="224" height="50" rx="8" fill="white" stroke="#c8d8e4" stroke-width="1.5" filter="url(#card-shadow)"/>
+  <rect x="45" y="160" width="6" height="50" rx="3" fill="#b2d235"/>
+  <text x="168" y="180" text-anchor="middle" font-size="12" font-weight="700" fill="#343a40">Data Catalog (CKAN)</text>
+  <text x="168" y="196" text-anchor="middle" font-size="10" fill="#6c757d">DCAT · discovery · metadata</text>
+
+  <!-- DPP Generator -->
+  <rect x="338" y="160" width="224" height="50" rx="8" fill="white" stroke="#c8d8e4" stroke-width="1.5" filter="url(#card-shadow)"/>
+  <rect x="338" y="160" width="6" height="50" rx="3" fill="#f58220"/>
+  <text x="461" y="180" text-anchor="middle" font-size="12" font-weight="700" fill="#343a40">DPP Generator</text>
+  <text x="461" y="196" text-anchor="middle" font-size="10" fill="#6c757d">JSON-LD · GS1 Digital Link · batch</text>
+
+  <!-- Dataspace Connector -->
+  <rect x="631" y="160" width="224" height="50" rx="8" fill="white" stroke="#c8d8e4" stroke-width="1.5" filter="url(#card-shadow)"/>
+  <rect x="631" y="160" width="6" height="50" rx="3" fill="#005b7f"/>
+  <text x="754" y="180" text-anchor="middle" font-size="12" font-weight="700" fill="#343a40">Dataspace Connector</text>
+  <text x="754" y="196" text-anchor="middle" font-size="10" fill="#6c757d">Eclipse EDC · Tractus-X · policies</text>
+
+  <!-- Vertical arrows: Semantic ↔ Application (bidirectional) -->
+  <line x1="168" y1="282" x2="168" y2="210" stroke="#a6bbc8" stroke-width="1.5" marker-end="url(#arr)" marker-start="url(#arr-rev)"/>
+  <line x1="450" y1="282" x2="450" y2="210" stroke="#a6bbc8" stroke-width="1.5" marker-end="url(#arr)" marker-start="url(#arr-rev)"/>
+  <line x1="742" y1="282" x2="742" y2="210" stroke="#a6bbc8" stroke-width="1.5" marker-end="url(#arr)" marker-start="url(#arr-rev)"/>
+
+  <!-- ========== SEMANTIC LAYER (hero element) ========== -->
+  <rect x="28" y="282" width="844" height="68" rx="12" fill="url(#sem-grad)" filter="url(#hero-shadow)"/>
+  <rect x="33" y="287" width="834" height="58" rx="8" fill="none" stroke-width="1" stroke="#ffffff" stroke-opacity="0.1"/>
+  <!-- Decorative nodes inside semantic layer -->
+  <circle cx="60" cy="316" r="4" fill="#ffffff" opacity="0.2"/>
+  <circle cx="82" cy="308" r="4" fill="#ffffff" opacity="0.2"/>
+  <circle cx="76" cy="328" r="3" fill="#ffffff" opacity="0.15"/>
+  <line x1="60" y1="316" x2="82" y2="308" stroke-width="1" stroke="#ffffff" stroke-opacity="0.15"/>
+  <line x1="82" y1="308" x2="76" y2="328" stroke-width="1" stroke="#ffffff" stroke-opacity="0.15"/>
+  <circle cx="846" cy="310" r="4" fill="#ffffff" opacity="0.2"/>
+  <circle cx="862" cy="322" r="4" fill="#ffffff" opacity="0.2"/>
+  <circle cx="852" cy="330" r="3" fill="#ffffff" opacity="0.15"/>
+  <line x1="846" y1="310" x2="862" y2="322" stroke-width="1" stroke="#ffffff" stroke-opacity="0.15"/>
+  <!-- Main label -->
+  <text x="450" y="310" text-anchor="middle" font-size="15" font-weight="700" fill="white" letter-spacing="0.5">SEMANTIC LAYER · Knowledge Graph · Ontology-based (BFO / IOF)</text>
+  <text x="450" y="330" text-anchor="middle" font-size="11" fill="#ffffff" opacity="0.68">RDF store · SPARQL endpoint · schema-agnostic queries · export to any format</text>
+  <!-- "Write once" tag -->
+  <rect x="362" y="324" width="176" height="20" rx="10" fill="#ffffff" opacity="0.15"/>
+  <text x="450" y="338" text-anchor="middle" font-size="10" font-weight="600" fill="#ffffff" opacity="0.88">✦ Write once — publish anywhere</text>
+
+  <!-- Vertical arrows: Legacy → Semantic -->
+  <line x1="145" y1="400" x2="145" y2="350" stroke="#a6bbc8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="340" y1="400" x2="340" y2="350" stroke="#a6bbc8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="540" y1="400" x2="540" y2="350" stroke="#a6bbc8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="740" y1="400" x2="740" y2="350" stroke="#a6bbc8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ========== LEGACY SYSTEMS ========== -->
+  <rect x="45" y="400" width="195" height="60" rx="8" fill="white" stroke="#dee2e6" stroke-width="1" filter="url(#card-shadow)"/>
+  <rect x="45" y="400" width="5" height="60" rx="2" fill="#dee2e6"/>
+  <text x="152" y="423" text-anchor="middle" font-size="12" font-weight="600" fill="#495057">ERP / SAP</text>
+  <text x="152" y="440" text-anchor="middle" font-size="10" fill="#adb5bd">Product master · BOM</text>
+  <text x="152" y="454" text-anchor="middle" font-size="10" fill="#adb5bd">Oracle · SAP S/4HANA</text>
+
+  <rect x="255" y="400" width="175" height="60" rx="8" fill="white" stroke="#dee2e6" stroke-width="1" filter="url(#card-shadow)"/>
+  <rect x="255" y="400" width="5" height="60" rx="2" fill="#dee2e6"/>
+  <text x="347" y="423" text-anchor="middle" font-size="12" font-weight="600" fill="#495057">PLM / CAD</text>
+  <text x="347" y="440" text-anchor="middle" font-size="10" fill="#adb5bd">Design · specs</text>
+  <text x="347" y="454" text-anchor="middle" font-size="10" fill="#adb5bd">Teamcenter · Windchill</text>
+
+  <rect x="445" y="400" width="175" height="60" rx="8" fill="white" stroke="#dee2e6" stroke-width="1" filter="url(#card-shadow)"/>
+  <rect x="445" y="400" width="5" height="60" rx="2" fill="#dee2e6"/>
+  <text x="537" y="423" text-anchor="middle" font-size="12" font-weight="600" fill="#495057">MES / SCADA</text>
+  <text x="537" y="440" text-anchor="middle" font-size="10" fill="#adb5bd">Process · quality</text>
+  <text x="537" y="454" text-anchor="middle" font-size="10" fill="#adb5bd">Manufacturing exec.</text>
+
+  <rect x="635" y="400" width="210" height="60" rx="8" fill="white" stroke="#dee2e6" stroke-width="1" filter="url(#card-shadow)"/>
+  <rect x="635" y="400" width="5" height="60" rx="2" fill="#dee2e6"/>
+  <text x="750" y="423" text-anchor="middle" font-size="12" font-weight="600" fill="#495057">Material Database</text>
+  <text x="750" y="440" text-anchor="middle" font-size="10" fill="#adb5bd">Properties · SDS · TDS</text>
+  <text x="750" y="454" text-anchor="middle" font-size="10" fill="#adb5bd">MatDB · in-house systems</text>
+
+  <!-- Footer note -->
+  <text x="450" y="494" text-anchor="middle" font-size="11" fill="#6c757d">No legacy system replacement required — the semantic layer maps existing data to shared vocabularies</text>
+</svg>

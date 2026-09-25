@@ -163,11 +163,17 @@ You do not need to work with this file directly.
 
 ---
 
-**Step 5 — CKAN finds a matching rule file**
+**Step 5 — CKAN identifies what the data is about**
 
-CKAN searches its `mappings` group — a library of rule files that describe how to translate your column structure into a shared scientific vocabulary. It tests each rule file against your data. If one matches your column names exactly, it is selected automatically.
+CKAN searches its `mappings` group — a library of rule files, each encoding the semantic structure of one data type (tensile test, TEM detection run, Catena-X material record, …). It tests each rule file against your column structure. When one matches, two things happen simultaneously:
 
-These rule files are what data engineers author to connect a lab's specific column naming conventions to common ontology terms. See [Author a Mapping](../guides/author-a-mapping.md) if your data needs a custom rule file.
+1. The pipeline knows *which rule file to apply* — no manual selection needed.
+2. The pipeline knows *what kind of measurement or process this data represents* — the matched rule file carries that semantic identity.
+
+!!! note "Matching = identification"
+    The rule file is not just a transformation recipe. It is the pipeline's way of recognising what your data is about. Every column name, unit annotation, and structural pattern in your CSV narrows the match until only one rule file fits. This is what makes the pipeline self-organising: upload data in a known format and the pipeline classifies and enriches it automatically.
+
+These rule files are what data engineers author once per data type. See [Author a Mapping](../guides/author-a-mapping.md) if your data needs a new rule file.
 
 ---
 

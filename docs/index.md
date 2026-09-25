@@ -54,7 +54,7 @@ The pipeline does not need to be told which row applies to a given upload. When 
 
 For example: upload image acquisition metadata and the pipeline selects a microscopy mapping that knows about instrument parameters and acquisition context. Upload a CSV whose column names and unit annotations match a tensile test rule file exactly, and that mapping is selected instead.
 
-Matching is strict — if the columns differ even slightly (different machine output, different export format), none of the rules apply and the file is left unenriched rather than partially processed. This means one machine model may need its own mapping file. The key insight is that multiple mapping files can all point to the same prototype graph: an INSTRON tensile tester and a Zwick tensile tester produce differently named columns, but both get mapped to the same tensile test semantic structure. The mapping handles the format difference; the prototype graph defines what the data *means*.
+Matching is based on the names and annotations in the metadata — not on column order or row order in the raw data. A rule applies if the named items it references are present; column sequence does not matter. But if the names themselves differ (different machine output, different export format), the rules do not match and the file is left unenriched rather than partially processed. This means one machine model may need its own mapping file. The key insight is that multiple mapping files can all point to the same prototype graph: an INSTRON tensile tester and a Zwick tensile tester produce differently named columns, but both get mapped to the same tensile test semantic structure. The mapping handles the format difference; the prototype graph defines what the data *means*.
 
 ---
 

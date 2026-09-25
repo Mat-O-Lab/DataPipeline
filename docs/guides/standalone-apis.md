@@ -35,7 +35,9 @@ Run them in order — CSVToCSVW first, RDFConverter last. MapToMethod is needed 
 
 Go to **[csvtocsvw.matolab.org](https://csvtocsvw.matolab.org/)**.
 
-You will see a form with a field labelled **data_url**.
+![CSVToCSVW web UI — URL input, file upload, and Start Conversion button](../assets/ui-csvtocsvw.png)
+
+You will see a form with a field labelled **URL Data File**.
 
 Paste the URL of your CSV file into that field, then click **Execute**.
 
@@ -66,6 +68,8 @@ On the same CSVToCSVW page, look for the **annotate_upload** form. Use the file 
 
 Go to **[maptomethod.matolab.org](https://maptomethod.matolab.org/)**.
 
+![MapToMethod web UI — metadata URL, template URL, type selector panels, and Start Mapping button](../assets/ui-maptomethod.png)
+
 The **types** form shows you which categories of scientific concepts appear in your annotated file. The **entities** form lists your individual columns with their internal names — the identifiers you will need when building a mapping.
 
 To explore the IOFMaterialsTutorial CSVW, paste this URL into the url field on the /api/types form:
@@ -85,6 +89,8 @@ See [Author a Mapping](author-a-mapping.md) for a full walkthrough of building t
 ## Step 3 — Convert to FAIR data (RDFConverter)
 
 Go to **[rdfconverter.matolab.org](https://rdfconverter.matolab.org/)**.
+
+![RDFConverter web UI — YARRRML mapping URL, optional data source URL, and Start Conversion button](../assets/ui-rdfconverter.png)
 
 **First, validate your mapping (recommended):**
 

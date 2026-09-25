@@ -72,7 +72,7 @@ mappings:
       - [mat:youngsModulus, $(youngsModulus), xsd:decimal]
 ```
 
-Every property name in the `po` block matches the SAMM aspect model schema exactly — this is what lets Stage 2 join the data graph with the schema graph.
+Every property name in the `po` block matches the SAMM aspect model schema exactly. Unlike the CSV path — where the prototype graph is a separate TTL loaded at mapping time — the SAMM schema is encoded directly into the YARRRML prefixes and property names. The schema knowledge is baked into the mapping rules rather than resolved at runtime. This is what lets Stage 2 join the data graph with the schema graph reliably.
 
 ---
 

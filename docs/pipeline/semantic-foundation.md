@@ -62,7 +62,7 @@ You may have encountered FAIR data principles (Findable, Accessible, Interoperab
 | **Interoperable** | Data is annotated using shared community ontologies, so any system using the same vocabulary can interpret it without human translation |
 | **Reusable** | Datasets carry persistent URIs and open ontology links — meaning the data remains interpretable years later, even without the original author |
 
-At [dataportal.material-digital.de](https://dataportal.material-digital.de/), you can see these principles applied to real materials science datasets — tensile tests, microstructure measurements, and synthesis records — shared across institutions using this infrastructure.
+At [dataportal.material-digital.de](https://dataportal.material-digital.de/), you can see these principles applied to real materials science datasets shared across institutions using this infrastructure — browse by topic: [tensile tests](https://dataportal.material-digital.de/dataset?q=tensile+tests) · [Vickers hardness](https://dataportal.material-digital.de/dataset?q=Vickers) · [creep](https://dataportal.material-digital.de/dataset?q=Creep) · [knowledge graphs](https://dataportal.material-digital.de/dataset?q=knowledge-graph).
 
 ---
 

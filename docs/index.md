@@ -56,8 +56,8 @@ The same pipeline handles different scientific and industrial data formats:
 
 DataStack runs at public data portals:
 
-- **[futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space/)** — 26 Catena-X datasets published with automatically generated semantic metadata
-- **[dataportal.material-digital.de](https://dataportal.material-digital.de/)** — Cross-project materials data, including PA6GF30 / Catena-X use cases
+- **[futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space/)** — 26 Catena-X datasets published with automatically generated semantic metadata · search: [SAMM](https://futurecarproduction.materialsdata.space/dataset?tags=SAMM) · [AAS](https://futurecarproduction.materialsdata.space/dataset?tags=Asset+Administration+Shell) · [microscopy](https://futurecarproduction.materialsdata.space/dataset?tags=Mikroskopie)
+- **[dataportal.material-digital.de](https://dataportal.material-digital.de/)** — Cross-project materials data, including PA6GF30 / Catena-X use cases · search: [tensile tests](https://dataportal.material-digital.de/dataset?q=tensile+tests) · [Vickers](https://dataportal.material-digital.de/dataset?q=Vickers) · [Creep](https://dataportal.material-digital.de/dataset?q=Creep) · [knowledge graph](https://dataportal.material-digital.de/dataset?q=knowledge-graph)
 
 The pipeline approach is documented in peer-reviewed publications:
 

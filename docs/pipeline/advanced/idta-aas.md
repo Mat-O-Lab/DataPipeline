@@ -38,42 +38,56 @@ For the two-stage pattern and the reasoning behind it, see [SAMM / Catena-X Pipe
 
 ## YARRRML mapping structure
 
-The mapping uses multiple JSONPath iterators. Each iterator selects a specific `SubmodelElementCollection` by `idShort` and emits one group of PMDco triples. The snippet below is illustrative of the real pattern applied to a steel alloy AAS submodel.
+The real `InspectionDocumentsOfSteelProducts.json-to-pmdco.yaml` (published on [futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space/dataset/e608c577-19a8-48d5-ad5e-310ab741d11b)) maps an AAS-aligned steel inspection document JSON directly to PMDco in a single pass:
 
 ```yaml
-# illustrative example — structure matches the AAS single-stage pattern described in
-# docs/specs/samm-idta-pipeline-patterns.json, pattern_b_idta_aas
 prefixes:
-  rr:   'http://www.w3.org/ns/r2rml#'
-  rml:  'http://semweb.mmlab.be/ns/rml#'
-  ql:   'http://semweb.mmlab.be/ns/ql#'
-  pmd:  'https://w3id.org/pmd/co/'
-  qudt: 'http://qudt.org/schema/qudt/'
-  unit: 'http://qudt.org/vocab/unit/'
-  xsd:  'http://www.w3.org/2001/XMLSchema#'
-
-sources:
-  tensileStrength:
-    access: '$(data_url)'
-    referenceFormulation: jsonpath
-    # Filter: pick the Property element whose idShort is 'TensileStrength'
-    iterator: "$.submodelElements[?(@.idShort=='MechanicalProperties')].value[?(@.idShort=='TensileStrength')]"
+  ex:   http://www.example.org/#
+  pmd:  https://w3id.org/pmd/co/
+  obo:  http://purl.obolibrary.org/obo/
+  tto:  https://w3id.org/pmd/tto/
+  qudt: https://qudt.org/schema/qudt/
+  rdfs: http://www.w3.org/2000/01/rdf-schema#
 
 mappings:
-  TensileStrengthQuality:
-    sources: [tensileStrength]
-    s: pmd:quality_tensile_$(value)
+  material:
+    sources: root
+    s: ex:316-4401_material
     po:
-      - [a, pmd:TensileStrength]
-      - [qudt:numericValue, $(value), xsd:decimal]
-      - [qudt:unit, unit:MegaPascal]
+      - [a, pmd:PMD_0000000]
+      - [a, obo:BFO_0000040]
+      - [rdfs:label, "N/A"]
+      - p: obo:RO_0000086
+        o:
+          - mapping: tensile_strength
+          - mapping: yield_strength
+          - mapping: elongation_after_fracture
+
+  tensile_strength_value:
+    sources: tensile_src
+    s: ex:316-4401_tensile_strength_value
+    po:
+      - [a, qudt:QuantityValue]
+      - [rdfs:label, "Tensile Strength Mean"]
+      - [qudt:numericValue, $(value)]
+      - [qudt:unit, qudt:MegaPA~iri]
+
+  fraction_carbon:
+    sources: carbon_src
+    s: ex:316-4401_fraction_carbon
+    po:
+      - [a, pmd:PMD_0025997]
+      - [obo:IAO_0000039, obo:UO_0000163~iri]
+      - [obo:OBI_0001937, $(value)]
 ```
+
+The input JSON (`InspectionDocument_316_4401_alloy.json`) and the resulting PMDco TTL are published at [dataportal.material-digital.de — Steel Inspection Document Mapro](https://dataportal.material-digital.de/dataset/a725c4a1-a463-47f8-bad3-fe84b73ef0d3).
 
 Key characteristics:
 
-- **Iterator per property** — one JSONPath filter per `idShort` keeps each mapping rule focused and readable.
-- **No schema graph join** — the `idShort` values are stable across AAS instances; no external TTL is needed to resolve their semantics.
-- **Direct PMDco output** — the `po` block maps straight to the target ontology. There is no intermediate CX or SAMM namespace.
+- **Direct PMDco output** — `po` blocks map straight to `pmd:`, `obo:`, `qudt:` — no intermediate namespace.
+- **No schema graph join** — source semantics are fully captured by the JSON structure and field names; no external TTL is needed.
+- **Composition as mass fractions** — `fraction_carbon` and siblings use `pmd:PMD_0025997` (mass fraction) with `obo:UO_0000163` (percent) as unit.
 
 ---
 
@@ -122,5 +136,4 @@ Use the [two-stage SAMM pattern](samm-catena-x.md) when:
 - You need to preserve source semantics in an intermediate named graph for provenance or downstream SPARQL queries
 - The ontology translation logic is complex enough to warrant a separate SPARQL CONSTRUCT file
 
-!!! info "Detailed walkthrough coming"
-    A step-by-step walkthrough with a real AAS submodel download, full YARRRML file, and Fuseki query is planned. In the meantime, the [SAMM / Catena-X page](samm-catena-x.md) provides the most complete end-to-end example of the DataStack pipeline, including the Stage 1 YARRRML structure that the AAS pattern mirrors.
+The full 11.9 KB YARRRML file covers mechanical properties (tensile strength, yield strength, elongation), chemical composition fractions (C, Cr, Mn, Mo, Ni, N, P, Si, S), and material identity — all in one pass.

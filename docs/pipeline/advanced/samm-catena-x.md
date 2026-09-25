@@ -198,6 +198,51 @@ Each `samm-mapping-*` dataset on the portal carries four resource types:
 
 The [Cross-Project Use Case dataset](https://dataportal.material-digital.de/dataset/cross-project-use-case) at dataportal.material-digital.de demonstrates the full pipeline for **PA6GF30** (30% glass-filled polyamide 6), sourced from a Catena-X industrial dataspace participant via Eclipse Dataspace Connector (EDC).
 
+All files are published on [dataportal.material-digital.de — Cross Project Use Case](https://dataportal.material-digital.de/dataset/f2bca6a2-04df-47cb-9439-589e46ba60e2).
+
+**Input JSON** (`material_data_test_pa6gf30.json`) — flat Catena-X payload:
+
+```json
+{
+  "materialInformation": {
+    "materialName": "PA6GF30",
+    "materialIdentifier": "Z1234"
+  },
+  "mechanicalProperty": {
+    "flexuralStrength": 210,
+    "youngsModulus": 9800,
+    "strainAtBreak": 3
+  },
+  "thermophysicalProperty": {
+    "humidity": 2.1,
+    "glassTransitionTemperature": 20,
+    "meltingTemperature": 223
+  },
+  "physicalProperty": { "density": 1530 }
+}
+```
+
+**Stage 1 output** (`material_data_test_pa6gf30-joined.ttl`) — SAMM-aligned RDF, the payload enriched by its prototype graph:
+
+```turtle
+@prefix mat: <urn:samm:io.catenax.material_data:1.0.0#> .
+
+<#MaterialData_Z1234> a mat:MaterialData ;
+    mat:materialInformation <#MaterialInformation_Z1234> ;
+    mat:mechanicalProperty <#MechanicalProperty_210_9800> .
+
+<#MaterialInformation_Z1234> a mat:MaterialInformationEntity ;
+    mat:materialIdentifier "Z1234" ;
+    mat:materialName "PA6GF30" .
+
+<#MechanicalProperty_210_9800> a mat:MechanicalPropertyEntity ;
+    mat:youngsModulus "9800" ;
+    mat:flexuralStrength "210" ;
+    mat:impactStrength "74" .
+```
+
+The flat JSON values are now typed instances in the `mat:` SAMM namespace — self-contained and queryable before Stage 2 runs.
+
 End-to-end workflow orchestrated by `cross_project_usecase.ipynb`:
 
 1. **Retrieve** — pull PA6GF30 JSON payload from Catena-X dataspace via EDC

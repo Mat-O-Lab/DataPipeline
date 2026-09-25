@@ -52,7 +52,9 @@ The same pipeline handles different scientific and industrial data formats:
 
 The pipeline does not need to be told which row applies to a given upload. When data arrives, CKAN tests it against its library of mapping rule files. The file that matches *identifies* what the data is about — and simultaneously provides the enrichment rules. No manual classification step, no format-specific pipeline branch.
 
-For example: upload image acquisition metadata and the pipeline selects a microscopy mapping that knows about instrument parameters and acquisition context. Upload a CSV whose columns match a tensile test rule file — same column names, same unit annotations — and that mapping is selected instead, enriching the data with tensile test semantics. A different CSV with different column names finds a different match. If no mapping in the library fits, the pipeline leaves the data unenriched rather than guessing.
+For example: upload image acquisition metadata and the pipeline selects a microscopy mapping that knows about instrument parameters and acquisition context. Upload a CSV whose column names and unit annotations match a tensile test rule file exactly, and that mapping is selected instead.
+
+Matching is strict — if the columns differ even slightly (different machine output, different export format), none of the rules apply and the file is left unenriched rather than partially processed. This means one machine model may need its own mapping file. The key insight is that multiple mapping files can all point to the same prototype graph: an INSTRON tensile tester and a Zwick tensile tester produce differently named columns, but both get mapped to the same tensile test semantic structure. The mapping handles the format difference; the prototype graph defines what the data *means*.
 
 ---
 

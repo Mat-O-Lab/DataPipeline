@@ -58,7 +58,6 @@ DataStack runs at public data portals:
 
 - **[futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space/)** — 26 Catena-X datasets published with automatically generated semantic metadata
 - **[dataportal.material-digital.de](https://dataportal.material-digital.de/)** — Cross-project materials data, including PA6GF30 / Catena-X use cases
-- **[ckan.iwm.fraunhofer.de](https://ckan.iwm.fraunhofer.de/)** — Fraunhofer IWM data portal; hosts tensile, Brinell, and Vickers hardness datasets from the digital mechanical testing lab demonstrator
 
 The pipeline approach is documented in peer-reviewed publications:
 

@@ -229,5 +229,5 @@ Plus, after loading into the query database:
 
 **Publications describing this pipeline:**
 
-- Nasrabadi, Hanke et al. (2023). *Toward a digital materials mechanical testing lab.* Computers in Industry, 153, 104016. [doi:10.1016/j.compind.2023.104016](https://doi.org/10.1016/j.compind.2023.104016) — describes the CSV→CSVW→YARRRML→RDF workflow with real tensile test data; datasets published at [ckan.iwm.fraunhofer.de](https://ckan.iwm.fraunhofer.de/dataset/toward-a-digital-materials-mechanical-testing-lab-1a71b8a5)
+- Nasrabadi, Hanke et al. (2023). *Toward a digital materials mechanical testing lab.* Computers in Industry, 153, 104016. [doi:10.1016/j.compind.2023.104016](https://doi.org/10.1016/j.compind.2023.104016) — describes the CSV→CSVW→YARRRML→RDF workflow with real tensile test data
 - Hanke et al. (2023). *FAIR microscopy data via the Mat-O-Lab pipeline.* Scientific Data (Nature). [doi:10.1038/s41597-023-02244-6](https://doi.org/10.1038/s41597-023-02244-6)

@@ -356,7 +356,7 @@ data:Zugfestigkeit29 a oa:Annotation ;
         qudt:value 314 ] .
 ```
 
-The full dataset is published at [ckan.iwm.fraunhofer.de](https://ckan.iwm.fraunhofer.de/dataset/toward-a-digital-materials-mechanical-testing-lab-1a71b8a5).
+The full dataset and paper are available via the publication DOI above.
 
 ### IOFMaterialsTutorial (length measurements)
 

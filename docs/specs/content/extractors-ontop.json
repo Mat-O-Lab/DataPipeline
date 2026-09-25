@@ -1,0 +1,57 @@
+{
+  "page": "extractors/ontop.md",
+  "title": "Ontop (SQL Bridge)",
+  "status": "stub",
+  "primary_persona": "P4",
+  "secondary_personas": [],
+  "narrative_arc": {
+    "enters_knowing": "They have a SQL database and want to expose it as SPARQL without ETL.",
+    "leaves_knowing": "What Ontop is, that it is an external tool (not Mat-O-Lab maintained), when to use it, and how its virtual SPARQL output can connect to the DataStack.",
+    "steps": [
+      "What Ontop is — OBDA (Ontology-Based Data Access) bridge, virtual SPARQL over SQL, no ETL",
+      "External tool note — not maintained by Mat-O-Lab; link to Ontop documentation",
+      "R2RML/OBDA mapping — minimal explanation, link to Ontop docs",
+      "Integration with DataStack — Ontop SPARQL endpoint can serve as data source for downstream mapping",
+      "No Mat-O-Lab integration built yet — honest limitation"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [],
+    "example_urls": {
+      "ontop": "https://ontop-vkg.org/",
+      "r2rml": "https://www.w3.org/TR/r2rml/"
+    },
+    "live_api_calls": []
+  },
+  "inline_assets_required": [],
+  "walkthrough_requirements": [],
+  "quality_gate": [
+    "External tool note prominent",
+    "Link to Ontop official documentation",
+    "No Mat-O-Lab integration note honest",
+    "Kept short — no more than one page of content",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Lowest priority. Keep short — explain what it is, link to official docs, note the gap. No Mat-O-Lab-specific content exists. If no meaningful content can be added beyond the stub, keep with '!!! info \"External tool\"' admonition and links.",
+  "audience": {
+    "primary": {
+      "code": "P4",
+      "name": "Domain Scientist",
+      "knows": [
+        "Their scientific domain deeply (materials science, microscopy, lab procedures)",
+        "CSV and spreadsheet data",
+        "Measurement concepts and experimental workflows they consider universal",
+        "Domain-specific tools (OMERO, ELN systems, instrument software)"
+      ],
+      "does_not_know": [
+        "Ontology terms like PMDCO, CHAMEO, EMMO even if these describe their own work",
+        "How ontologies model domain concepts — that this modeling discipline exists at all",
+        "SPARQL, RDF, or any semantic technology",
+        "Docker, APIs, or configuration"
+      ],
+      "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results.",
+      "key_gap": "Double gap: (1) no semantic web knowledge whatsoever, and (2) domain experts frequently assume their concepts are universal common knowledge when they are not — documentation must not assume shared domain vocabulary and must explain what gets modeled and why, not just how."
+    }
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
+}

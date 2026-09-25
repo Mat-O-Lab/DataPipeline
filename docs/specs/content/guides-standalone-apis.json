@@ -1,0 +1,127 @@
+{
+  "page": "guides/standalone-apis.md",
+  "title": "Standalone APIs",
+  "status": "authored",
+  "primary_persona": "P4",
+  "secondary_personas": [
+    "P3"
+  ],
+  "narrative_arc": {
+    "enters_knowing": "They want to use the microservices without CKAN — scripted pipelines, CI/CD, batch processing.",
+    "leaves_knowing": "One working curl per service, a chaining shell script for full CSV→RDF pipeline, upload endpoint for private data.",
+    "steps": [
+      "CSVToCSVW — annotate CSV from URL, diff against pre-computed result, upload endpoint for private data",
+      "MapToMethod — types and entities exploration, generate YARRRML mapping",
+      "RDFConverter — validate (checkmapping), convert (createrdf) with inline JSON response",
+      "Full pipeline shell script — CSV→CSVW→validate→RDF using real IOFMaterialsTutorial data",
+      "Other real working examples table — IOFMaterialsTutorial + BAMresearch DF-TEM-PAW"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/csvtocsvw-service.json",
+      "docs/specs/maptomethod-service.json",
+      "docs/specs/rdfconverter-service.json"
+    ],
+    "example_urls": {
+      "example_csv": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv",
+      "example_csvw": "https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example2-metadata.json",
+      "iof_csvw": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json",
+      "iof_mapping": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml",
+      "iof_joined": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-joined.ttl",
+      "bam_csv": "https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs.csv",
+      "bam_mapping": "https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-map.yaml",
+      "bam_joined": "https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-joined.ttl"
+    },
+    "live_api_calls": [
+      "POST https://csvtocsvw.matolab.org/api/annotate with example2.csv URL",
+      "GET https://maptomethod.matolab.org/api/types with IOFMaterialsTutorial CSVW",
+      "POST https://rdfconverter.matolab.org/api/checkmapping with IOFMaterialsTutorial data",
+      "POST https://rdfconverter.matolab.org/api/createrdf with IOFMaterialsTutorial data"
+    ]
+  },
+  "inline_assets_required": [
+    {
+      "type": "bash",
+      "description": "curl POST /api/annotate with real example2.csv URL. Already in page.",
+      "status": "done"
+    },
+    {
+      "type": "bash",
+      "description": "curl GET /api/types + inline JSON response. Already in page.",
+      "status": "done"
+    },
+    {
+      "type": "bash",
+      "description": "curl POST /api/checkmapping + inline JSON response {rules_applicable, rules_skipped}. Already in page.",
+      "status": "done"
+    },
+    {
+      "type": "bash",
+      "description": "curl POST /api/createrdf + inline JSON response with num_mappings_applied. Already in page.",
+      "status": "done"
+    },
+    {
+      "type": "bash",
+      "description": "Full 3-step shell script: CSV→CSVW→validate→RDF. Already in page.",
+      "status": "done"
+    }
+  ],
+  "walkthrough_requirements": [
+    {
+      "step": "Annotate CSV",
+      "command": "curl -X POST 'https://csvtocsvw.matolab.org/api/annotate?return_type=json-ld' -H 'Content-Type: application/json' -d '{\"data_url\": \"https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv\", \"encoding\": \"auto\"}'",
+      "expected": "CSVW JSON-LD with column annotations",
+      "status": "done"
+    }
+  ],
+  "quality_gate": [
+    "One curl example per service (CSVToCSVW, MapToMethod, RDFConverter)",
+    "Full chaining shell script present",
+    "Upload endpoint for private data documented (annotate_upload)",
+    "num_mappings_applied and num_mappings_skipped visible in createrdf response",
+    "Real-world examples table (IOFMaterialsTutorial + BAMresearch)",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Page is fully authored. All curl commands use real IOFMaterialsTutorial URLs and are reproducible. RDFConverter response shows correct field names (num_mappings_applied, num_mappings_skipped, graph). No issues found in prior session.",
+  "audience": {
+    "primary": {
+      "code": "P4",
+      "name": "Domain Scientist",
+      "knows": [
+        "Their scientific domain deeply (materials science, microscopy, lab procedures)",
+        "CSV and spreadsheet data",
+        "Measurement concepts and experimental workflows they consider universal",
+        "Domain-specific tools (OMERO, ELN systems, instrument software)"
+      ],
+      "does_not_know": [
+        "Ontology terms like PMDCO, CHAMEO, EMMO even if these describe their own work",
+        "How ontologies model domain concepts — that this modeling discipline exists at all",
+        "SPARQL, RDF, or any semantic technology",
+        "Docker, APIs, or configuration"
+      ],
+      "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results.",
+      "key_gap": "Double gap: (1) no semantic web knowledge whatsoever, and (2) domain experts frequently assume their concepts are universal common knowledge when they are not — documentation must not assume shared domain vocabulary and must explain what gets modeled and why, not just how."
+    },
+    "secondary": [
+      {
+        "code": "P3",
+        "name": "Data Engineer",
+        "goal": "Connect data sources, author mappings, and query transformation results."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation",
+  "maintenance": {
+    "screenshots": [
+      { "file": "docs/assets/ui-csvtocsvw.png", "url": "https://csvtocsvw.matolab.org/", "used_in": "guides/standalone-apis.md Step 1" },
+      { "file": "docs/assets/ui-maptomethod.png", "url": "https://maptomethod.matolab.org/", "used_in": "guides/standalone-apis.md Step 2" },
+      { "file": "docs/assets/ui-rdfconverter.png", "url": "https://rdfconverter.matolab.org/", "used_in": "guides/standalone-apis.md Step 3" }
+    ],
+    "live_files": [
+      { "url": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv", "used_in": "Step 1 worked example" },
+      { "url": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json", "used_in": "Step 2 types exploration" },
+      { "url": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml", "used_in": "Step 3 checkmapping + createrdf" }
+    ]
+  }
+}

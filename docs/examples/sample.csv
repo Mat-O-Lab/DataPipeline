@@ -1,0 +1,9 @@
+material,PA6GF30
+test_standard,DIN EN ISO 527
+operator,Lab A
+date,2024-03-15
+
+temperature_C,tensile_strength_MPa,yield_strength_MPa,elongation_pct
+23,180,120,3.2
+60,140,90,4.1
+80,115,75,5.8

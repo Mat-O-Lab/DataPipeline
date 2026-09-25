@@ -1,0 +1,126 @@
+{
+  "name": "ckanext-csvwmapandtransform",
+  "type": "ckan-extension",
+  "repo": "https://github.com/Mat-O-Lab/ckanext-csvwmapandtransform",
+  "depends_on": ["rdfconverter-service", "mappings CKAN group"],
+  "purpose": "After an RDF/JSON-LD resource is created or updated in CKAN, automatically discovers YAML mapping files stored in a CKAN group named 'mappings', tests each against the resource via RDFConverter /api/checkmapping, selects the best-fit mapping, and calls RDFConverter /api/createrdf to produce a joined Turtle RDF knowledge graph — which is added back to the same CKAN dataset.",
+  "ckan_interfaces": ["IResourceController", "IResourceUrlChange"],
+  "integration_points": [
+    {"hook": "after_resource_create", "trigger": "New resource created"},
+    {"hook": "after_create", "trigger": "Dataset/resource created"},
+    {"hook": "after_update", "trigger": "Resource updated"},
+    {"hook": "notify", "trigger": "Resource URL changed"}
+  ],
+  "trigger_conditions": [
+    "resource format (lowercased) is in ckanext.csvwmapandtransform.formats",
+    "resource URL does NOT contain '-joined' (prevents recursive re-processing)"
+  ],
+  "mapping_discovery": {
+    "action": "csvwmapandtransform_find_mappings",
+    "mechanism": "CKAN package_search with fq=groups:mappings",
+    "collects": "Every resource with format == YAML from packages in the mappings group",
+    "prerequisite": "A CKAN group named exactly 'mappings' must exist"
+  },
+  "mapping_selection": {
+    "mechanism": "For each YAML mapping URL: POST {rdfconverter_url}/api/checkmapping → {rules_applicable, rules_skipped} → rating = rules_applicable - rules_skipped",
+    "strategies": [
+      {
+        "name": "exact",
+        "default": true,
+        "condition": "rules_skipped == 0 AND rules_applicable > 0",
+        "use_when": "Production — only fully-matching mappings apply",
+        "risk": "May produce no output if no exact mapping exists"
+      },
+      {
+        "name": "best_match",
+        "condition": "rating > 0 (best-rated candidate wins)",
+        "use_when": "Development / exploration — best partial match applies",
+        "risk": "May apply an imperfect mapping, producing partial graphs"
+      }
+    ]
+  },
+  "rdf_conversion": {
+    "endpoint": "POST {rdfconverter_url}/api/createrdf?return_type=turtle",
+    "params": {"mapping_url": "selected mapping URL", "data_url": "resource URL"},
+    "output": "Turtle file uploaded as new resource in same CKAN dataset; filename contains '-joined'"
+  },
+  "registered_actions": [
+    {"action": "csvwmapandtransform_find_mappings", "purpose": "Discover mappings from mappings group"},
+    {"action": "csvwmapandtransform_transform", "purpose": "Trigger transformation job"},
+    {"action": "csvwmapandtransform_test_mappings", "purpose": "Test all mappings against a resource"},
+    {"action": "csvwmapandtransform_transform_status", "purpose": "Check job status"},
+    {"action": "csvwmapandtransform_hook", "purpose": "Job status callback"}
+  ],
+  "configuration": [
+    {
+      "key": "ckanext.csvwmapandtransform.maptomethod_url",
+      "env_var": "CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__MAPTOMETHOD_URL",
+      "default": "https://maptomethod.matolab.org",
+      "description": "MapToMethod URL — used in browser iframes for mapping authoring UI"
+    },
+    {
+      "key": "ckanext.csvwmapandtransform.rdfconverter_url",
+      "env_var": "CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__RDFCONVERTER_URL",
+      "default": "https://rdfconverter.matolab.org",
+      "datastack_value": "http://rdfconverter:5000",
+      "description": "RDFConverter URL (use internal container URL in DataStack)"
+    },
+    {
+      "key": "ckanext.csvwmapandtransform.formats",
+      "env_var": "CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__FORMATS",
+      "default": "json json-ld turtle n3 nt hext trig longturtle xml ld+json",
+      "description": "Resource formats that trigger transformation"
+    },
+    {
+      "key": "ckanext.csvwmapandtransform.mapping_strategy",
+      "env_var": "CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__MAPPING_STRATEGY",
+      "default": "exact",
+      "options": ["exact", "best_match"],
+      "description": "Mapping selection strategy"
+    },
+    {
+      "key": "ckanext.csvwmapandtransform.ckan_token",
+      "env_var": "CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__CKAN_TOKEN",
+      "default": "",
+      "description": "CKAN API token for background job authentication"
+    },
+    {
+      "key": "ckanext.csvwmapandtransform.rdfconverter_timeout_check",
+      "env_var": "CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__RDFCONVERTER_TIMEOUT_CHECK",
+      "default": 30,
+      "description": "Timeout (seconds) for /api/checkmapping calls"
+    },
+    {
+      "key": "ckanext.csvwmapandtransform.rdfconverter_timeout_create",
+      "env_var": "CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__RDFCONVERTER_TIMEOUT_CREATE",
+      "default": 120,
+      "description": "Timeout (seconds) for /api/createrdf calls"
+    },
+    {
+      "key": "ckanext.csvwmapandtransform.ssl_verify",
+      "env_var": "CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__SSL_VERIFY",
+      "default": true,
+      "description": "SSL verification for outbound requests"
+    },
+    {
+      "key": "ckanext.csvwmapandtransform.db_url",
+      "env_var": "CKANINI__CKANEXT__CSVWMAPANDTRANSFORM__DB_URL",
+      "default": "sqlalchemy.url (inherits from CKAN)",
+      "description": "Database URL for job state tracking"
+    }
+  ],
+  "capabilities": [
+    "Fully automatic — no user action needed after CSV upload (if mappings exist)",
+    "Scales to many mappings — checks all YAML resources in the mappings group",
+    "Two selection strategies for different accuracy/coverage tradeoffs",
+    "-joined suffix prevents recursive re-processing loops",
+    "Configurable timeouts for large datasets"
+  ],
+  "limitations": [
+    "Requires a 'mappings' CKAN group (case-sensitive) with YAML resources",
+    "Data URL must be publicly accessible from the CKAN server",
+    "exact strategy may silently produce no output if no mapping fully matches",
+    "RDFConverter timeouts may need tuning for large files (default: 120s)",
+    "BACKGROUNDJOBS_API_TOKEN must be set or jobs will not execute"
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "name": "OmeroExtractor",
+  "type": "microservice",
+  "version": "v0.0.4",
+  "status": "early-stage",
+  "repo": "https://github.com/Mat-O-Lab/OmeroExtractor",
+  "public_deployment": "https://metadata.omero.matolab.org",
+  "api_docs": "https://metadata.omero.matolab.org/api/docs",
+  "openapi_json": "https://metadata.omero.matolab.org/api/openapi.json",
+  "image": "ghcr.io/mat-o-lab/omeroextractor",
+  "framework": "FastAPI + Uvicorn + Starlette",
+  "language": "Python",
+  "depends_on": ["OMERO.Server + OMERO.Web instance"],
+  "purpose": "Extracts metadata from an OMERO.Server (Open Microscopy Environment) and exposes it as semantically enriched JSON-LD/RDF. Connects to OMERO.Web API to pull structured image/dataset/ROI metadata, fetches raw key-value pairs from microscope acquisition software, and converts merged JSON to RDF using a custom OME ontology generated from the official OME XSD schema.",
+  "pipeline_position": "Stage 1 extractor for OMERO microscopy data",
+  "tech_stack": [
+    {"layer": "Framework", "technology": "FastAPI + Uvicorn + Starlette"},
+    {"layer": "RDF", "technology": "rdflib"},
+    {"layer": "HTTP client", "technology": "requests (to OMERO.Web)"},
+    {"layer": "Templating", "technology": "Jinja2 + starlette-wtf + WTForms"},
+    {"layer": "Container", "technology": "Docker Compose — API + OMERO.Web sidecar (omeroweb:4080)"}
+  ],
+  "output_formats": ["json-ld", "turtle", "longturtle", "n3", "nt", "hext", "trig", "xml"],
+  "ontologies_used": [
+    {
+      "name": "OME (custom)",
+      "namespace": "https://github.com/Mat-O-Lab/OmeroExtractor/raw/main/ome.ttl#",
+      "role": "Core microscopy types (Image, Dataset, Channel, ROI) — generated from ome.xsd via xsd2owl"
+    },
+    {
+      "name": "Open Annotation",
+      "namespace": "http://www.w3.org/ns/oa#",
+      "role": "Wraps key/value acquisition metadata as oa:Annotation entries"
+    },
+    {
+      "name": "QUDT",
+      "namespace": "http://qudt.org/schema/qudt/",
+      "role": "Numeric acquisition values typed as qudt:QuantityValue"
+    },
+    {
+      "name": "PROV-O",
+      "namespace": "http://www.w3.org/ns/prov#",
+      "role": "prov:wasGeneratedBy, prov:generatedAtTime"
+    }
+  ],
+  "test_fixtures": {
+    "repo": "https://github.com/Mat-O-Lab/OmeroExtractor/tree/main/tests",
+    "files": [
+      {
+        "json": "tests/image83.json",
+        "ttl": "tests/image83.ttl",
+        "description": "Real OMERO image 83 metadata (TEM microscopy, anonymized)"
+      },
+      {
+        "json": "tests/image2.json",
+        "ttl": "tests/image2.ttl",
+        "description": "OMERO image 2 metadata"
+      },
+      {
+        "json": "tests/rois2.json",
+        "ttl": "tests/rois2.ttl",
+        "description": "ROI annotations for image 2"
+      },
+      {
+        "json": "tests/rois83.json",
+        "ttl": "tests/rois83.ttl",
+        "description": "ROI annotations for image 83"
+      }
+    ]
+  },
+  "api_endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/image/{id}",
+      "summary": "Extract metadata for a single OMERO image → RDF",
+      "path_params": {"id": "integer OMERO image ID"},
+      "query_params": {
+        "anonymize": {"type": "boolean", "default": true, "description": "Strip PII (owner name, email) from output"},
+        "format": {"type": "string", "default": "json-ld", "options": ["json-ld", "turtle", "longturtle", "n3", "nt", "hext", "trig", "xml"]}
+      },
+      "example_curl": "curl \"https://metadata.omero.matolab.org/api/image/83?anonymize=true&format=turtle\" --output image83.ttl"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dataset/{id}",
+      "summary": "Extract metadata for a dataset (collection of images) → RDF",
+      "path_params": {"id": "integer OMERO dataset ID"},
+      "query_params": {
+        "anonymize": {"type": "boolean", "default": true},
+        "format": {"type": "string", "default": "json-ld"}
+      },
+      "example_curl": "curl \"https://metadata.omero.matolab.org/api/dataset/12?anonymize=true&format=json-ld\" --output dataset12.json"
+    },
+    {
+      "method": "GET",
+      "path": "/api/rois/{id}",
+      "summary": "Extract ROI (Region of Interest) annotations for an image → RDF",
+      "path_params": {"id": "integer OMERO image ID"},
+      "query_params": {
+        "anonymize": {"type": "boolean", "default": true},
+        "format": {"type": "string", "default": "json-ld"}
+      },
+      "example_curl": "curl \"https://metadata.omero.matolab.org/api/rois/83?anonymize=true&format=json-ld\" --output rois83.json"
+    },
+    {
+      "method": "GET",
+      "path": "/api/info",
+      "summary": "Service health and version"
+    }
+  ],
+  "configuration": [
+    {"env_var": "APP_PORT", "default": "80", "description": "External port"},
+    {"env_var": "OMERO_WEB_HOST", "default": null, "required": true, "description": "OMERO.Web base URL"},
+    {"env_var": "OMERO_WEB_PUBLIC_USER", "default": "publicuser", "description": "OMERO public user (service account — end users need no OMERO credentials)"},
+    {"env_var": "OMERO_WEB_PUBLIC_PASSWORD", "default": null, "required": true, "description": "OMERO public user password"},
+    {"env_var": "OMERO_WEB_USER", "default": "root", "description": "OMERO admin user for fallback auth"},
+    {"env_var": "OMERO_WEB_PASS", "default": null, "description": "OMERO admin password (falls back to OMERO_ROOT_PASS)"}
+  ],
+  "real_world_example": {
+    "dataset_repo": "https://github.com/BAMresearch/DF-TEM-PAW",
+    "description": "Dark-field TEM precipitate analysis on steel samples at BAM. Full pipeline: OmeroExtractor → MapToMethod → RDFConverter → Fuseki",
+    "publication": {
+      "title": "FAIR microscopy data via the Mat-O-Lab pipeline",
+      "doi": "10.1007/s40192-023-00331-5",
+      "url": "https://link.springer.com/article/10.1007/s40192-023-00331-5"
+    }
+  },
+  "capabilities": [
+    "Extracts full OMERO image + dataset + ROI metadata in one call",
+    "Merges structured OMERO.Web API data with raw acquisition metadata from microscope software",
+    "OME ontology alignment via ome.ttl (generated from official OME XSD schema)",
+    "QUDT unit annotation on numeric acquisition parameters",
+    "Anonymization option for PII removal",
+    "8 RDF serialization formats",
+    "Web form UI at / for ad-hoc image ID lookup"
+  ],
+  "limitations": [
+    "Requires an accessible OMERO.Web instance configured via env vars",
+    "v0.0.4 — early stage; API surface may change",
+    "No bulk/batch extraction — one image/dataset per API call",
+    "Domain-specific mapping from OME ontology to target ontologies (e.g. PMDco) requires downstream YARRRML mapping"
+  ]
+}

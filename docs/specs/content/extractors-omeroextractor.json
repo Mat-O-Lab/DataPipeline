@@ -1,0 +1,96 @@
+{
+  "page": "extractors/omeroextractor.md",
+  "title": "OmeroExtractor",
+  "status": "partial",
+  "primary_persona": "P3",
+  "secondary_personas": [
+    "P1"
+  ],
+  "narrative_arc": {
+    "enters_knowing": "They have OMERO microscopy data and want to understand how to extract it into the pipeline.",
+    "leaves_knowing": "What OmeroExtractor does, what its JSON-LD output looks like, the DF-TEM-PAW real-world example, current maturity status.",
+    "steps": [
+      "What OmeroExtractor does — wraps OMERO REST API, produces OME JSON-LD with image metadata and ROIs",
+      "Status badge: Early stage (v0.0.4)",
+      "Output ontologies: OME, OA, QUDT, PROV-O",
+      "API endpoints — /api/image/{id}, /api/roi/{id}, /api/dataset/{id}",
+      "Inline: real JSON-LD output snippet for image83 (from test fixtures in local repo)",
+      "Real-world example: BAMresearch/DF-TEM-PAW — Hanke et al. 2023",
+      "How the output connects to Stage 2 (MapToMethod → RDFConverter)"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/omeroextractor-service.json"
+    ],
+    "example_urls": {
+      "omeroextractor_repo": "https://github.com/Mat-O-Lab/OmeroExtractor",
+      "bam_example": "https://github.com/BAMresearch/DF-TEM-PAW",
+      "publication": "https://link.springer.com/article/10.1007/s40192-023-00331-5"
+    },
+    "local_test_fixtures": [
+      "/home/hanke/OmeroExtractor/tests/image83.json",
+      "/home/hanke/OmeroExtractor/tests/image83.ttl",
+      "/home/hanke/OmeroExtractor/tests/image2.json",
+      "/home/hanke/OmeroExtractor/tests/rois2.json",
+      "/home/hanke/OmeroExtractor/tests/rois83.json"
+    ],
+    "live_api_calls": []
+  },
+  "inline_assets_required": [
+    {
+      "type": "json",
+      "description": "First 20 lines of image83.json test fixture — real OMERO image metadata as JSON-LD. Use local fixture at /home/hanke/OmeroExtractor/tests/image83.json."
+    },
+    {
+      "type": "turtle",
+      "description": "First 15 lines of image83.ttl test fixture — RDF serialization of OMERO image. Use local fixture."
+    }
+  ],
+  "walkthrough_requirements": [
+    {
+      "step": "Note: no public OMERO instance for live testing",
+      "note": "Use test fixtures from local repo for inline examples. Label with: # from OmeroExtractor tests/image83.json"
+    }
+  ],
+  "quality_gate": [
+    "Status badge: Early stage (v0.0.4) prominently displayed",
+    "Inline JSON-LD snippet from test fixtures (image83.json)",
+    "BAMresearch/DF-TEM-PAW linked as real-world example",
+    "Hanke et al. 2023 publication cited",
+    "How output feeds into Stage 2 explained",
+    "Note: no public deployment for live testing",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Local test fixtures at /home/hanke/OmeroExtractor/tests/ are the authoritative source for inline examples — use them directly. No public OMERO deployment available. omeroextractor-service.json has test_fixtures paths and real_world_example section.",
+  "audience": {
+    "primary": {
+      "code": "P3",
+      "name": "Data Engineer",
+      "knows": [
+        "Python or similar scripting language",
+        "REST APIs and HTTP concepts",
+        "YAML and JSON authoring",
+        "General software engineering practices",
+        "Tabular data and data transformation concepts"
+      ],
+      "does_not_know": [
+        "RDF, triples, or the semantic web stack",
+        "YARRRML, RML, or any mapping language",
+        "SPARQL query language",
+        "Ontologies, reasoning, or OWL",
+        "What a named graph or blank node is"
+      ],
+      "goal": "Connect data sources, author mappings, and query transformation results.",
+      "key_gap": "Solid general engineering skills but semantic web is completely foreign. Every RDF/SPARQL/YARRRML concept must be explained from first principles — do not assume any prior semantic knowledge."
+    },
+    "secondary": [
+      {
+        "code": "P1",
+        "name": "Evaluator",
+        "goal": "Assess whether DataStack fits their lab or institution — understand outputs and find the right entry point."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
+}

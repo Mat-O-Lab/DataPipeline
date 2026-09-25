@@ -1,0 +1,92 @@
+{
+  "page": "extractors/openbismantic.md",
+  "title": "OpenBISmantic",
+  "status": "partial",
+  "primary_persona": "P4",
+  "secondary_personas": [
+    "P3"
+  ],
+  "narrative_arc": {
+    "enters_knowing": "They have an openBIS ELN/LIMS instance and want to expose it as Linked Data.",
+    "leaves_knowing": "What OpenBISmantic provides, how content negotiation works, the RO-Crate export feature, deployment options, limitations.",
+    "steps": [
+      "Status badge: Demonstrator — no active public deployment",
+      "What OpenBISmantic does — wraps openBIS with FastAPI, all entities as resolvable RDF IRIs via permIds",
+      "Content negotiation — same URL, different Accept header → different RDF format (inline curl pair)",
+      "openBIS hierarchy mapped to RDF: Space → Project → Collection → Object → Dataset",
+      "API endpoints — /object/{perm_id}, /dataset/{perm_id}, etc.",
+      "RO-Crate export — /export_bundle endpoint for portable archival",
+      "Output ontologies: Schema.org, DCAT, PROV-O",
+      "Deployment options: full stack (includes openBIS) vs. API-only (points at existing openBIS)",
+      "Downstream: RO-Crate ZIP → RDFConverter for semantic mapping"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/openbismantic-service.json"
+    ],
+    "example_urls": {
+      "openbismantic_repo": "https://github.com/Mat-O-Lab/OpenBISmantic",
+      "openbis": "https://openbis.ch/",
+      "ro_crate": "https://www.researchobject.org/ro-crate/",
+      "pybis": "https://pypi.org/project/PyBIS/"
+    },
+    "live_api_calls": []
+  },
+  "inline_assets_required": [
+    {
+      "type": "bash",
+      "description": "Content negotiation curl pair: same URL, Accept: application/ld+json vs Accept: application/x-turtle. Use placeholder URL since no public deployment. Label: # replace with your OpenBISmantic URL",
+      "sample": "curl -H \"Accept: application/ld+json\" \"https://your-openbismantic.example.org/object/20230601123456789-42\"\ncurl -H \"Accept: application/x-turtle\" \"https://your-openbismantic.example.org/object/20230601123456789-42\""
+    },
+    {
+      "type": "bash",
+      "description": "Deployment curl: git clone + docker compose up for full-stack deployment."
+    }
+  ],
+  "walkthrough_requirements": [
+    {
+      "step": "No public deployment — use placeholder URLs",
+      "note": "All curl examples use placeholder https://your-openbismantic.example.org. Label clearly."
+    }
+  ],
+  "quality_gate": [
+    "Status badge: Demonstrator — no active public deployment",
+    "Content negotiation curl example present (two Accept headers for same URL)",
+    "openBIS hierarchy (Space→Project→Collection→Object→Dataset) explained",
+    "RO-Crate export explained with /export_bundle endpoint",
+    "Two deployment modes documented (full stack vs. API-only)",
+    "Required env vars listed (OPENBIS_URL, BASE_URL, ADMIN_PASS)",
+    "Downstream path to RDFConverter described",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Page is partial. openbismantic-service.json has full content. No public deployment — all curls use placeholder. Requires openBIS 20.10+ server (PyBIS auth requirement). Output uses Schema.org/DCAT/PROV-O — domain-specific mapping needs downstream YARRRML via RDFConverter.",
+  "audience": {
+    "primary": {
+      "code": "P4",
+      "name": "Domain Scientist",
+      "knows": [
+        "Their scientific domain deeply (materials science, microscopy, lab procedures)",
+        "CSV and spreadsheet data",
+        "Measurement concepts and experimental workflows they consider universal",
+        "Domain-specific tools (OMERO, ELN systems, instrument software)"
+      ],
+      "does_not_know": [
+        "Ontology terms like PMDCO, CHAMEO, EMMO even if these describe their own work",
+        "How ontologies model domain concepts — that this modeling discipline exists at all",
+        "SPARQL, RDF, or any semantic technology",
+        "Docker, APIs, or configuration"
+      ],
+      "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results.",
+      "key_gap": "Double gap: (1) no semantic web knowledge whatsoever, and (2) domain experts frequently assume their concepts are universal common knowledge when they are not — documentation must not assume shared domain vocabulary and must explain what gets modeled and why, not just how."
+    },
+    "secondary": [
+      {
+        "code": "P3",
+        "name": "Data Engineer",
+        "goal": "Connect data sources, author mappings, and query transformation results."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
+}

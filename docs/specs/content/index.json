@@ -1,0 +1,93 @@
+{
+  "page": "index.md",
+  "title": "Mat-O-Lab DataStack",
+  "status": "partial",
+  "primary_persona": "P1",
+  "secondary_personas": [
+    "P2",
+    "P3",
+    "P4"
+  ],
+  "narrative_arc": {
+    "enters_knowing": "They heard about the DataStack or landed from a search. No prior knowledge assumed.",
+    "leaves_knowing": "The pipeline principle, what outputs they get, which audience entry point matches them, one real-world proof point.",
+    "steps": [
+      "Core principle block quote — one sentence that captures the whole idea",
+      "Audience tab switcher — four tabs, each linking directly to their entry point",
+      "Use case gallery — three concrete examples (lab CSV, OMERO microscopy, SAMM/Catena-X) with one-sentence outcome each",
+      "Proof of production — Hanke et al. 2023 citation + 26 Catena-X mappings statistic",
+      "Call to action — quickstart link for data engineers, pipeline link for researchers"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/datastack.json",
+      "docs/specs/samm-idta-pipeline-patterns.json"
+    ],
+    "example_urls": {
+      "publication": "https://link.springer.com/article/10.1007/s40192-023-00331-5",
+      "live_ckan": "https://futurecarproduction.materialsdata.space",
+      "bam_example": "https://github.com/BAMresearch/DF-TEM-PAW",
+      "iof_tutorial": "https://github.com/Mat-O-Lab/IOFMaterialsTutorial"
+    },
+    "live_api_calls": []
+  },
+  "inline_assets_required": [
+    {
+      "type": "prose",
+      "description": "One-sentence core principle (already exists as block quote — verify it's kept)",
+      "sample": "> Create complete, consistent metadata for a non-semantic resource — then use semantic technologies to transform that further."
+    },
+    {
+      "type": "table",
+      "description": "Use case gallery: three rows, columns: Domain | Source | Output ontology | Real example"
+    }
+  ],
+  "walkthrough_requirements": [],
+  "quality_gate": [
+    "Four audience tabs present (researcher, data engineer, ontology engineer, developer)",
+    "Use case gallery has at least three rows with real example links",
+    "Publication DOI linked (Hanke et al. 2023)",
+    "No Docker or API terminology on P1-facing content",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Page already has audience tabs and core principle. Needs: use case gallery table with real examples, proof-of-production statistics.",
+  "audience": {
+    "primary": {
+      "code": "P1",
+      "name": "Evaluator",
+      "knows": [
+        "Spreadsheets and tabular data",
+        "Research data management concepts at a high level",
+        "What 'FAIR data' means in principle",
+        "Their institution's data workflows"
+      ],
+      "does_not_know": [
+        "Docker or any container technology",
+        "RDF, triples, ontologies, or the semantic web",
+        "REST APIs or any coding",
+        "How the pipeline works internally"
+      ],
+      "goal": "Assess whether DataStack fits their lab or institution — understand outputs and find the right entry point.",
+      "key_gap": "No technical background assumed. Needs concept-first explanations with real-world outcomes before any system detail."
+    },
+    "secondary": [
+      {
+        "code": "P2",
+        "name": "Operator",
+        "goal": "Get the stack deployed, configured, and running reliably."
+      },
+      {
+        "code": "P3",
+        "name": "Data Engineer",
+        "goal": "Connect data sources, author mappings, and query transformation results."
+      },
+      {
+        "code": "P4",
+        "name": "Domain Scientist",
+        "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
+}

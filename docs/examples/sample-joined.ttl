@@ -1,0 +1,28 @@
+@prefix ex: <https://example.org/> .
+@prefix pmdco: <https://github.com/materialdigital/core-ontology/tree/main/pmdco#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# PMDco quality — one result individual per test row
+ex:result_23
+    a pmdco:TensileTestResult ;
+    pmdco:hasTensileStrength [
+        a qudt:QuantityValue ;
+        qudt:numericValue "180"^^xsd:double ;
+        # QUDT unit — MegaPascal for tensile strength
+        qudt:unit unit:MegaPA
+    ] ;
+    pmdco:hasYieldStrength [
+        a qudt:QuantityValue ;
+        qudt:numericValue "120"^^xsd:double ;
+        qudt:unit unit:MegaPA
+    ] ;
+    pmdco:hasElongation [
+        a qudt:QuantityValue ;
+        qudt:numericValue "3.2"^^xsd:double ;
+        qudt:unit unit:PERCENT
+    ] ;
+    # provenance statement — traces result back to source CSV
+    prov:wasDerivedFrom <https://example.org/sample.csv> .

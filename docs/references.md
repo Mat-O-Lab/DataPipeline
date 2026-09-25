@@ -24,7 +24,7 @@ All URLs, repos, deployments, datasets, and publications found during research.
 
 | Repo / URL | Role |
 |---|---|
-| https://github.com/ThHanke/ontosphere | OntosphereIO — browser app for pattern authoring (AI + OWL2DL + SHACL); **recommended tool** |
+| https://github.com/ThHanke/ontosphere | Ontosphere — browser app for pattern authoring (AI + OWL2DL + SHACL); **recommended tool** |
 | https://github.com/materialdigital/core-ontology | PMDCO (Platform MaterialDigital Core Ontology) |
 | https://github.com/materialdigital/core-ontology/tree/main/patterns/ | PMDCO reference patterns library |
 | https://github.com/materialdigital/core-ontology/tree/main/patterns/chemical%20composition | Example: chemical composition pattern |
@@ -143,4 +143,4 @@ GET https://dataportal.material-digital.de/api/3/action/package_list
 
 | URL | Status | Why outdated |
 |---|---|---|
-| https://github.com/Mat-O-Lab/IOFMaterialsTutorial | Outdated | Uses draw.io for "graph prototypes" (now: OntosphereIO + "patterns"); pipeline without CKAN; old IOF ontology versions. Useful for conceptual understanding only — do not recommend tooling. |
+| https://github.com/Mat-O-Lab/IOFMaterialsTutorial | Outdated | Uses draw.io for "graph prototypes" (now: Ontosphere + "patterns"); pipeline without CKAN; old IOF ontology versions. Useful for conceptual understanding only — do not recommend tooling. |

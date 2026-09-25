@@ -1,0 +1,57 @@
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "oa": "http://www.w3.org/ns/oa#",
+      "qudt": "http://qudt.org/schema/qudt/",
+      "unit": "http://qudt.org/vocab/unit/",
+      "prov": "http://www.w3.org/ns/prov#",
+      "xsd": "http://www.w3.org/2001/XMLSchema#",
+      "csv": "https://example.org/sample.csv/"
+    }
+  ],
+  "@id": "https://example.org/sample.csv",
+  "@type": "http://www.w3.org/ns/csvw#TableGroup",
+  "notes": [
+    {
+      "@id": "csv:material0",
+      "@type": "oa:Annotation",
+      "oa:hasBody": { "@value": "PA6GF30" }
+    },
+    {
+      "@id": "csv:test_standard1",
+      "@type": "oa:Annotation",
+      "oa:hasBody": { "@value": "DIN EN ISO 527" }
+    }
+  ],
+  "tables": [
+    {
+      "@type": "http://www.w3.org/ns/csvw#Table",
+      "tableSchema": {
+        "columns": [
+          {
+            "name": "temperature_C",
+            "titles": "temperature_C",
+            "qudt:unit": { "@id": "unit:DEG_C" }
+          },
+          {
+            "name": "tensile_strength_MPa",
+            "titles": "tensile_strength_MPa",
+            "qudt:unit": { "@id": "unit:MegaPA" }
+          },
+          {
+            "name": "yield_strength_MPa",
+            "titles": "yield_strength_MPa",
+            "qudt:unit": { "@id": "unit:MegaPA" }
+          },
+          {
+            "name": "elongation_pct",
+            "titles": "elongation_pct",
+            "qudt:unit": { "@id": "unit:PERCENT" }
+          }
+        ]
+      }
+    }
+  ],
+  "prov:wasGeneratedBy": { "@id": "https://csvtocsvw.matolab.org" }
+}

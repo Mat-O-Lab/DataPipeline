@@ -1,0 +1,27 @@
+# Deploy MkDocs site to GitHub Pages.
+# Prerequisite: in repo Settings → Pages, set source to "Deploy from a branch"
+# and select the "gh-pages" branch, "/" (root) folder.
+name: Deploy docs
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install docs dependencies
+        run: pip install -r requirements-docs.txt
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force

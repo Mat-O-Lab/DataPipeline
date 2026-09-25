@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 530" font-family="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#005b7f"/><stop offset="100%" stop-color="#206b82"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0d7a66"/><stop offset="100%" stop-color="#179C7d"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c96808"/><stop offset="100%" stop-color="#f58220"/>
+    </linearGradient>
+    <linearGradient id="g4" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#5a7a8a"/><stop offset="100%" stop-color="#a6bbc8"/>
+    </linearGradient>
+    <filter id="layer-shadow" x="-5%" y="-5%" width="110%" height="120%"><feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.157"/></filter>
+    <linearGradient id="g5" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7aab25"/><stop offset="100%" stop-color="#b2d235"/>
+    </linearGradient>  </defs>
+
+  <!-- Background -->
+  <rect width="760" height="530" fill="#f0f4f7" rx="12"/>
+  <text x="380" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#005b7f">Industrial Ontology Stack</text>
+  <text x="380" y="52" text-anchor="middle" font-size="12" fill="#6c757d">From upper ontology to application — a shared vocabulary foundation for cross-domain interoperability</text>
+
+  <!-- Axis left -->
+  <line x1="46" y1="68" x2="46" y2="454" stroke="#dee2e6" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="46,63 42,73 50,73" fill="#dee2e6"/>
+  <polygon points="46,459 42,449 50,449" fill="#dee2e6"/>
+  <text x="46" y="60" text-anchor="middle" font-size="9" fill="#adb5bd">General</text>
+  <text x="46" y="470" text-anchor="middle" font-size="9" fill="#adb5bd">Specific</text>
+  <text x="22" y="262" text-anchor="middle" font-size="10" fill="#c8d0d8" transform="rotate(-90,22,262)">Abstraction</text>
+
+  <!-- ===== LAYER 1: BFO ===== -->
+  <polygon points="290,68 470,68 498,128 262,128" fill="url(#g1)" filter="url(#layer-shadow)"/>
+  <text x="380" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="white">BFO — Basic Formal Ontology</text>
+  <text x="380" y="107" text-anchor="middle" font-size="10" fill="#ffffff" opacity="0.78">ISO/IEC 21838-2:2021  ·  ~35 terms  ·  shared grounding in reality</text>
+
+  <!-- ===== LAYER 2: MID-LEVEL (PMDCO / IOF) ===== -->
+  <polygon points="262,137 498,137 528,208 232,208" fill="url(#g2)" filter="url(#layer-shadow)"/>
+  <!-- Category label (tier name) -->
+  <text x="380" y="153" text-anchor="middle" font-size="8.5" font-weight="700" letter-spacing="1.8" fill="#ffffff" opacity="0.55">MID-LEVEL ONTOLOGY</text>
+  <!-- PMDCO primary -->
+  <text x="380" y="173" text-anchor="middle" font-size="15" font-weight="700" fill="white">PMDCO</text>
+  <text x="380" y="189" text-anchor="middle" font-size="10.5" fill="#ffffff" opacity="0.82">Platform MaterialDigital Core Ontology</text>
+  <!-- IOF inline italic alternative -->
+  <text x="380" y="204" text-anchor="middle" font-size="9.5" font-style="italic" fill="#ffffff" opacity="0.50">alt: IOF — Industrial Ontologies Foundry  (uses BFO 2020)</text>
+
+  <!-- ===== LAYER 3: DOMAIN ONTOLOGIES (taller, less crowded) ===== -->
+  <polygon points="232,217 528,217 562,310 198,310" fill="url(#g3)" filter="url(#layer-shadow)"/>
+  <!-- Category label -->
+  <text x="380" y="233" text-anchor="middle" font-size="8.5" font-weight="700" letter-spacing="1.8" fill="#ffffff" opacity="0.55">DOMAIN ONTOLOGIES</text>
+  <!-- Two rows of pills, 3 per row, well spaced -->
+  <!-- Row 1: y=248 -->
+  <rect x="210" y="240" width="104" height="22" rx="11" fill="#ffffff" opacity="0.22"/>
+  <text x="262" y="255" text-anchor="middle" font-size="9.5" fill="white">Circular Economy</text>
+  <rect x="326" y="240" width="108" height="22" rx="11" fill="#ffffff" opacity="0.22"/>
+  <text x="380" y="255" text-anchor="middle" font-size="9.5" fill="white">Mech. Testing</text>
+  <rect x="434" y="240" width="102" height="22" rx="11" fill="#ffffff" opacity="0.22"/>
+  <text x="485" y="255" text-anchor="middle" font-size="9.5" fill="white">Chem. Analysis</text>
+  <!-- Row 2: y=270 -->
+  <rect x="218" y="270" width="88" height="22" rx="11" fill="#ffffff" opacity="0.22"/>
+  <text x="262" y="285" text-anchor="middle" font-size="9.5" fill="white">Logistics</text>
+  <rect x="326" y="270" width="108" height="22" rx="11" fill="#ffffff" opacity="0.22"/>
+  <text x="380" y="285" text-anchor="middle" font-size="9.5" fill="white">Materials Science</text>
+  <rect x="434" y="270" width="102" height="22" rx="11" fill="#ffffff" opacity="0.22"/>
+  <text x="485" y="285" text-anchor="middle" font-size="9.5" fill="white">Sustainability / LCA</text>
+
+  <!-- ===== LAYER 4: VOCABULARY STANDARDS ===== -->
+  <polygon points="198,319 562,319 598,378 162,378" fill="url(#g4)" filter="url(#layer-shadow)"/>
+  <text x="380" y="335" text-anchor="middle" font-size="8.5" font-weight="700" letter-spacing="1.8" fill="#ffffff" opacity="0.55">VOCABULARY STANDARDS</text>
+  <!-- Vocab pills (single row) -->
+  <rect x="171" y="344" width="68" height="22" rx="11" fill="#ffffff" opacity="0.25"/>
+  <text x="205" y="359" text-anchor="middle" font-size="9.5" fill="white">ECLASS</text>
+  <rect x="248" y="344" width="70" height="22" rx="11" fill="#ffffff" opacity="0.25"/>
+  <text x="283" y="359" text-anchor="middle" font-size="9.5" fill="white">IEC CDD</text>
+  <rect x="327" y="344" width="50" height="22" rx="11" fill="#ffffff" opacity="0.25"/>
+  <text x="352" y="359" text-anchor="middle" font-size="9.5" fill="white">GS1</text>
+  <rect x="386" y="344" width="98" height="22" rx="11" fill="#ffffff" opacity="0.25"/>
+  <text x="435" y="359" text-anchor="middle" font-size="9.5" fill="white">ISO 13584-42</text>
+  <rect x="480" y="344" width="92" height="22" rx="11" fill="#ffffff" opacity="0.25"/>
+  <text x="526" y="359" text-anchor="middle" font-size="9.5" fill="white">DPP Core Onto.</text>
+
+  <!-- ===== LAYER 5: APPLICATION ONTOLOGIES ===== -->
+  <polygon points="162,387 598,387 636,450 124,450" fill="url(#g5)" filter="url(#layer-shadow)"/>
+  <text x="380" y="403" text-anchor="middle" font-size="8.5" font-weight="700" letter-spacing="1.8" fill="#142800" opacity="0.5">APPLICATION ONTOLOGIES</text>
+  <!-- App pills -->
+  <rect x="136" y="412" width="122" height="22" rx="11" fill="#ffffff" opacity="0.3"/>
+  <text x="197" y="427" text-anchor="middle" font-size="9.5" fill="#2d3c00">Company-specific</text>
+  <rect x="268" y="412" width="118" height="22" rx="11" fill="#ffffff" opacity="0.3"/>
+  <text x="327" y="427" text-anchor="middle" font-size="9.5" fill="#2d3c00">Product-class DPP</text>
+  <rect x="396" y="412" width="120" height="22" rx="11" fill="#ffffff" opacity="0.3"/>
+  <text x="456" y="427" text-anchor="middle" font-size="9.5" fill="#2d3c00">Supply-chain / sector</text>
+  <rect x="512" y="412" width="96" height="22" rx="11" fill="#ffffff" opacity="0.3"/>
+  <text x="560" y="427" text-anchor="middle" font-size="9.5" fill="#2d3c00">Consortia DPPs</text>
+
+  <!-- Footer -->
+  <text x="380" y="475" text-anchor="middle" font-size="10.5" fill="#6c757d">Each layer reuses and specialises terms from above — enabling cross-domain interoperability without bilateral schema agreements</text>
+  <text x="380" y="493" text-anchor="middle" font-size="10" fill="#179C7d" font-weight="600">PMDCO developed by Platform MaterialDigital (BMBF, Germany) · BFO 2019 based · IOF mapping in progress</text>
+</svg>

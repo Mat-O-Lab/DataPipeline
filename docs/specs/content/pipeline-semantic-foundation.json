@@ -1,0 +1,105 @@
+{
+  "page": "pipeline/semantic-foundation.md",
+  "title": "Semantic Foundation",
+  "status": "draft",
+  "primary_persona": "P1",
+  "secondary_personas": [
+    "P3"
+  ],
+  "audience": {
+    "primary": {
+      "code": "P1",
+      "name": "Evaluator",
+      "knows": [
+        "Spreadsheets and tabular data",
+        "Research data management concepts at a high level",
+        "What 'FAIR data' means in principle",
+        "Their institution's data workflows"
+      ],
+      "does_not_know": [
+        "Docker or any container technology",
+        "RDF, triples, ontologies, or the semantic web",
+        "REST APIs or any coding",
+        "How the pipeline works internally"
+      ],
+      "goal": "Assess whether DataStack fits their lab or institution — understand outputs and find the right entry point.",
+      "key_gap": "No technical background assumed. Needs concept-first explanations with real-world outcomes before any system detail."
+    },
+    "secondary": [
+      {
+        "code": "P3",
+        "name": "Data Engineer",
+        "goal": "Connect data sources, author mappings, and query transformation results."
+      }
+    ]
+  },
+  "narrative_arc": {
+    "enters_knowing": "They understand FAIR data in principle but do not know why semantics or linked data are the right approach.",
+    "leaves_knowing": "What linked data means in practice, why URIs and shared vocabularies solve the integration problem, how DataStack implements the semantic layer (Block 2), and what the ontology stack looks like from BFO to domain ontologies.",
+    "steps": [
+      "The problem: data locked in proprietary formats — introduce without jargon, one paragraph",
+      "Linked data in one concept: resources get persistent URIs, meaning travels with the data",
+      "fig-linked-data.svg — the PMD stack as live example (CKAN → Fuseki → Sparklis → SPARQL)",
+      "The ontology stack — fig1-ontology-stack.svg with one-sentence explanation per layer (BFO → PMDCO → domain → application)",
+      "How DataStack fits: Block 2 of the semantic interoperability building blocks — fig5-building-blocks.svg with Block 2 highlighted",
+      "What FAIR means here: Findable (CKAN/DCAT catalog), Accessible (SPARQL endpoint), Interoperable (PMDCO-mapped RDF), Reusable (persistent URIs + open ontology)",
+      "Where to go next: callout box — three paths depending on reader role (deploy → P2 quickstart; map data → P3 author-a-mapping; explore outputs → P4 standalone-apis)"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/datastack.json",
+      "docs/specs/personas.json"
+    ],
+    "external_sources": [
+      "semantics-industry-whitepaper/rework/whitepaper-body.md — §2 Why Semantics, §4 Building Blocks Block 2",
+      "semantics-industry-whitepaper/CONTEXT.md — core thesis and key messages"
+    ],
+    "example_urls": {
+      "pmd_dataportal": "https://dataportal.material-digital.de/",
+      "pmdco": "https://w3id.org/pmd/co",
+      "bfo": "https://basic-formal-ontology.org/"
+    }
+  },
+  "inline_assets_required": [
+    {
+      "type": "svg",
+      "file": "docs/assets/fig-linked-data.svg",
+      "caption": "Linked Data Foundation — knowledge artifacts linked by persistent URIs, queryable by any system",
+      "placement": "after intro paragraph, before ontology stack"
+    },
+    {
+      "type": "svg",
+      "file": "docs/assets/fig1-ontology-stack.svg",
+      "caption": "Industrial Ontology Stack — from BFO upper ontology to application-level deployment",
+      "placement": "ontology stack section"
+    },
+    {
+      "type": "svg",
+      "file": "docs/assets/fig5-building-blocks.svg",
+      "caption": "Semantic Interoperability Building Blocks — DataStack implements Block 2",
+      "placement": "where DataStack fits section"
+    }
+  ],
+  "tone_and_depth": {
+    "target_reading_level": "non-technical researcher or lab manager",
+    "avoid": [
+      "RDF syntax examples (turtle, JSON-LD snippets) — concepts only on this page",
+      "YARRRML or mapping language details",
+      "Docker or deployment references",
+      "Acronym-first introductions — always expand on first use"
+    ],
+    "use": [
+      "Analogies: ontology as structured dictionary, URI as permanent address",
+      "Real PMD examples: tensile test specimen, steel S355",
+      "Outcome-first sentences — what the reader gets, then how"
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation",
+  "whitepaper_sections": [
+    "§2.1",
+    "§2.3",
+    "§2.4",
+    "§4 Block 2"
+  ]
+}

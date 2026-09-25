@@ -1,0 +1,192 @@
+{
+  "name": "RDFConverter",
+  "type": "microservice",
+  "version": "v1.3.3",
+  "repo": "https://github.com/Mat-O-Lab/RDFConverter",
+  "public_deployment": "https://rdfconverter.matolab.org",
+  "api_docs": "https://rdfconverter.matolab.org/api/docs",
+  "openapi_json": "https://rdfconverter.matolab.org/api/openapi.json",
+  "image": "ghcr.io/mat-o-lab/rdfconverter",
+  "license": "Apache-2.0",
+  "doi": "10.5281/zenodo.19084883",
+  "framework": "FastAPI (Python) + YARRRML Parser (Node.js) + RML Mapper (Java)",
+  "language": "Python",
+  "depends_on": ["yarrrml-parser", "rmlmapper-webapi"],
+  "purpose": "Transforms structured data (CSV, JSON, XML, RDF) into semantic RDF knowledge graphs using YARRRML/RML declarative mapping rules. Orchestrates the official YARRRML Parser (Node.js) and RML Mapper (Java) behind a FastAPI REST layer, enabling FAIR data publication without coding.",
+  "pipeline_position": "Stage 3 (RDF conversion and validation)",
+  "internal_architecture": {
+    "description": "Three-service Docker Compose: rdfconverter (FastAPI, Python) calls yarrrml-parser (Node.js, port 3001) and rmlmapper (Java webapi, port 4000) over internal Docker bridge network rdfconverter_net",
+    "services": [
+      {"name": "rdfconverter", "lang": "Python/FastAPI", "role": "Main API orchestrator"},
+      {"name": "yarrrml-parser", "lang": "Node.js", "port": 3001, "role": "YARRRML → RML conversion"},
+      {"name": "rmlmapper-webapi", "lang": "Java", "port": 4000, "role": "RML execution against data"}
+    ]
+  },
+  "input_data_formats": ["CSV", "JSON (JSONPath iterator)", "XML (XPath/XQuery)", "Turtle", "N-Triples", "N3", "JSON-LD", "RDF/XML"],
+  "output_formats": ["json-ld", "n3", "nt", "hext", "trig", "turtle", "longturtle", "xml"],
+  "standards": ["YARRRML", "RML (W3C)", "CSVW", "SAMM", "PROV-O", "SHACL", "JSON-LD"],
+  "api_tags": ["convert", "validate", "debug"],
+  "example_files": {
+    "repo": "https://github.com/Mat-O-Lab/RDFConverter/tree/main/examples",
+    "worked_examples": [
+      {
+        "name": "IOFMaterialsTutorial (CSV/CSVW + YARRRML → Turtle)",
+        "mapping_url": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml",
+        "data_url": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json",
+        "output": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-joined.ttl"
+      },
+      {
+        "name": "AAS Inspection Documents of Steel Products",
+        "mapping_url": "https://futurecarproduction.materialsdata.space/dataset/e608c577-19a8-48d5-ad5e-310ab741d11b/resource/d4c80145-4fd9-4d99-9f22-4d687e8c6549/download/inspectiondocumentsofsteelproducts.json-to-pmdco.yaml",
+        "data_url": "https://futurecarproduction.materialsdata.space/dataset/7c41e2f2-e0ee-4ec9-b887-6e3e2a68ced9/resource/475d99df-b4b4-4ee6-ab0d-6941019bd112/download/inspectiondocumentsofsteelproducts.sample.json"
+      },
+      {
+        "name": "Catena-X SAMM Material Class & Composition",
+        "mapping_url": "https://futurecarproduction.materialsdata.space/dataset/0cb5ba8a-4f7e-4988-88b5-edb551474689/resource/6adc9bcd-ed24-4c90-880b-29d06f02584b/download/materialclassandcomposition.json-to-samm.yaml",
+        "data_url": ""
+      }
+    ]
+  },
+  "api_endpoints": [
+    {
+      "method": "POST",
+      "path": "/api/createrdf",
+      "tag": "convert",
+      "summary": "Create RDF from URL-accessible data",
+      "query_params": {
+        "mapping_url": {"type": "string", "format": "uri", "required": true},
+        "data_url": {"type": "string", "format": "uri", "description": "Overrides data source in mapping if given"},
+        "return_type": {"type": "string", "default": "turtle"}
+      },
+      "response_schema": {
+        "filename": {"type": "string", "example": "data-joined.ttl"},
+        "graph": {"type": "string", "description": "RDF graph as string in requested format"},
+        "num_mappings_applied": {"type": "integer"},
+        "num_mappings_skipped": {"type": "integer"}
+      },
+      "example_curl": "curl -X POST \"https://rdfconverter.matolab.org/api/createrdf?return_type=turtle\" -G --data-urlencode \"mapping_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml\" --data-urlencode \"data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json\" --output measurements-joined.ttl"
+    },
+    {
+      "method": "POST",
+      "path": "/api/createrdfupload",
+      "tag": "convert",
+      "summary": "Create RDF from uploaded file content (no public URL required)",
+      "request_body": {
+        "content_type": "application/json",
+        "schema": {
+          "mapping_url": {"type": "string", "format": "uri", "required": true},
+          "data_url": {"type": "string", "format": "uri", "required": true, "description": "Used as base URI for semantic identity of uploaded data"},
+          "data_content": {"type": "string", "required": true, "description": "File contents as string (JSON, JSON-LD, Turtle, CSV, etc.)"}
+        }
+      },
+      "response_schema": "RDFResponse (same as /api/createrdf)"
+    },
+    {
+      "method": "POST",
+      "path": "/api/checkmapping",
+      "tag": "validate",
+      "summary": "Dry-run: count applicable vs skipped mapping rules (no output produced)",
+      "query_params": {
+        "mapping_url": {"type": "string", "format": "uri", "required": true},
+        "data_url": {"type": "string", "format": "uri", "required": true}
+      },
+      "response_schema": {
+        "rules_applicable": {"type": "integer", "description": "Rules that found a match in the data"},
+        "rules_skipped": {"type": "integer", "description": "Rules that did not find a match"}
+      },
+      "quality_gate": "rules_skipped == 0 means all rules matched; used by ckanext-csvwmapandtransform for mapping selection",
+      "example_curl": "curl -X POST \"https://rdfconverter.matolab.org/api/checkmapping\" -G --data-urlencode \"mapping_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml\" --data-urlencode \"data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json\"",
+      "example_response": {"rules_applicable": 1, "rules_skipped": 0}
+    },
+    {
+      "method": "POST",
+      "path": "/api/yarrrmltorml",
+      "tag": "convert",
+      "summary": "Convert YARRRML mapping to RML (no execution)",
+      "request_body": {"mapping_url": "URI of YARRRML file"},
+      "response": "RML mapping in Turtle format"
+    },
+    {
+      "method": "POST",
+      "path": "/api/yarrrmltosparql",
+      "tag": "convert",
+      "summary": "Convert YARRRML mapping to SPARQL SELECT query",
+      "request_body": {"mapping_url": "URI of YARRRML file"},
+      "response": "SPARQL SELECT query as plain text"
+    },
+    {
+      "method": "POST",
+      "path": "/api/normalizeyarrrml",
+      "tag": "convert",
+      "summary": "Normalize YARRRML nested-list po: blocks to inline-list form"
+    },
+    {
+      "method": "POST",
+      "path": "/api/rdfvalidator",
+      "tag": "validate",
+      "summary": "Validate RDF against a SHACL shapes graph",
+      "query_params": {
+        "shapes_url": {"type": "string", "format": "uri"},
+        "rdf_url": {"type": "string", "format": "uri"}
+      },
+      "response_schema": {
+        "conformance_report": {"type": "string"},
+        "shapes_graph": {"type": "string"}
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/test",
+      "tag": "debug",
+      "summary": "Test a mapping and return detailed per-rule statistics",
+      "query_params": {
+        "mapping_url": {"type": "string", "format": "uri"},
+        "data_url": {"type": "string", "format": "uri"}
+      },
+      "response_schema": {
+        "per_rule_statistics": {"type": "object"},
+        "logs": {"type": "string"},
+        "triple_count": {"type": "integer"},
+        "output_preview": {"type": "string"}
+      },
+      "example_curl": "curl -X POST \"https://rdfconverter.matolab.org/api/test\" -G --data-urlencode \"mapping_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml\" --data-urlencode \"data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json\""
+    },
+    {
+      "method": "GET",
+      "path": "/info",
+      "summary": "Service version",
+      "response": {"version": "v1.3.3"}
+    }
+  ],
+  "configuration": [
+    {"env_var": "APP_PORT", "default": "6003", "description": "External port for rdfconverter service"},
+    {"env_var": "YARRRML_URL", "default": "http://yarrrml-parser:3001", "description": "Internal yarrrml-parser service URL"},
+    {"env_var": "MAPPER_URL", "default": "http://rmlmapper:4000", "description": "Internal rmlmapper-webapi service URL"},
+    {"env_var": "PARSER_PORT", "default": "3001", "description": "yarrrml-parser port"},
+    {"env_var": "MAPPER_PORT", "default": "4000", "description": "rmlmapper port"},
+    {"env_var": "APP_MODE", "default": "development", "description": "Application mode"},
+    {"env_var": "SSL_VERIFY", "default": "True", "description": "Verify SSL certs for outbound URL fetches"},
+    {"env_var": "ROOT_PATH", "default": "", "description": "ASGI root path for reverse proxy deployments"}
+  ],
+  "capabilities": [
+    "Any YARRRML-described data → FAIR RDF knowledge graph",
+    "Input: CSV, JSON, XML, RDF (auto-detected)",
+    "Dry-run check (/api/checkmapping) without producing output — enables automated mapping selection",
+    "SHACL constraint validation of output",
+    "PROV-O provenance included in all outputs automatically",
+    "Upload endpoint for private/local data (data_content field)",
+    "8 RDF serialization formats",
+    "YARRRML → SPARQL SELECT translation"
+  ],
+  "limitations": [
+    "URL-based endpoints require data to be publicly accessible from service host",
+    "RML Mapper (Java) is the execution bottleneck — complex mappings or large files may time out",
+    "rmlmapper port 4000 is fixed in DataStack compose",
+    "YARRRML/RML learning curve for mapping authors (MapToMethod mitigates this)"
+  ],
+  "external_resources": {
+    "yarrrml_tutorial": "https://rml.io/yarrrml/tutorial/",
+    "yarrrml_matey_editor": "https://rml.io/yarrrml/matey/",
+    "yarrrml_spec": "https://rml.io/yarrrml/spec/"
+  }
+}

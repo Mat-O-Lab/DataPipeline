@@ -1,0 +1,93 @@
+{
+  "version": "1.0",
+  "description": "Reader persona definitions for DataStack documentation. All page specs reference these by code (P1–P4).",
+  "personas": {
+    "P1": {
+      "code": "P1",
+      "name": "Evaluator",
+      "tagline": "Should we use this?",
+      "adoption_context": "external_evaluator",
+      "cognitive_load_tolerance": "low",
+      "knows": [
+        "Spreadsheets and tabular data",
+        "Research data management concepts at a high level",
+        "What 'FAIR data' means in principle",
+        "Their institution's data workflows"
+      ],
+      "does_not_know": [
+        "Docker or any container technology",
+        "RDF, triples, ontologies, or the semantic web",
+        "REST APIs or any coding",
+        "How the pipeline works internally"
+      ],
+      "goal": "Assess whether DataStack fits their lab or institution — understand outputs and find the right entry point.",
+      "key_gap": "No technical background assumed. Needs concept-first explanations with real-world outcomes before any system detail."
+    },
+    "P2": {
+      "code": "P2",
+      "name": "Operator",
+      "tagline": "I need to deploy and run this.",
+      "adoption_context": "operator",
+      "cognitive_load_tolerance": "medium",
+      "knows": [
+        "Docker Compose and container concepts",
+        "Linux CLI and shell basics",
+        ".env files and environment variable configuration",
+        "Basic networking: ports, URLs, reverse proxies",
+        "Reading and editing YAML and JSON"
+      ],
+      "does_not_know": [
+        "RDF, SPARQL, or ontologies",
+        "What a triple store is or why it exists",
+        "Materials science domain concepts",
+        "Mapping or transformation logic"
+      ],
+      "goal": "Get the stack deployed, configured, and running reliably.",
+      "key_gap": "Strong on infrastructure, zero on semantics. Semantic explanations should be deferred or skipped — ops context only."
+    },
+    "P3": {
+      "code": "P3",
+      "name": "Data Engineer",
+      "tagline": "I need to wire this into my data workflow.",
+      "adoption_context": "integrator",
+      "cognitive_load_tolerance": "high",
+      "knows": [
+        "Python or similar scripting language",
+        "REST APIs and HTTP concepts",
+        "YAML and JSON authoring",
+        "General software engineering practices",
+        "Tabular data and data transformation concepts"
+      ],
+      "does_not_know": [
+        "RDF, triples, or the semantic web stack",
+        "YARRRML, RML, or any mapping language",
+        "SPARQL query language",
+        "Ontologies, reasoning, or OWL",
+        "What a named graph or blank node is"
+      ],
+      "goal": "Connect data sources, author mappings, and query transformation results.",
+      "key_gap": "Solid general engineering skills but semantic web is completely foreign. Every RDF/SPARQL/YARRRML concept must be explained from first principles — do not assume any prior semantic knowledge."
+    },
+    "P4": {
+      "code": "P4",
+      "name": "Domain Scientist",
+      "tagline": "I have data and I want FAIR outputs.",
+      "adoption_context": "domain_consumer",
+      "cognitive_load_tolerance": "low",
+      "knows": [
+        "Their scientific domain deeply (materials science, microscopy, lab procedures)",
+        "CSV and spreadsheet data",
+        "Measurement concepts and experimental workflows they consider universal",
+        "Domain-specific tools (OMERO, ELN systems, instrument software)"
+      ],
+      "does_not_know": [
+        "Ontology terms like PMDCO, CHAMEO, EMMO even if these describe their own work",
+        "How ontologies model domain concepts — that this modeling discipline exists at all",
+        "SPARQL, RDF, or any semantic technology",
+        "Docker, APIs, or configuration"
+      ],
+      "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results.",
+      "key_gap": "Double gap: (1) no semantic web knowledge whatsoever, and (2) domain experts frequently assume their concepts are universal common knowledge when they are not — documentation must not assume shared domain vocabulary and must explain what gets modeled and why, not just how."
+    }
+  }
+}

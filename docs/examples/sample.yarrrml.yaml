@@ -1,0 +1,41 @@
+# prefixes block — declare all namespace aliases used in mappings
+prefixes:
+  ex: "https://example.org/"
+  pmdco: "https://github.com/materialdigital/core-ontology/tree/main/pmdco#"
+  qudt: "http://qudt.org/schema/qudt/"
+  unit: "http://qudt.org/vocab/unit/"
+  csvw: "http://www.w3.org/ns/csvw#"
+
+mappings:
+  # mapping subject — one TensileTestResult per data row
+  TensileTestResult:
+    sources:
+      - ["https://example.org/sample.csvw.json~jsonpath", "$['tables'][0]['tableSchema']['columns'][*]"]
+    subjects: "ex:result_$(temperature_C)"
+
+    # predicate-object pair — link result to measured tensile strength value
+    predicates-objects:
+      - predicates: pmdco:hasTensileStrength
+        objects:
+          value: "$(tensile_strength_MPa)"
+          datatype: xsd:double
+
+      - predicates: pmdco:hasYieldStrength
+        objects:
+          value: "$(yield_strength_MPa)"
+          datatype: xsd:double
+
+      - predicates: pmdco:hasElongation
+        objects:
+          value: "$(elongation_pct)"
+          datatype: xsd:double
+
+      # iterator — QUDT unit annotation for each numeric column
+      - predicates: qudt:unit
+        objects:
+          - mapping: TensileTestResult_unit
+
+  TensileTestResult_unit:
+    sources:
+      - ["https://example.org/sample.csvw.json~jsonpath", "$['tables'][0]['tableSchema']['columns'][?(@['name']=='tensile_strength_MPa')]"]
+    subjects: "$(qudt:unit['@id'])"

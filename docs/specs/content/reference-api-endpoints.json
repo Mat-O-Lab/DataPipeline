@@ -1,0 +1,99 @@
+{
+  "page": "reference/api-endpoints.md",
+  "title": "API Endpoints",
+  "status": "authored",
+  "primary_persona": "P3",
+  "secondary_personas": [
+    "P4"
+  ],
+  "narrative_arc": {
+    "enters_knowing": "They want to call a specific endpoint directly — it's a reference lookup, not a sequential read.",
+    "leaves_knowing": "The method, path, key parameters, and a working curl example for every endpoint across all three services.",
+    "steps": [
+      "Service table — base URL, /api/docs link, version for all 3 services",
+      "return_type options list (shared by CSVToCSVW and RDFConverter)",
+      "CSVToCSVW section: 4 endpoints with curl examples for /api/annotate, /api/annotate_upload, /api/rdf, /info",
+      "MapToMethod section: 4 endpoints with curl examples for /api/types, /api/entities (with query params), /api/mapping (request body table), /info",
+      "RDFConverter section: 9 endpoints including /api/yarrrmltosparql and /api/normalizeyarrrml",
+      "RDFConverter response schema for /api/createrdf (correct field names)"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/csvtocsvw-service.json",
+      "docs/specs/maptomethod-service.json",
+      "docs/specs/rdfconverter-service.json"
+    ],
+    "example_urls": {
+      "csvtocsvw_openapi": "https://csvtocsvw.matolab.org/api/openapi.json",
+      "maptomethod_openapi": "https://maptomethod.matolab.org/api/openapi.json",
+      "rdfconverter_openapi": "https://rdfconverter.matolab.org/api/openapi.json",
+      "csvtocsvw_info": "https://csvtocsvw.matolab.org/info",
+      "maptomethod_info": "https://maptomethod.matolab.org/info",
+      "rdfconverter_info": "https://rdfconverter.matolab.org/info"
+    },
+    "live_api_calls": [
+      "GET https://csvtocsvw.matolab.org/info",
+      "GET https://maptomethod.matolab.org/info",
+      "GET https://rdfconverter.matolab.org/info"
+    ]
+  },
+  "inline_assets_required": [
+    {
+      "type": "bash",
+      "description": "curl for each primary endpoint: POST /api/annotate, GET /api/types, POST /api/checkmapping. All use real IOFMaterialsTutorial URLs. Already in page.",
+      "status": "done"
+    },
+    {
+      "type": "json",
+      "description": "/api/createrdf response schema with correct fields: filename, graph, num_mappings_applied, num_mappings_skipped. Already in page.",
+      "status": "done"
+    },
+    {
+      "type": "json",
+      "description": "/info response for each service. Already in page.",
+      "status": "done"
+    }
+  ],
+  "walkthrough_requirements": [],
+  "quality_gate": [
+    "CSVToCSVW: 4 endpoints (annotate, annotate_upload, rdf, info)",
+    "MapToMethod: 4 endpoints (types, entities, mapping, info); /api/entities query params documented",
+    "RDFConverter: 9 endpoints including yarrrmltosparql and normalizeyarrrml",
+    "RDFConverter createrdf response uses num_mappings_applied (not rules_applicable)",
+    "3 inline curl examples (one per service) with real IOFMaterialsTutorial URLs",
+    "Upload endpoint (annotate_upload, createrdfupload) documented separately from URL-based",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Page is fully authored. Critical correctness: createrdf response must use 'graph', 'num_mappings_applied', 'num_mappings_skipped' (not graph_data, rules_applicable). This was verified against source code in prior session. Periodic re-check against live /info endpoints recommended.",
+  "audience": {
+    "primary": {
+      "code": "P3",
+      "name": "Data Engineer",
+      "knows": [
+        "Python or similar scripting language",
+        "REST APIs and HTTP concepts",
+        "YAML and JSON authoring",
+        "General software engineering practices",
+        "Tabular data and data transformation concepts"
+      ],
+      "does_not_know": [
+        "RDF, triples, or the semantic web stack",
+        "YARRRML, RML, or any mapping language",
+        "SPARQL query language",
+        "Ontologies, reasoning, or OWL",
+        "What a named graph or blank node is"
+      ],
+      "goal": "Connect data sources, author mappings, and query transformation results.",
+      "key_gap": "Solid general engineering skills but semantic web is completely foreign. Every RDF/SPARQL/YARRRML concept must be explained from first principles — do not assume any prior semantic knowledge."
+    },
+    "secondary": [
+      {
+        "code": "P4",
+        "name": "Domain Scientist",
+        "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
+}

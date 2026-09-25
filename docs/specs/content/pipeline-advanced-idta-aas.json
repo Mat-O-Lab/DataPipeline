@@ -1,0 +1,80 @@
+{
+  "page": "pipeline/advanced/idta-aas.md",
+  "title": "IDTA / AAS Submodel Pattern",
+  "status": "stub",
+  "primary_persona": "P3",
+  "secondary_personas": [],
+  "narrative_arc": {
+    "enters_knowing": "They know AAS submodel JSON structure and want to map it to PMDco via YARRRML.",
+    "leaves_knowing": "Why AAS maps in a single stage (unlike SAMM), how to write the YARRRML, how to validate the output.",
+    "steps": [
+      "AAS structure overview — submodel, submodelElement, typed properties",
+      "Why single-stage works — AAS structure maps directly without intermediate namespace",
+      "Contrast with SAMM two-stage pattern (link to samm-catena-x.md)",
+      "Inline: minimal AAS submodel YARRRML example (10–15 lines)",
+      "Validation: checkmapping quality gate",
+      "When to use this pattern"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/samm-idta-pipeline-patterns.json",
+      "docs/specs/rdfconverter-service.json"
+    ],
+    "example_urls": {
+      "idta_github": "https://github.com/admin-shell-io",
+      "yarrrml_spec": "https://rml.io/yarrrml/spec/",
+      "pmdco": "https://github.com/materialdigital/core-ontology"
+    },
+    "live_api_calls": []
+  },
+  "inline_assets_required": [
+    {
+      "type": "yaml",
+      "description": "Minimal AAS submodel YARRRML mapping: 10–15 lines, showing submodelElement iterator and one property mapped to PMDco. Source from samm-idta-pipeline-patterns.json aas_single_stage section if available, otherwise construct minimal example."
+    }
+  ],
+  "walkthrough_requirements": [
+    {
+      "step": "Validate an AAS mapping",
+      "command": "curl -X POST 'https://rdfconverter.matolab.org/api/checkmapping' -G --data-urlencode 'mapping_url=<aas_mapping_url>' --data-urlencode 'data_url=<aas_csvw_url>'",
+      "expected": "{\"rules_applicable\": N, \"rules_skipped\": 0}"
+    }
+  ],
+  "quality_gate": [
+    "Single-stage vs. two-stage contrast explained",
+    "Inline YARRRML snippet present",
+    "Cross-link to samm-catena-x.md present",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Lower priority than SAMM page. samm-idta-pipeline-patterns.json may have AAS-specific content — check aas_* keys. If insufficient source material, keep as documented stub with 'coming soon' note and link to samm page.",
+  "audience": {
+    "primary": {
+      "code": "P3",
+      "name": "Data Engineer",
+      "knows": [
+        "Python or similar scripting language",
+        "REST APIs and HTTP concepts",
+        "YAML and JSON authoring",
+        "General software engineering practices",
+        "Tabular data and data transformation concepts"
+      ],
+      "does_not_know": [
+        "RDF, triples, or the semantic web stack",
+        "YARRRML, RML, or any mapping language",
+        "SPARQL query language",
+        "Ontologies, reasoning, or OWL",
+        "What a named graph or blank node is"
+      ],
+      "goal": "Connect data sources, author mappings, and query transformation results.",
+      "key_gap": "Solid general engineering skills but semantic web is completely foreign. Every RDF/SPARQL/YARRRML concept must be explained from first principles — do not assume any prior semantic knowledge."
+    }
+  },
+  "building_block": "Block 3 — Dataspace Participation",
+  "maintenance": {
+    "live_files": [
+      { "url": "https://futurecarproduction.materialsdata.space/dataset/e608c577-19a8-48d5-ad5e-310ab741d11b/resource/d4c80145-4fd9-4d99-9f22-4d687e8c6549/download/inspectiondocumentsofsteelproducts.json-to-pmdco.yaml", "used_in": "Real AAS YARRRML mapping example" },
+      { "url": "https://dataportal.material-digital.de/dataset/a725c4a1-a463-47f8-bad3-fe84b73ef0d3/resource/25076900-3a83-4580-a354-47055958a22c/download/inspectiondocument_316_4401_alloy.json", "used_in": "AAS input JSON (referenced, not embedded)" }
+    ]
+  }
+}

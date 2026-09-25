@@ -1,0 +1,106 @@
+{
+  "page": "extractors/csvtocsvw.md",
+  "title": "CSVToCSVW",
+  "status": "authored",
+  "primary_persona": "P3",
+  "secondary_personas": [
+    "P4"
+  ],
+  "narrative_arc": {
+    "enters_knowing": "They want to understand what CSVToCSVW does, how it annotates columns, what the output looks like.",
+    "leaves_knowing": "The multi-block CSV format, how unit annotations work from bracket notation, the 4 endpoints, real CSVW output for a known example.",
+    "steps": [
+      "What CSVToCSVW does — CSV → CSVW JSON-LD with QUDT unit annotations",
+      "Multi-block CSV format — metadata rows, blank separator, data table",
+      "Column header notation — bracket notation [mm] → unit:MilliM, suffix notation _MPa → unit:MegaPA",
+      "QUDT unit mapping table — at least 5 examples",
+      "Inline CSVW JSON-LD snippet from example2.csv — showing column annotations",
+      "Four endpoints table with curl examples",
+      "Real-world examples: IOFMaterialsTutorial, BAMresearch DF-TEM-PAW, CSVToCSVW examples/"
+    ]
+  },
+  "reference_material": {
+    "spec_files": [
+      "docs/specs/csvtocsvw-service.json"
+    ],
+    "example_urls": {
+      "example_csv": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv",
+      "example_csvw": "https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example2-metadata.json",
+      "example1_csv": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example.csv",
+      "example1_csvw": "https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example-metadata.json",
+      "iof_csvw": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json",
+      "bam_csvw": "https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-metadata.json",
+      "csvtocsvw_api": "https://csvtocsvw.matolab.org/api/docs",
+      "w3c_csvw": "https://www.w3.org/TR/tabular-data-primer/",
+      "qudt": "https://qudt.org/"
+    },
+    "live_api_calls": [
+      "POST https://csvtocsvw.matolab.org/api/annotate?return_type=json-ld with data_url pointing to example2.csv"
+    ]
+  },
+  "inline_assets_required": [
+    {
+      "type": "json",
+      "description": "CSVW JSON-LD snippet from example2.csv: columns MaschineMm→unit:MilliM, KraftKn→unit:KiloN, Mx840A0Ch5C→unit:DEG_C, ZeitS→unit:SEC. With oa:Annotation entries.",
+      "status": "done"
+    },
+    {
+      "type": "bash",
+      "description": "curl POST /api/annotate with example2.csv URL. Already in page.",
+      "status": "done"
+    },
+    {
+      "type": "table",
+      "description": "QUDT unit annotation examples: at least 5 rows. Column header → unit IRI.",
+      "status": "done"
+    }
+  ],
+  "walkthrough_requirements": [
+    {
+      "step": "Annotate example2.csv",
+      "command": "curl -X POST 'https://csvtocsvw.matolab.org/api/annotate?return_type=json-ld' -H 'Content-Type: application/json' -d '{\"data_url\": \"https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv\", \"encoding\": \"auto\"}' --output example2-metadata.json",
+      "expected": "CSVW JSON-LD file with column annotations including qudt:unit IRIs",
+      "status": "done"
+    }
+  ],
+  "quality_gate": [
+    "Bracket notation and suffix notation both explained with examples",
+    "QUDT unit table with at least 5 column→unit pairs",
+    "Inline CSVW JSON-LD snippet with real column names from example2.csv",
+    "4 API endpoints documented with curl examples",
+    "Real-world examples section with at least 3 datasets",
+    "W3C CSVW primer linked",
+    "mkdocs build --strict exits 0"
+  ],
+  "notes": "Page is substantially authored. Main gap: verify CSVW snippet uses correct column names from example2.csv (MaschineMm, KraftKn, Mx840A0Ch5C, ZeitS) and correct unit IRIs. Fetch live to confirm accuracy.",
+  "audience": {
+    "primary": {
+      "code": "P3",
+      "name": "Data Engineer",
+      "knows": [
+        "Python or similar scripting language",
+        "REST APIs and HTTP concepts",
+        "YAML and JSON authoring",
+        "General software engineering practices",
+        "Tabular data and data transformation concepts"
+      ],
+      "does_not_know": [
+        "RDF, triples, or the semantic web stack",
+        "YARRRML, RML, or any mapping language",
+        "SPARQL query language",
+        "Ontologies, reasoning, or OWL",
+        "What a named graph or blank node is"
+      ],
+      "goal": "Connect data sources, author mappings, and query transformation results.",
+      "key_gap": "Solid general engineering skills but semantic web is completely foreign. Every RDF/SPARQL/YARRRML concept must be explained from first principles — do not assume any prior semantic knowledge."
+    },
+    "secondary": [
+      {
+        "code": "P4",
+        "name": "Domain Scientist",
+        "goal": "Upload their data, trigger the pipeline, and use or export FAIR-compliant results."
+      }
+    ]
+  },
+  "building_block": "Block 2 — Semantic Data Foundation"
+}

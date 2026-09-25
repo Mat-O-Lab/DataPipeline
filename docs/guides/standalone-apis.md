@@ -105,7 +105,12 @@ If `rules_skipped` is 0, everything matched. If it is greater than 0, check [Aut
 
 **Then, produce the output:**
 
-Use the **createrdf** form. Paste the same two URLs (CSVW and mapping), choose **turtle** as the return type, and click **Execute**.
+Use the **createrdf** form. Paste the mapping URL and choose **turtle** as the return type, then click **Execute**.
+
+!!! tip "Try an existing mapping on your own data"
+    The **Optional: Data Source URL** field lets you override the data URL that is hardcoded inside the mapping file. This means you can take any published mapping (e.g. from the real datasets table below), point it at your own similarly-formatted CSVW, and test whether the mapping works for your data — without modifying the mapping file at all. Leave the field empty to use the data URL embedded in the mapping.
+
+    This is also exactly how the CKAN integration works. For CSV uploads, CKAN generates the CSVW and then calls RDFConverter with the mapping URL and the CSVW URL as the data source override. For Catena-X JSON payloads, CKAN passes the actual JSON file URL as the override — this is what lets a single SAMM mapping file apply to every incoming payload and automatically identify which SAMM aspect model it belongs to.
 
 The service applies the mapping and returns a .ttl file — a FAIR knowledge graph. This file contains your measurement data enriched with standardised scientific concepts, ready for sharing, archiving, or querying.
 

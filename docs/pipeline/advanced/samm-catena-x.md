@@ -156,6 +156,22 @@ WHERE {
 }
 ```
 
+The real `material.samm-to-pmdco.construct.sparql` (published on [futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space/dataset/a7f7e9d6-d3c6-4c41-840d-ea61c636f8e7)) uses a VALUES table to handle all properties in one generic CONSTRUCT block. Each row assigns a property a role and conversion factor — the CONSTRUCT clause generates the appropriate PMDco node pattern from those roles:
+
+```sparql
+VALUES (?prop ?role ?targetClass ?unit ?conversionFactor ?status ?note) {
+  ( cx:chemicalCharacterization "information" obo:IAO_0000027 UNDEF 1.0 "generated" "Domain review required." )
+  ( ext2:globalAssetId          "identifier"  obo:IAO_0000027 UNDEF 1.0 "generated" "Domain review required." )
+  ( ext1:materialClassification "information" obo:IAO_0000027 UNDEF 1.0 "generated" "Domain review required." )
+  ( cx:materialFormat            "quality"     obo:IAO_0000300 UNDEF 1.0 "generated" "Domain review required." )
+  ( cx:materialStatus            "quality"     obo:IAO_0000027 UNDEF 1.0 "generated" "Domain review required." )
+  ( cx:thermalCharacterization  "information" obo:IAO_0000027 UNDEF 1.0 "generated" "Domain review required." )
+  ( cx:wasteCode                 "identifier"  pmd:PMD_0060009 UNDEF 1.0 "generated" "Domain review required." )
+}
+```
+
+The role value (`"quality"`, `"identifier"`, `"information"`) drives which branches of the CONSTRUCT clause fire — one VALUES table replaces nine separate INSERT blocks.
+
 The real `pmdco-mapping-insert.sparql` repeats this four-node block for all 13 properties:
 `stressAtBreak`, `flexuralStrength`, `youngsModulus`, `flexuralModulus`, `strainAtBreak`, `impactStrength`, `density`, `meltingTemperature`, `glassTransitionTemperature`, `humidity`, `waterAbsorption`, `linearThermalExpansionCoefficientParallel`, `linearThermalExpansionCoefficientTransverse`.
 

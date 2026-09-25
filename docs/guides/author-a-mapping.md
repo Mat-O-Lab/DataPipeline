@@ -353,6 +353,33 @@ These are complete, working pipeline outputs you can inspect directly:
 | IOFMaterialsTutorial (length) | [measurements-metadata.json](https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json) | [measurements-map.yaml](https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml) | [measurements-joined.ttl](https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-joined.ttl) |
 | BAMresearch DF-TEM-PAW (TEM) | [detection\_runs-metadata.json](https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-metadata.json) | [detection\_runs-map.yaml](https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-map.yaml) | [detection\_runs-joined.ttl](https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-joined.ttl) |
 
+The DF-TEM-PAW mapping is a real current-format example. Its YARRRML shows the complete pattern: `method:` prefix points to the prototype graph TTL; each rule links a CSVW column to a named individual slot in that graph via `pmd:co/isResourceOf`:
+
+```yaml
+prefixes:
+  data:   'https://github.com/BAMresearch/DF-TEM-PAW/raw/main/detection_runs-metadata.json/'
+  method: 'https://github.com/BAMresearch/DF-TEM-PAW/raw/main/PrecipitateAnalysisWorkflow.ttl/'
+
+mappings:
+  diskRadius:
+    sources: [data_entities]
+    s: $(@id)
+    condition:
+      function: equal
+      parameters: [[str1, $(name)], [str2, DiskradiusvaluePx]]
+    po: [['https://w3id.org/pmd/co/isResourceOf', 'method:diskRadius~iri']]
+
+  specimenAgingTemperature:
+    sources: [data_entities]
+    s: $(@id)
+    condition:
+      function: equal
+      parameters: [[str1, $(name)], [str2, AgingTempC]]
+    po: [['https://w3id.org/pmd/co/isResourceOf', 'method:specimenAgingTemperature~iri']]
+```
+
+The `method:diskRadius~iri` syntax resolves to the full IRI of the `diskRadius` named individual in the prototype graph — the slot this CSV column fills. One rule per column; one `po:` line per rule.
+
 ---
 
 ## Troubleshooting {#troubleshooting}

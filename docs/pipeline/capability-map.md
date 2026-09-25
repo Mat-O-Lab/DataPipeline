@@ -75,7 +75,7 @@ The term "graph prototype" is obsolete — the correct PMDCO term is **pattern**
 
 ## What the Pipeline CAN Do
 
-- **Supports all common research data formats** — CSV, TSV, microscopy images (OMERO), ELN records (OpenBIS), Catena-X/SAMM JSON, AAS JSON, and existing RDF
+- **Extensible to new data formats** — currently supports CSV/TSV, microscopy images (OMERO), ELN records (OpenBIS), Catena-X/SAMM JSON, and AAS JSON; adding a new format requires a mapping file and optionally a new extractor
 - **Fully automated end-to-end for CSV** — uploading a spreadsheet triggers the complete transformation without any manual steps (up to the knowledge graph sync)
 - **Auto-mapping discovery** — one mapping covers all future uploads with matching column structure; no per-file configuration needed
 - **Query across all datasets** — once transformed, all linked data in a CKAN dataset can be queried together through a single endpoint

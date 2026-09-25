@@ -326,9 +326,41 @@ curl -X POST "https://csvtocsvw.matolab.org/api/annotate?return_type=json-ld" \
 
 This pipeline is documented in: [Hanke et al. (2023)](https://link.springer.com/article/10.1007/s40192-023-00331-5)
 
-### IOFMaterialsTutorial (tensile test data)
+### Published tensile test example — Kupfer Digital (Nasrabadi et al. 2023)
 
-The [IOFMaterialsTutorial](https://github.com/Mat-O-Lab/IOFMaterialsTutorial) repository provides a complete worked example of a tensile test CSV going through the full pipeline. The CSVW output is at [`measurements-metadata.json`](https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json).
+The paper [*Toward a digital materials mechanical testing lab*](https://doi.org/10.1016/j.compind.2023.104016) (Nasrabadi, Hanke et al., *Computers in Industry*, 2023) documents a complete CSVToCSVW → MapToMethod → RDFConverter pipeline run on real copper alloy tensile test data from an accredited BAM laboratory.
+
+The source CSV contains German-language column headers — a typical real-world challenge. CSVToCSVW converts the column "Zugfestigkeit" (tensile strength, 314 MPa) into a JSON-LD annotation with QUDT unit semantics:
+
+```json
+{
+  "@id": "Zugfestigkeit29",
+  "@type": "oa:Annotation",
+  "oa:hasBody": [{
+    "@type": "qudt:QuantityValue",
+    "qudt:value": { "@value": 314, "@type": "xsd:integer" },
+    "qudt:unit": { "@id": "http://qudt.org/vocab/unit/MegaPA" }
+  }]
+}
+```
+
+After mapping through MapToMethod and conversion via RDFConverter, the same measurement becomes:
+
+```turtle
+data:Zugfestigkeit29 a oa:Annotation ;
+    rdfs:label "Zugfestigkeit" ;
+    bfo:RO_0010002 <…#MeasurementOfUltimateTensileStrength> ;
+    csvw:rownum 29 ;
+    oa:hasBody [ a qudt:QuantityValue ;
+        qudt:unit qunit:MegaPA ;
+        qudt:value 314 ] .
+```
+
+The full dataset is published at [ckan.iwm.fraunhofer.de](https://ckan.iwm.fraunhofer.de/dataset/toward-a-digital-materials-mechanical-testing-lab-1a71b8a5).
+
+### IOFMaterialsTutorial (length measurements)
+
+The [IOFMaterialsTutorial](https://github.com/Mat-O-Lab/IOFMaterialsTutorial) repository provides a simpler worked example with five length measurements. Useful for exploring the API mechanics; note that it uses an older pattern format.
 
 ---
 

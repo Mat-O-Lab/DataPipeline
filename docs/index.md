@@ -54,12 +54,16 @@ The same pipeline handles different scientific and industrial data formats:
 
 ## In production today
 
-DataStack runs at two public data portals:
+DataStack runs at public data portals:
 
 - **[futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space/)** — 26 Catena-X datasets published with automatically generated semantic metadata
 - **[dataportal.material-digital.de](https://dataportal.material-digital.de/)** — Cross-project materials data, including PA6GF30 / Catena-X use cases
+- **[ckan.iwm.fraunhofer.de](https://ckan.iwm.fraunhofer.de/)** — Fraunhofer IWM data portal; hosts tensile, Brinell, and Vickers hardness datasets from the digital mechanical testing lab demonstrator
 
-The microscopy pipeline path is described in a peer-reviewed publication:
+The pipeline approach is documented in peer-reviewed publications:
+
+> Nasrabadi, Hanke et al. (2023). *Toward a digital materials mechanical testing lab.*
+> Computers in Industry, 153, 104016. [doi:10.1016/j.compind.2023.104016](https://doi.org/10.1016/j.compind.2023.104016)
 
 > Hanke et al. (2023). *FAIR microscopy data via the Mat-O-Lab pipeline.*
 > Scientific Data (Nature). [doi:10.1038/s41597-023-02244-6](https://doi.org/10.1038/s41597-023-02244-6)

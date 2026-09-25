@@ -225,4 +225,9 @@ Plus, after loading into the query database:
 
 ---
 
-*The DataStack pipeline is described in a peer-reviewed paper: [Hanke et al. (2023)](https://link.springer.com/article/10.1007/s40192-023-00331-5).*
+---
+
+**Publications describing this pipeline:**
+
+- Nasrabadi, Hanke et al. (2023). *Toward a digital materials mechanical testing lab.* Computers in Industry, 153, 104016. [doi:10.1016/j.compind.2023.104016](https://doi.org/10.1016/j.compind.2023.104016) — describes the CSV→CSVW→YARRRML→RDF workflow with real tensile test data; datasets published at [ckan.iwm.fraunhofer.de](https://ckan.iwm.fraunhofer.de/dataset/toward-a-digital-materials-mechanical-testing-lab-1a71b8a5)
+- Hanke et al. (2023). *FAIR microscopy data via the Mat-O-Lab pipeline.* Scientific Data (Nature). [doi:10.1038/s41597-023-02244-6](https://doi.org/10.1038/s41597-023-02244-6)

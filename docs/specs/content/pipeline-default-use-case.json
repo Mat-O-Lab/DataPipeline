@@ -87,5 +87,11 @@
       "key_gap": "No technical background assumed. Needs concept-first explanations with real-world outcomes before any system detail."
     }
   },
-  "building_block": "Block 2 — Semantic Data Foundation"
+  "building_block": "Block 2 — Semantic Data Foundation",
+  "maintenance": {
+    "live_files": [
+      { "url": "https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example2-metadata.json", "used_in": "Step 2 — real CSVW JSON excerpt" },
+      { "url": "https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-joined.ttl", "used_in": "Step 6 — real joined TTL excerpt" }
+    ]
+  }
 }

@@ -129,5 +129,12 @@
       "key_gap": "Solid general engineering skills but semantic web is completely foreign. Every RDF/SPARQL/YARRRML concept must be explained from first principles — do not assume any prior semantic knowledge."
     }
   },
-  "building_block": "Block 1 — Semantic Vocabulary"
+  "building_block": "Block 1 — Semantic Vocabulary",
+  "maintenance": {
+    "live_files": [
+      { "url": "https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-map.yaml", "used_in": "Real-world examples — DF-TEM-PAW YARRRML snippet" },
+      { "url": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json", "used_in": "Steps 1–8 worked example CSVW" },
+      { "url": "https://github.com/Mat-O-Lab/IOFMaterialsTutorial/raw/main/LengthMeasurement.ttl", "used_in": "Steps 1–8 worked example prototype graph" }
+    ]
+  }
 }

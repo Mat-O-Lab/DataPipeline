@@ -70,5 +70,11 @@
       "key_gap": "Solid general engineering skills but semantic web is completely foreign. Every RDF/SPARQL/YARRRML concept must be explained from first principles — do not assume any prior semantic knowledge."
     }
   },
-  "building_block": "Block 3 — Dataspace Participation"
+  "building_block": "Block 3 — Dataspace Participation",
+  "maintenance": {
+    "live_files": [
+      { "url": "https://futurecarproduction.materialsdata.space/dataset/e608c577-19a8-48d5-ad5e-310ab741d11b/resource/d4c80145-4fd9-4d99-9f22-4d687e8c6549/download/inspectiondocumentsofsteelproducts.json-to-pmdco.yaml", "used_in": "Real AAS YARRRML mapping example" },
+      { "url": "https://dataportal.material-digital.de/dataset/a725c4a1-a463-47f8-bad3-fe84b73ef0d3/resource/25076900-3a83-4580-a354-47055958a22c/download/inspectiondocument_316_4401_alloy.json", "used_in": "AAS input JSON (referenced, not embedded)" }
+    ]
+  }
 }

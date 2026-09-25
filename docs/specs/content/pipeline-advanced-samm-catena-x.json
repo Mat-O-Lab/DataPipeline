@@ -97,5 +97,13 @@
       }
     ]
   },
-  "building_block": "Block 3 — Dataspace Participation"
+  "building_block": "Block 3 — Dataspace Participation",
+  "maintenance": {
+    "live_files": [
+      { "url": "https://futurecarproduction.materialsdata.space/dataset/a7f7e9d6-d3c6-4c41-840d-ea61c636f8e7/resource/04dcf43e-6ac9-4933-941c-8d273fce9e90/download/material.json-to-samm.yaml", "used_in": "Stage 1 YARRRML real example — material mapping" },
+      { "url": "https://futurecarproduction.materialsdata.space/dataset/a7f7e9d6-d3c6-4c41-840d-ea61c636f8e7/resource/1127fbbc-b68e-48b4-9707-c506074fe28f/download/material.samm-to-pmdco.construct.sparql", "used_in": "Stage 2 SPARQL VALUES table excerpt" },
+      { "url": "https://dataportal.material-digital.de/dataset/f2bca6a2-04df-47cb-9439-589e46ba60e2/resource/5f7d5a69-f8f5-49d1-9780-c3ecdc0e11ec/download/material_data_test_pa6gf30.json", "used_in": "PA6GF30 input JSON excerpt" },
+      { "url": "https://dataportal.material-digital.de/dataset/f2bca6a2-04df-47cb-9439-589e46ba60e2/resource/6ffde9ce-f6c6-4214-8949-a60fb3123157/download/material_data_test_pa6gf30-joined.ttl", "used_in": "PA6GF30 Stage 1 joined TTL excerpt" }
+    ]
+  }
 }

@@ -111,5 +111,17 @@
       }
     ]
   },
-  "building_block": "Block 2 — Semantic Data Foundation"
+  "building_block": "Block 2 — Semantic Data Foundation",
+  "maintenance": {
+    "screenshots": [
+      { "file": "docs/assets/ui-csvtocsvw.png", "url": "https://csvtocsvw.matolab.org/", "used_in": "guides/standalone-apis.md Step 1" },
+      { "file": "docs/assets/ui-maptomethod.png", "url": "https://maptomethod.matolab.org/", "used_in": "guides/standalone-apis.md Step 2" },
+      { "file": "docs/assets/ui-rdfconverter.png", "url": "https://rdfconverter.matolab.org/", "used_in": "guides/standalone-apis.md Step 3" }
+    ],
+    "live_files": [
+      { "url": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv", "used_in": "Step 1 worked example" },
+      { "url": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json", "used_in": "Step 2 types exploration" },
+      { "url": "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml", "used_in": "Step 3 checkmapping + createrdf" }
+    ]
+  }
 }

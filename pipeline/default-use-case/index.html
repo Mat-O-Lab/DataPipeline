@@ -1874,6 +1874,28 @@
 <hr />
 <p><strong>Step 1 — CKAN detects the format</strong></p>
 <p>The file extension (<code>.csv</code>, <code>.asc</code>, <code>.tsv</code>, <code>.txt</code>) tells CKAN to start the pipeline. Any other format is ignored. No configuration is needed on your part.</p>
+<details class="example">
+<summary>Try it yourself — see a real uploaded dataset</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Web UI</label><label for="__tabbed_1_2">What triggers it</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Browse a dataset that the pipeline has already processed:</p>
+<ol>
+<li>Open <strong><a href="https://futurecarproduction.materialsdata.space/">futurecarproduction.materialsdata.space</a></strong></li>
+<li>Search for <strong><a href="https://futurecarproduction.materialsdata.space/dataset?q=SAMM">SAMM</a></strong> or <strong><a href="https://futurecarproduction.materialsdata.space/dataset?q=Mikroskopie">microscopy</a></strong></li>
+<li>Click any dataset — look at the <strong>Resources</strong> list</li>
+</ol>
+<p>You will see multiple resources for a single dataset: the original file alongside the automatically generated CSVW, Turtle, and joined files. These are the outputs of Steps 2–6 running automatically after the original file was uploaded.</p>
+</div>
+<div class="tabbed-block">
+<p>Upload any file with these extensions to a CKAN instance running DataStack and the pipeline starts automatically:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>.csv   .asc   .tsv   .txt
+</code></pre></div>
+<p>Any other extension (<code>.xlsx</code>, <code>.pdf</code>, <code>.zip</code>) is stored as-is with no pipeline processing.</p>
+</div>
+</div>
+</div>
+</details>
 <hr />
 <p><strong>Step 2 — CKAN creates a column-description file</strong></p>
 <p>A service called CSVToCSVW reads your CSV and produces a companion metadata document. This file — called a <strong>CSVW file</strong> (short for "CSV on the Web", a <a href="https://www.w3.org/TR/tabular-data-primer/">W3C standard</a>) — annotates every column with:</p>
@@ -1882,50 +1904,117 @@
 <li><strong>Provenance.</strong> A record of which service produced the file, following the <a href="https://www.w3.org/TR/prov-o/">PROV-O</a> standard. Think of it as a digital audit trail.</li>
 <li><strong>Annotation rows.</strong> Any header rows above your data table are preserved as structured annotations.</li>
 </ul>
+<details class="example">
+<summary>Try it yourself — see what CSVToCSVW produces</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Web UI</label><label for="__tabbed_2_2">curl</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ol>
+<li>Open <strong><a href="https://csvtocsvw.matolab.org/">csvtocsvw.matolab.org</a></strong></li>
+<li>Find the <strong>annotate</strong> form</li>
+<li>Fill <strong>data_url</strong>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv
+</code></pre></div></li>
+<li>Click <strong>Execute</strong></li>
+</ol>
+<p>You will see the JSON-LD output — every column now carries a <code>qudt:unit</code> identifier and a normalised name. This is exactly what CKAN generates automatically when you upload a CSV.</p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"https://csvtocsvw.matolab.org/api/annotate?return_type=json-ld"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"data_url": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv",</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="s1">       "encoding": "auto"}'</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span>--output<span class="w"> </span>example2-metadata.json
+</code></pre></div>
+<p>✓ <strong>Expected:</strong> JSON-LD with <code>csvw#TableGroup</code> and columns annotated with QUDT unit IRIs.</p>
+</div>
+</div>
+</div>
+</details>
 <p>The CSVW file appears as a new resource in your CKAN dataset. The excerpt below is from the real <a href="https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example2-metadata.json"><code>example2-metadata.json</code></a> produced by CSVToCSVW for a typical lab instrument export — German-language headers, multi-channel measurement data. You do not need to understand this format — it is produced entirely automatically:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">"@context"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="s2">"http://www.w3.org/ns/csvw"</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">      </span><span class="nt">"oa"</span><span class="p">:</span><span class="w">   </span><span class="s2">"http://www.w3.org/ns/oa#"</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">      </span><span class="nt">"qudt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://qudt.org/schema/qudt/"</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">      </span><span class="nt">"prov"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://www.w3.org/ns/prov#"</span><span class="p">,</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">      </span><span class="nt">"csv"</span><span class="p">:</span><span class="w">  </span><span class="s2">"https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv/"</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="p">],</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="nt">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://www.w3.org/ns/csvw#TableGroup"</span><span class="p">,</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="nt">"notes"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="nt">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"csv:Probe0"</span><span class="p">,</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="nt">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"oa:Annotation"</span><span class="p">,</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Probe"</span><span class="p">,</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="nt">"oa:hasBody"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">"oa:value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AWA_3_03_Rz"</span><span class="w"> </span><span class="p">}]</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">  </span><span class="p">}],</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">  </span><span class="nt">"tables"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">    </span><span class="nt">"tableSchema"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">      </span><span class="nt">"columns"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">        </span><span class="p">{</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">          </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MaschineMm"</span><span class="p">,</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">          </span><span class="nt">"titles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"Maschine [mm]"</span><span class="p">,</span><span class="w"> </span><span class="s2">"MaschineMm"</span><span class="p">],</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">          </span><span class="nt">"qudt:unit"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://qudt.org/vocab/unit/MilliM"</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">        </span><span class="p">},</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">        </span><span class="p">{</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">          </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"KraftKn"</span><span class="p">,</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">          </span><span class="nt">"titles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"Kraft [kN]"</span><span class="p">,</span><span class="w"> </span><span class="s2">"KraftKn"</span><span class="p">],</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">          </span><span class="nt">"qudt:unit"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://qudt.org/vocab/unit/KiloN"</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">        </span><span class="p">}</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">      </span><span class="p">]</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="w">  </span><span class="p">}]</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">"@context"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="s2">"http://www.w3.org/ns/csvw"</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">      </span><span class="nt">"oa"</span><span class="p">:</span><span class="w">   </span><span class="s2">"http://www.w3.org/ns/oa#"</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">      </span><span class="nt">"qudt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://qudt.org/schema/qudt/"</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">      </span><span class="nt">"prov"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://www.w3.org/ns/prov#"</span><span class="p">,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">      </span><span class="nt">"csv"</span><span class="p">:</span><span class="w">  </span><span class="s2">"https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv/"</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="nt">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://www.w3.org/ns/csvw#TableGroup"</span><span class="p">,</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="nt">"notes"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="nt">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"csv:Probe0"</span><span class="p">,</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="nt">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"oa:Annotation"</span><span class="p">,</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">    </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Probe"</span><span class="p">,</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">    </span><span class="nt">"oa:hasBody"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">"oa:value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AWA_3_03_Rz"</span><span class="w"> </span><span class="p">}]</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">  </span><span class="p">}],</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">  </span><span class="nt">"tables"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="w">    </span><span class="nt">"tableSchema"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="w">      </span><span class="nt">"columns"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="w">        </span><span class="p">{</span>
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="w">          </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MaschineMm"</span><span class="p">,</span>
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="w">          </span><span class="nt">"titles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"Maschine [mm]"</span><span class="p">,</span><span class="w"> </span><span class="s2">"MaschineMm"</span><span class="p">],</span>
+<a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="w">          </span><span class="nt">"qudt:unit"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://qudt.org/vocab/unit/MilliM"</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="w">        </span><span class="p">},</span>
+<a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a><span class="w">        </span><span class="p">{</span>
+<a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a><span class="w">          </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"KraftKn"</span><span class="p">,</span>
+<a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a><span class="w">          </span><span class="nt">"titles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"Kraft [kN]"</span><span class="p">,</span><span class="w"> </span><span class="s2">"KraftKn"</span><span class="p">],</span>
+<a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a><span class="w">          </span><span class="nt">"qudt:unit"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://qudt.org/vocab/unit/KiloN"</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a><span class="w">      </span><span class="p">]</span>
+<a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a><span class="w">  </span><span class="p">}]</span>
+<a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a><span class="p">}</span>
 </code></pre></div>
 <p><em>The original header <code>"Kraft [kN]"</code> is preserved alongside the normalised name <code>"KraftKn"</code>, and the column now carries <code>unit:KiloN</code> — an internationally agreed identifier for kilonewtons. The metadata row <code>"Probe"</code> with its specimen identifier is captured as an <code>oa:Annotation</code>. Everything is produced automatically from the CSV.</em></p>
 <hr />
 <p><strong>Step 3 — The data table becomes browsable</strong></p>
 <p>CKAN imports the CSV rows into its built-in data store. Your measurements are now accessible through a table preview in the browser — you can sort, filter, and explore the numbers without downloading anything.</p>
+<details class="example">
+<summary>Try it yourself — browse raw measurement data in the portal</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:1"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Web UI</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ol>
+<li>Open <strong><a href="https://dataportal.material-digital.de/dataset?q=tensile+tests">dataportal.material-digital.de/dataset?q=tensile+tests</a></strong></li>
+<li>Open any dataset and click the <strong>CSV resource</strong> (not the <code>.ttl</code> files)</li>
+<li>Click <strong>Preview</strong> or <strong>Explore → Data Explorer</strong></li>
+</ol>
+<p>You can sort columns, filter rows, and page through the data without downloading. This is the raw measurement table — Steps 4–6 are what turn it into linked data.</p>
+</div>
+</div>
+</div>
+</details>
 <hr />
 <p><strong>Step 4 — CKAN converts the column-description file to linked-data format</strong></p>
 <p>The column-description file is converted into a format called <strong>Turtle</strong> — a compact notation for linked data (structured information where every concept and relationship has a stable, web-addressable identifier). A second resource file appears in the dataset. This file is the input for the mapping step.</p>
 <p>You do not need to work with this file directly.</p>
+<details class="example">
+<summary>Try it yourself — inspect the CSVW that gets converted</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Web UI</label><label for="__tabbed_4_2">curl</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>The CSVW JSON-LD produced in Step 2 is the input for this conversion. Open the interactive API explorer and inspect it directly:</p>
+<ol>
+<li>Open <strong><a href="https://csvtocsvw.matolab.org/api/docs">csvtocsvw.matolab.org/api/docs</a></strong></li>
+<li>Find the <strong>POST /api/annotate</strong> endpoint and click <strong>Try it out</strong></li>
+<li>Fill <strong>data_url</strong>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv
+</code></pre></div></li>
+<li>Click <strong>Execute</strong> — examine the response body</li>
+</ol>
+<p>The JSON-LD you see here is what CKAN converts to Turtle in this step. The conversion preserves all content; only the syntax changes from JSON-LD to Turtle notation.</p>
+</div>
+<div class="tabbed-block">
+<p>Fetch the existing CSVW for the IOFMaterialsTutorial (already produced by Step 2):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-m<span class="w"> </span>json.tool
+</code></pre></div>
+<p>The <code>qudt:unit</code> and <code>titles</code> fields per column are what the mapping step in Steps 5–6 uses to match and transform your data.</p>
+</div>
+</div>
+</div>
+</details>
 <hr />
 <p><strong>Step 5 — CKAN identifies what the data is about</strong></p>
 <p>CKAN searches its <code>mappings</code> group — a library of rule files, each encoding the semantic structure of one data type (tensile test, TEM detection run, Catena-X material record, …). It tests each rule file against your column structure. When one matches, two things happen simultaneously:</p>
@@ -1938,25 +2027,97 @@
 <p>The rule file is not just a transformation recipe. It is the pipeline's way of recognising what your data is about. Every column name, unit annotation, and structural pattern in your CSV narrows the match until only one rule file fits. This is what makes the pipeline self-organising: upload data in a known format and the pipeline classifies and enriches it automatically.</p>
 </div>
 <p>These rule files are what data engineers author once per data type. See <a href="../../guides/author-a-mapping/">Author a Mapping</a> if your data needs a new rule file.</p>
+<details class="example">
+<summary>Try it yourself — test a mapping against a CSVW</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Web UI (API explorer)</label><label for="__tabbed_5_2">curl</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ol>
+<li>Open <strong><a href="https://rdfconverter.matolab.org/api/docs">rdfconverter.matolab.org/api/docs</a></strong></li>
+<li>Find <strong>POST /api/checkmapping</strong> and click <strong>Try it out</strong></li>
+<li>Fill <strong>mapping_url</strong>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml
+</code></pre></div></li>
+<li>Fill <strong>data_url</strong>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json
+</code></pre></div></li>
+<li>Click <strong>Execute</strong></li>
+</ol>
+<p>✓ <strong>Expected:</strong> <code>{"rules_applicable": 1, "rules_skipped": 0}</code> — the mapping matched.</p>
+<p>Now swap the mapping URL for one from a <em>different</em> data type (e.g. the BAMresearch detection runs mapping) and run again — you will see <code>rules_applicable: 0</code>, which is exactly what CKAN sees when it rejects a non-matching rule file and moves on to the next one in the library.</p>
+<p><strong>SAMM / Catena-X payload?</strong> The same <code>/api/checkmapping</code> endpoint works for JSON payloads too. Provide a SAMM mapping URL and a raw JSON payload URL in the <strong>data_url</strong> field to test whether a SAMM mapping applies to your payload structure.</p>
+</div>
+<div class="tabbed-block">
+<p>Matching mapping:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"https://rdfconverter.matolab.org/api/checkmapping"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span>-G<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s2">"mapping_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s2">"data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json"</span>
+</code></pre></div>
+<p>Non-matching mapping (different data type):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"https://rdfconverter.matolab.org/api/checkmapping"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>-G<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s2">"mapping_url=https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-map.yaml"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s2">"data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json"</span>
+</code></pre></div>
+<p>✓ <strong>Expected for mismatch:</strong> <code>{"rules_applicable": 0, "rules_skipped": 11}</code> — CKAN skips this mapping and tries the next one.</p>
+</div>
+</div>
+</div>
+</details>
 <hr />
 <p><strong>Step 6 — CKAN produces the linked dataset</strong></p>
 <p>The matching rule file and your data are sent to a transformation service. It applies the rules and produces a <strong>joined linked-data file</strong> — your measurements expressed using a shared materials science vocabulary called <a href="https://github.com/materialdigital/core-ontology">PMDco</a> (Platform MaterialDigital Core Ontology). This means concepts like "tensile test result" or "yield strength" now carry the same identifier they would in any other dataset that uses PMDco — making your data directly comparable and combinable with other labs' data.</p>
+<details class="example">
+<summary>Try it yourself — run the full conversion</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Web UI</label><label for="__tabbed_6_2">curl</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ol>
+<li>Open <strong><a href="https://rdfconverter.matolab.org/">rdfconverter.matolab.org</a></strong></li>
+<li>Find the <strong>checkmapping</strong> form and fill:</li>
+<li><strong>mapping_url</strong>: <code>https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml</code></li>
+<li><strong>data_url</strong>: <code>https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json</code></li>
+<li>Click <strong>Execute</strong> — verify <code>rules_skipped: 0</code></li>
+<li>Find the <strong>createrdf</strong> form, same two URLs, set <strong>return_type</strong> to <code>turtle</code>, click <strong>Execute</strong></li>
+</ol>
+<p>The result is the FAIR knowledge graph — the same file CKAN stores as <code>yourfile-joined.ttl</code>.</p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Validate</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"https://rdfconverter.matolab.org/api/checkmapping"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span>-G<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s2">"mapping_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s2">"data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json"</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Convert</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"https://rdfconverter.matolab.org/api/createrdf?return_type=turtle"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">  </span>-G<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s2">"mapping_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s2">"data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">  </span>--output<span class="w"> </span>measurements-joined.ttl
+</code></pre></div>
+<p>✓ <strong>Expected:</strong> Turtle file with PMDco process nodes (<code>co:AgingProcess</code>, etc.) and QUDT quantity values. Compare it to the table in the next section.</p>
+</div>
+</div>
+</div>
+</details>
 <p>The joined file appears in your CKAN dataset. The excerpt below is from the real <a href="https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-joined.ttl"><code>detection_runs-joined.ttl</code></a> — a pipeline output from BAMresearch TEM microscopy detection data. The structure is the same regardless of data type: PMDco process and quality nodes, QUDT quantity values, provenance links.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">co:</span><span class="w">    </span><span class="nv">&lt;https://w3id.org/pmd/co/&gt;</span><span class="w"> </span><span class="p">.</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">qudt:</span><span class="w">  </span><span class="nv">&lt;http://qudt.org/schema/qudt/&gt;</span><span class="w"> </span><span class="p">.</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">qunit:</span><span class="w"> </span><span class="nv">&lt;http://qudt.org/vocab/unit/&gt;</span><span class="w"> </span><span class="p">.</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">prov:</span><span class="w">  </span><span class="nv">&lt;http://www.w3.org/ns/prov#&gt;</span><span class="w"> </span><span class="p">.</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nn">row0</span><span class="p">:</span><span class="nt">ArtificalAging</span> <span class="kt">a</span> <span class="nn">co</span><span class="p">:</span><span class="nt">AgingProcess</span> <span class="p">;</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="nn">co</span><span class="p">:</span><span class="nt">input</span>  <span class="nn">row0</span><span class="p">:</span><span class="nt">specimenAgingTemperature</span><span class="p">,</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>              <span class="nn">row0</span><span class="p">:</span><span class="nt">specimenAgingTime</span> <span class="p">;</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="nn">co</span><span class="p">:</span><span class="nt">output</span> <span class="nn">row0</span><span class="p">:</span><span class="nt">transmissionElectronMicroscopeSpecimen</span> <span class="p">;</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="nn">co</span><span class="p">:</span><span class="nt">nextProcess</span> <span class="nn">row0</span><span class="p">:</span><span class="nt">darkfieldTransmissionElectronMicroscopyImaging</span> <span class="p">.</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="nn">ns1</span><span class="p">:</span><span class="nt">table-1-AgingTempC</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="p">[</span> <span class="kt">a</span> <span class="nn">qudt</span><span class="p">:</span><span class="nt">QuantityValue</span> <span class="p">;</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>      <span class="nn">qudt</span><span class="p">:</span><span class="nt">unit</span>  <span class="nn">qunit</span><span class="p">:</span><span class="nt">DEG_C</span> <span class="p">;</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>      <span class="nn">qudt</span><span class="p">:</span><span class="nt">value</span> <span class="mf">1.9</span><span class="err">e</span><span class="mi">+02</span> <span class="p">]</span> <span class="p">.</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">co:</span><span class="w">    </span><span class="nv">&lt;https://w3id.org/pmd/co/&gt;</span><span class="w"> </span><span class="p">.</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">qudt:</span><span class="w">  </span><span class="nv">&lt;http://qudt.org/schema/qudt/&gt;</span><span class="w"> </span><span class="p">.</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">qunit:</span><span class="w"> </span><span class="nv">&lt;http://qudt.org/vocab/unit/&gt;</span><span class="w"> </span><span class="p">.</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="k">@prefix</span><span class="w"> </span><span class="nn">prov:</span><span class="w">  </span><span class="nv">&lt;http://www.w3.org/ns/prov#&gt;</span><span class="w"> </span><span class="p">.</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="nn">row0</span><span class="p">:</span><span class="nt">ArtificalAging</span> <span class="kt">a</span> <span class="nn">co</span><span class="p">:</span><span class="nt">AgingProcess</span> <span class="p">;</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="nn">co</span><span class="p">:</span><span class="nt">input</span>  <span class="nn">row0</span><span class="p">:</span><span class="nt">specimenAgingTemperature</span><span class="p">,</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>              <span class="nn">row0</span><span class="p">:</span><span class="nt">specimenAgingTime</span> <span class="p">;</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    <span class="nn">co</span><span class="p">:</span><span class="nt">output</span> <span class="nn">row0</span><span class="p">:</span><span class="nt">transmissionElectronMicroscopeSpecimen</span> <span class="p">;</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>    <span class="nn">co</span><span class="p">:</span><span class="nt">nextProcess</span> <span class="nn">row0</span><span class="p">:</span><span class="nt">darkfieldTransmissionElectronMicroscopyImaging</span> <span class="p">.</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="nn">ns1</span><span class="p">:</span><span class="nt">table-1-AgingTempC</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>    <span class="p">[</span> <span class="kt">a</span> <span class="nn">qudt</span><span class="p">:</span><span class="nt">QuantityValue</span> <span class="p">;</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>      <span class="nn">qudt</span><span class="p">:</span><span class="nt">unit</span>  <span class="nn">qunit</span><span class="p">:</span><span class="nt">DEG_C</span> <span class="p">;</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>      <span class="nn">qudt</span><span class="p">:</span><span class="nt">value</span> <span class="mf">1.9</span><span class="err">e</span><span class="mi">+02</span> <span class="p">]</span> <span class="p">.</span>
 </code></pre></div>
 <p><em>Each measurement is now a typed PMDco process node (<code>co:AgingProcess</code>) with typed inputs and outputs. Numeric values carry QUDT unit identifiers (<code>qunit:DEG_C</code>). The same structure applies to tensile tests, composition measurements, or any other data type — only the process class and property IRIs change.</em></p>
 <hr />
@@ -1967,6 +2128,38 @@
 <p>This is a known limitation — see <a href="../capability-map/">Capability Map</a> for context.</p>
 </div>
 <p>Once triggered, your linked dataset is loaded into <strong>Fuseki</strong> — a dedicated query database for linked data. CKAN then adds a query-interface link to your dataset so you and your collaborators can search and explore the data directly in a browser, using tools like Sparklis or YASGUI, without downloading or installing anything.</p>
+<details class="example">
+<summary>Try it yourself — query the knowledge graph with SPARQL</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">Web UI (YASGUI)</label><label for="__tabbed_7_2">curl</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>If you have a local DataStack running (from <a href="../../guides/quickstart/">Quickstart</a>), open <strong>YASGUI</strong> at <code>http://&lt;CKAN_HOST&gt;/yasgui</code> and set the endpoint to:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>http://&lt;CKAN_HOST&gt;/fuseki/ckan/sparql
+</code></pre></div>
+<p>Paste this query to list all process types in the loaded graph:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">PREFIX</span> <span class="nn">co</span><span class="p">:</span> <span class="nl">&lt;https://w3id.org/pmd/co/&gt;</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="nv">?type</span> <span class="p">(</span><span class="nf">COUNT</span><span class="p">(</span><span class="nv">?s</span><span class="p">)</span> <span class="k">AS</span> <span class="nv">?count</span><span class="p">)</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="k">WHERE</span> <span class="p">{</span> <span class="nv">?s</span> <span class="k">a</span> <span class="nv">?type</span> <span class="p">.</span> <span class="k">FILTER</span><span class="p">(</span><span class="nf">STRSTARTS</span><span class="p">(</span><span class="nf">STR</span><span class="p">(</span><span class="nv">?type</span><span class="p">),</span> <span class="s">"https://w3id.org/pmd/co/"</span><span class="p">))</span> <span class="p">}</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="k">GROUP BY</span> <span class="nv">?type</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="k">ORDER BY</span> <span class="k">DESC</span><span class="p">(</span><span class="nv">?count</span><span class="p">)</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="k">LIMIT</span> <span class="mi">20</span>
+</code></pre></div>
+<p>Click <strong>Run</strong>. Each row is a PMDco class present in your data — the pipeline's semantic classification of your measurements.</p>
+</div>
+<div class="tabbed-block">
+<p>Query a local Fuseki endpoint:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"http://localhost:3030/ckan/sparql"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Accept: application/sparql-results+json"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s2">"query=PREFIX co: &lt;https://w3id.org/pmd/co/&gt;</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="s2">SELECT DISTINCT ?type (COUNT(?s) AS ?count)</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="s2">WHERE { ?s a ?type . FILTER(STRSTARTS(STR(?type), \"https://w3id.org/pmd/co/\")) }</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="s2">GROUP BY ?type ORDER BY DESC(?count) LIMIT 20"</span>
+</code></pre></div>
+<p>✓ <strong>Expected:</strong> JSON results with <code>type</code> (PMDco IRI) and <code>count</code> columns. If the result is empty, the Fuseki load (Step 7 button) has not been triggered yet for this dataset.</p>
+</div>
+</div>
+</div>
+</details>
 <hr />
 <h2 id="what-you-end-up-with">What you end up with<a class="headerlink" href="#what-you-end-up-with" title="Permanent link">&para;</a></h2>
 <p>After the full pipeline runs, your CKAN dataset contains four resources:</p>

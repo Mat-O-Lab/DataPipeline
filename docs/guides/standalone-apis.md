@@ -47,17 +47,42 @@ The service reads your CSV columns (names, units, separators) and returns an ann
 
 This real CSV from the IOFMaterialsTutorial repository contains three columns: Zeit [s], Maschine [mm], and Kraft [kN] — time, displacement, and force from a steel tensile test.
 
-Try it yourself: paste this URL into the data_url field on the CSVToCSVW form:
+??? example "Try it yourself — Step 1: Annotate a CSV"
 
-```
-https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv
-```
+    === "Web UI"
 
-Click **Execute**. The annotated file downloads or appears on screen. This is your CSVW file — a structured description of the columns and their units, ready for the next step.
+        1. Open **[csvtocsvw.matolab.org](https://csvtocsvw.matolab.org/)**
+        2. Find the **annotate** form
+        3. Fill **data_url**:
+           ```
+           https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv
+           ```
+        4. Leave **encoding** as `auto`
+        5. Click **Execute**
 
-**If your CSV is not publicly accessible on the internet** (e.g. it lives only on your computer or your institute's internal server):
+        The response is a JSON-LD file — your CSVW. Save it or copy the URL from the response header; you need it in Step 3.
 
-On the same CSVToCSVW page, look for the **annotate_upload** form. Use the file upload field to select your local CSV directly, then click **Execute**. The result is identical; the service processes the file and returns the annotated description without storing your data.
+        **Local file?** Use the **annotate_upload** form instead — upload the file directly. Same result, no public URL needed.
+
+    === "curl"
+
+        ```bash
+        curl -X POST "https://csvtocsvw.matolab.org/api/annotate?return_type=json-ld" \
+          -H "Content-Type: application/json" \
+          -d '{"data_url": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv",
+               "encoding": "auto"}' \
+          --output example2-metadata.json
+        ```
+
+        For a local file:
+
+        ```bash
+        curl -X POST "https://csvtocsvw.matolab.org/api/annotate_upload?return_type=json-ld" \
+          -F "file=@/path/to/your/sample.csv" \
+          --output sample.csvw.json
+        ```
+
+        ✓ **Expected:** a JSON-LD file with `@type: csvw#TableGroup` and columns each carrying a `qudt:unit` annotation.
 
 ---
 
@@ -72,15 +97,54 @@ Go to **[maptomethod.matolab.org](https://maptomethod.matolab.org/)**.
 
 The **types** form shows you which categories of scientific concepts appear in your annotated file. The **entities** form lists your individual columns with their internal names — the identifiers you will need when building a mapping.
 
-To explore the IOFMaterialsTutorial CSVW, paste this URL into the url field on the /api/types form:
+??? example "Try it yourself — Step 2: Explore column types"
 
-```
-https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json
-```
+    === "Web UI"
 
-Click **Execute**. The result lists the kinds of things the service found: measurement columns, unit annotations, grouping information.
+        1. Open **[maptomethod.matolab.org](https://maptomethod.matolab.org/)**
+        2. Find the **types** form
+        3. Fill **url**:
+           ```
+           https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json
+           ```
+        4. Click **Execute**
 
-To generate a mapping automatically, use the **mapping** form. Provide the CSVW URL, a template file URL (ask your data curator for the right one), and a list of which columns correspond to which template slots. The form returns a mapping file (.yaml) you can save and use in Step 3.
+        The result lists RDF type IRIs found in the file — e.g. `csvw#Column`, `qudt/DerivedUnit`. This tells you what the service can map.
+
+        To generate a mapping, use the **mapping** form. You need the CSVW URL, a template `.ttl` URL (from your data curator), and a column-to-slot assignment. See [Author a Mapping](author-a-mapping.md) for the full walkthrough.
+
+    === "curl"
+
+        Explore types:
+
+        ```bash
+        curl "https://maptomethod.matolab.org/api/types?url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json"
+        ```
+
+        ✓ **Expected:**
+        ```json
+        ["http://qudt.org/schema/qudt/DerivedUnit", "http://www.w3.org/ns/csvw#Column",
+         "http://www.w3.org/ns/csvw#TableGroup", "http://www.w3.org/ns/prov#Activity",
+         "http://www.w3.org/ns/prov#SoftwareAgent"]
+        ```
+
+        Generate a mapping (IOFMaterialsTutorial example):
+
+        ```bash
+        curl -X POST "https://maptomethod.matolab.org/api/mapping" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "data_url":     "https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json",
+            "template_url": "https://github.com/Mat-O-Lab/IOFMaterialsTutorial/raw/main/LengthMeasurement.ttl",
+            "predicate":    "http://purl.obolibrary.org/obo/RO_0010002",
+            "map": {
+              "table-1-LengthMm": "https://github.com/Mat-O-Lab/IOFMaterialsTutorial/raw/main/LengthMeasurement.ttl/LengthData"
+            }
+          }' \
+          --output my-mapping.yaml
+        ```
+
+        ✓ **Expected:** a YARRRML `.yaml` file ready for use in Step 3.
 
 See [Author a Mapping](author-a-mapping.md) for a full walkthrough of building the mapping from scratch.
 
@@ -114,14 +178,59 @@ Use the **createrdf** form. Paste the mapping URL and choose **turtle** as the r
 
 The service applies the mapping and returns a .ttl file — a FAIR knowledge graph. This file contains your measurement data enriched with standardised scientific concepts, ready for sharing, archiving, or querying.
 
-**Worked example — IOFMaterialsTutorial steel measurements**
+??? example "Try it yourself — Step 3: Validate and convert"
 
-| Field | Value |
-|---|---|
-| Mapping URL | `https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml` |
-| Data URL (CSVW) | `https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json` |
+    === "Web UI"
 
-Paste these into the checkmapping form and click **Execute**. You should see `rules_applicable: 1, rules_skipped: 0`. Then use the same URLs in the createrdf form to download the finished knowledge graph.
+        **Validate first (recommended):**
+
+        1. Open **[rdfconverter.matolab.org](https://rdfconverter.matolab.org/)**
+        2. Find the **checkmapping** form
+        3. Fill **mapping_url**:
+           ```
+           https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml
+           ```
+        4. Fill **data_url**:
+           ```
+           https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json
+           ```
+        5. Click **Execute**
+
+        ✓ **Expected:** `rules_applicable: 1, rules_skipped: 0`
+
+        **Then produce the knowledge graph:**
+
+        1. Find the **createrdf** form
+        2. Fill the same **mapping_url** and **data_url** as above
+        3. Set **return_type** to `turtle`
+        4. Click **Execute**
+
+        The result is your `.ttl` knowledge graph — download or copy the content.
+
+    === "curl"
+
+        Validate:
+
+        ```bash
+        curl -X POST "https://rdfconverter.matolab.org/api/checkmapping" \
+          -G \
+          --data-urlencode "mapping_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml" \
+          --data-urlencode "data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json"
+        ```
+
+        ✓ **Expected:** `{"rules_applicable": 1, "rules_skipped": 0}`
+
+        Convert:
+
+        ```bash
+        curl -X POST "https://rdfconverter.matolab.org/api/createrdf?return_type=turtle" \
+          -G \
+          --data-urlencode "mapping_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml" \
+          --data-urlencode "data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json" \
+          --output measurements-joined.ttl
+        ```
+
+        ✓ **Expected:** a Turtle file with PMDco process nodes and QUDT quantity values.
 
 ---
 

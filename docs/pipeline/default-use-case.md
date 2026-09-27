@@ -96,6 +96,28 @@ Upload your CSV to CKAN and the following seven steps happen:
 
 The file extension (`.csv`, `.asc`, `.tsv`, `.txt`) tells CKAN to start the pipeline. Any other format is ignored. No configuration is needed on your part.
 
+??? example "Try it yourself — see a real uploaded dataset"
+
+    === "Web UI"
+
+        Browse a dataset that the pipeline has already processed:
+
+        1. Open **[futurecarproduction.materialsdata.space](https://futurecarproduction.materialsdata.space/)**
+        2. Search for **[SAMM](https://futurecarproduction.materialsdata.space/dataset?q=SAMM)** or **[microscopy](https://futurecarproduction.materialsdata.space/dataset?q=Mikroskopie)**
+        3. Click any dataset — look at the **Resources** list
+
+        You will see multiple resources for a single dataset: the original file alongside the automatically generated CSVW, Turtle, and joined files. These are the outputs of Steps 2–6 running automatically after the original file was uploaded.
+
+    === "What triggers it"
+
+        Upload any file with these extensions to a CKAN instance running DataStack and the pipeline starts automatically:
+
+        ```
+        .csv   .asc   .tsv   .txt
+        ```
+
+        Any other extension (`.xlsx`, `.pdf`, `.zip`) is stored as-is with no pipeline processing.
+
 ---
 
 **Step 2 — CKAN creates a column-description file**
@@ -105,6 +127,32 @@ A service called CSVToCSVW reads your CSV and produces a companion metadata docu
 - **Standard unit labels.** Column names like `tensile_strength_MPa` are matched to internationally recognised measurement unit identifiers from [QUDT](https://qudt.org/) — a public vocabulary of physical quantities and units. This makes the column machine-readable to any system that understands units.
 - **Provenance.** A record of which service produced the file, following the [PROV-O](https://www.w3.org/TR/prov-o/) standard. Think of it as a digital audit trail.
 - **Annotation rows.** Any header rows above your data table are preserved as structured annotations.
+
+??? example "Try it yourself — see what CSVToCSVW produces"
+
+    === "Web UI"
+
+        1. Open **[csvtocsvw.matolab.org](https://csvtocsvw.matolab.org/)**
+        2. Find the **annotate** form
+        3. Fill **data_url**:
+           ```
+           https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv
+           ```
+        4. Click **Execute**
+
+        You will see the JSON-LD output — every column now carries a `qudt:unit` identifier and a normalised name. This is exactly what CKAN generates automatically when you upload a CSV.
+
+    === "curl"
+
+        ```bash
+        curl -X POST "https://csvtocsvw.matolab.org/api/annotate?return_type=json-ld" \
+          -H "Content-Type: application/json" \
+          -d '{"data_url": "https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv",
+               "encoding": "auto"}' \
+          --output example2-metadata.json
+        ```
+
+        ✓ **Expected:** JSON-LD with `csvw#TableGroup` and columns annotated with QUDT unit IRIs.
 
 The CSVW file appears as a new resource in your CKAN dataset. The excerpt below is from the real [`example2-metadata.json`](https://raw.githubusercontent.com/Mat-O-Lab/CSVToCSVW/main/examples/example2-metadata.json) produced by CSVToCSVW for a typical lab instrument export — German-language headers, multi-channel measurement data. You do not need to understand this format — it is produced entirely automatically:
 
@@ -153,6 +201,16 @@ The CSVW file appears as a new resource in your CKAN dataset. The excerpt below 
 
 CKAN imports the CSV rows into its built-in data store. Your measurements are now accessible through a table preview in the browser — you can sort, filter, and explore the numbers without downloading anything.
 
+??? example "Try it yourself — browse raw measurement data in the portal"
+
+    === "Web UI"
+
+        1. Open **[dataportal.material-digital.de/dataset?q=tensile+tests](https://dataportal.material-digital.de/dataset?q=tensile+tests)**
+        2. Open any dataset and click the **CSV resource** (not the `.ttl` files)
+        3. Click **Preview** or **Explore → Data Explorer**
+
+        You can sort columns, filter rows, and page through the data without downloading. This is the raw measurement table — Steps 4–6 are what turn it into linked data.
+
 ---
 
 **Step 4 — CKAN converts the column-description file to linked-data format**
@@ -160,6 +218,32 @@ CKAN imports the CSV rows into its built-in data store. Your measurements are no
 The column-description file is converted into a format called **Turtle** — a compact notation for linked data (structured information where every concept and relationship has a stable, web-addressable identifier). A second resource file appears in the dataset. This file is the input for the mapping step.
 
 You do not need to work with this file directly.
+
+??? example "Try it yourself — inspect the CSVW that gets converted"
+
+    === "Web UI"
+
+        The CSVW JSON-LD produced in Step 2 is the input for this conversion. Open the interactive API explorer and inspect it directly:
+
+        1. Open **[csvtocsvw.matolab.org/api/docs](https://csvtocsvw.matolab.org/api/docs)**
+        2. Find the **POST /api/annotate** endpoint and click **Try it out**
+        3. Fill **data_url**:
+           ```
+           https://github.com/Mat-O-Lab/CSVToCSVW/raw/main/examples/example2.csv
+           ```
+        4. Click **Execute** — examine the response body
+
+        The JSON-LD you see here is what CKAN converts to Turtle in this step. The conversion preserves all content; only the syntax changes from JSON-LD to Turtle notation.
+
+    === "curl"
+
+        Fetch the existing CSVW for the IOFMaterialsTutorial (already produced by Step 2):
+
+        ```bash
+        curl https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json | python3 -m json.tool
+        ```
+
+        The `qudt:unit` and `titles` fields per column are what the mapping step in Steps 5–6 uses to match and transform your data.
 
 ---
 
@@ -175,11 +259,87 @@ CKAN searches its `mappings` group — a library of rule files, each encoding th
 
 These rule files are what data engineers author once per data type. See [Author a Mapping](../guides/author-a-mapping.md) if your data needs a new rule file.
 
+??? example "Try it yourself — test a mapping against a CSVW"
+
+    === "Web UI (API explorer)"
+
+        1. Open **[rdfconverter.matolab.org/api/docs](https://rdfconverter.matolab.org/api/docs)**
+        2. Find **POST /api/checkmapping** and click **Try it out**
+        3. Fill **mapping_url**:
+           ```
+           https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml
+           ```
+        4. Fill **data_url**:
+           ```
+           https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json
+           ```
+        5. Click **Execute**
+
+        ✓ **Expected:** `{"rules_applicable": 1, "rules_skipped": 0}` — the mapping matched.
+
+        Now swap the mapping URL for one from a *different* data type (e.g. the BAMresearch detection runs mapping) and run again — you will see `rules_applicable: 0`, which is exactly what CKAN sees when it rejects a non-matching rule file and moves on to the next one in the library.
+
+        **SAMM / Catena-X payload?** The same `/api/checkmapping` endpoint works for JSON payloads too. Provide a SAMM mapping URL and a raw JSON payload URL in the **data_url** field to test whether a SAMM mapping applies to your payload structure.
+
+    === "curl"
+
+        Matching mapping:
+
+        ```bash
+        curl -X POST "https://rdfconverter.matolab.org/api/checkmapping" \
+          -G \
+          --data-urlencode "mapping_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml" \
+          --data-urlencode "data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json"
+        ```
+
+        Non-matching mapping (different data type):
+
+        ```bash
+        curl -X POST "https://rdfconverter.matolab.org/api/checkmapping" \
+          -G \
+          --data-urlencode "mapping_url=https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-map.yaml" \
+          --data-urlencode "data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json"
+        ```
+
+        ✓ **Expected for mismatch:** `{"rules_applicable": 0, "rules_skipped": 11}` — CKAN skips this mapping and tries the next one.
+
 ---
 
 **Step 6 — CKAN produces the linked dataset**
 
 The matching rule file and your data are sent to a transformation service. It applies the rules and produces a **joined linked-data file** — your measurements expressed using a shared materials science vocabulary called [PMDco](https://github.com/materialdigital/core-ontology) (Platform MaterialDigital Core Ontology). This means concepts like "tensile test result" or "yield strength" now carry the same identifier they would in any other dataset that uses PMDco — making your data directly comparable and combinable with other labs' data.
+
+??? example "Try it yourself — run the full conversion"
+
+    === "Web UI"
+
+        1. Open **[rdfconverter.matolab.org](https://rdfconverter.matolab.org/)**
+        2. Find the **checkmapping** form and fill:
+           - **mapping_url**: `https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml`
+           - **data_url**: `https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json`
+        3. Click **Execute** — verify `rules_skipped: 0`
+        4. Find the **createrdf** form, same two URLs, set **return_type** to `turtle`, click **Execute**
+
+        The result is the FAIR knowledge graph — the same file CKAN stores as `yourfile-joined.ttl`.
+
+    === "curl"
+
+        ```bash
+        # Validate
+        curl -X POST "https://rdfconverter.matolab.org/api/checkmapping" \
+          -G \
+          --data-urlencode "mapping_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml" \
+          --data-urlencode "data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json"
+
+        # Convert
+        curl -X POST "https://rdfconverter.matolab.org/api/createrdf?return_type=turtle" \
+          -G \
+          --data-urlencode "mapping_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-map.yaml" \
+          --data-urlencode "data_url=https://raw.githubusercontent.com/Mat-O-Lab/IOFMaterialsTutorial/main/measurements-metadata.json" \
+          --output measurements-joined.ttl
+        ```
+
+        ✓ **Expected:** Turtle file with PMDco process nodes (`co:AgingProcess`, etc.) and QUDT quantity values. Compare it to the table in the next section.
 
 The joined file appears in your CKAN dataset. The excerpt below is from the real [`detection_runs-joined.ttl`](https://raw.githubusercontent.com/BAMresearch/DF-TEM-PAW/main/detection_runs-joined.ttl) — a pipeline output from BAMresearch TEM microscopy detection data. The structure is the same regardless of data type: PMDco process and quality nodes, QUDT quantity values, provenance links.
 
@@ -213,6 +373,44 @@ ns1:table-1-AgingTempC
     This is a known limitation — see [Capability Map](capability-map.md) for context.
 
 Once triggered, your linked dataset is loaded into **Fuseki** — a dedicated query database for linked data. CKAN then adds a query-interface link to your dataset so you and your collaborators can search and explore the data directly in a browser, using tools like Sparklis or YASGUI, without downloading or installing anything.
+
+??? example "Try it yourself — query the knowledge graph with SPARQL"
+
+    === "Web UI (YASGUI)"
+
+        If you have a local DataStack running (from [Quickstart](../guides/quickstart.md)), open **YASGUI** at `http://<CKAN_HOST>/yasgui` and set the endpoint to:
+
+        ```
+        http://<CKAN_HOST>/fuseki/ckan/sparql
+        ```
+
+        Paste this query to list all process types in the loaded graph:
+
+        ```sparql
+        PREFIX co: <https://w3id.org/pmd/co/>
+        SELECT DISTINCT ?type (COUNT(?s) AS ?count)
+        WHERE { ?s a ?type . FILTER(STRSTARTS(STR(?type), "https://w3id.org/pmd/co/")) }
+        GROUP BY ?type
+        ORDER BY DESC(?count)
+        LIMIT 20
+        ```
+
+        Click **Run**. Each row is a PMDco class present in your data — the pipeline's semantic classification of your measurements.
+
+    === "curl"
+
+        Query a local Fuseki endpoint:
+
+        ```bash
+        curl -X POST "http://localhost:3030/ckan/sparql" \
+          -H "Accept: application/sparql-results+json" \
+          --data-urlencode "query=PREFIX co: <https://w3id.org/pmd/co/>
+        SELECT DISTINCT ?type (COUNT(?s) AS ?count)
+        WHERE { ?s a ?type . FILTER(STRSTARTS(STR(?type), \"https://w3id.org/pmd/co/\")) }
+        GROUP BY ?type ORDER BY DESC(?count) LIMIT 20"
+        ```
+
+        ✓ **Expected:** JSON results with `type` (PMDco IRI) and `count` columns. If the result is empty, the Fuseki load (Step 7 button) has not been triggered yet for this dataset.
 
 ---
 

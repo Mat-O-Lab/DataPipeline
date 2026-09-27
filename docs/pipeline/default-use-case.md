@@ -372,19 +372,26 @@ ns1:table-1-AgingTempC
 
     This is a known limitation — see [Capability Map](capability-map.md) for context.
 
-Once triggered, your linked dataset is loaded into **Fuseki** — a dedicated query database for linked data. CKAN then adds a query-interface link to your dataset so you and your collaborators can search and explore the data directly in a browser, using tools like Sparklis or YASGUI, without downloading or installing anything.
+Once triggered, ckanext-fuseki loads your linked dataset into a Fuseki named graph scoped to that dataset and registers a SPARQL endpoint at:
 
-??? example "Try it yourself — query the knowledge graph with SPARQL"
+```
+https://<CKAN_HOST>/dataset/<dataset-id>/fuseki/sparql
+```
 
-    === "Web UI (YASGUI)"
+This URL is saved as a resource in your CKAN dataset — it appears alongside the CSV, CSVW, and Turtle files in the resource list. Access follows CKAN's own authorisation rules: users with read permission on a private dataset can issue `SELECT`/`CONSTRUCT`/`ASK` queries; public datasets accept unauthenticated `GET` queries. Write operations (`INSERT`, `DELETE`, `UPDATE`) are always restricted to authorised users.
 
-        If you have a local DataStack running (from [Quickstart](../guides/quickstart.md)), open **YASGUI** at `http://<CKAN_HOST>/yasgui` and set the endpoint to:
+CKAN also adds a **Query** button to the dataset view. Clicking it opens **Sparklis** — a sentence-building query interface deployed as its own container. Sparklis lets you explore and filter the knowledge graph by clicking concepts and properties rather than writing SPARQL by hand, and it includes a YASGUI panel for raw SPARQL editing when you need it.
 
-        ```
-        http://<CKAN_HOST>/fuseki/ckan/sparql
-        ```
+??? example "Try it yourself — query the knowledge graph"
 
-        Paste this query to list all process types in the loaded graph:
+    === "Web UI (Sparklis)"
+
+        1. Open any DataStack dataset that has been loaded into Fuseki
+        2. Click the **Query** button in the dataset view — Sparklis opens with the endpoint pre-filled
+        3. Click any concept in the left panel to start building a query by sentence — e.g. click a PMDco class to list all instances of that type
+        4. Switch to the **YASGUI** tab for raw SPARQL
+
+        Or query the SPARQL endpoint directly in YASGUI: paste the dataset's `/fuseki/sparql` URL as the endpoint and run:
 
         ```sparql
         PREFIX co: <https://w3id.org/pmd/co/>
@@ -395,14 +402,14 @@ Once triggered, your linked dataset is loaded into **Fuseki** — a dedicated qu
         LIMIT 20
         ```
 
-        Click **Run**. Each row is a PMDco class present in your data — the pipeline's semantic classification of your measurements.
+        Each row is a PMDco class present in the dataset — the pipeline's semantic classification of your measurements.
 
     === "curl"
 
-        Query a local Fuseki endpoint:
+        Public datasets accept unauthenticated GET queries:
 
         ```bash
-        curl -X POST "http://localhost:3030/ckan/sparql" \
+        curl -G "https://<CKAN_HOST>/dataset/<dataset-id>/fuseki/sparql" \
           -H "Accept: application/sparql-results+json" \
           --data-urlencode "query=PREFIX co: <https://w3id.org/pmd/co/>
         SELECT DISTINCT ?type (COUNT(?s) AS ?count)
@@ -410,7 +417,7 @@ Once triggered, your linked dataset is loaded into **Fuseki** — a dedicated qu
         GROUP BY ?type ORDER BY DESC(?count) LIMIT 20"
         ```
 
-        ✓ **Expected:** JSON results with `type` (PMDco IRI) and `count` columns. If the result is empty, the Fuseki load (Step 7 button) has not been triggered yet for this dataset.
+        ✓ **Expected:** JSON results with `type` (PMDco IRI) and `count` columns. If the result is empty, the Fuseki load button has not been triggered yet for this dataset.
 
 ---
 
@@ -427,8 +434,8 @@ After the full pipeline runs, your CKAN dataset contains four resources:
 
 Plus, after loading into the query database:
 
-- A live query interface scoped to your dataset
-- A browser link in the CKAN resource list — click it to start exploring your data with Sparklis or YASGUI
+- A SPARQL endpoint resource in the CKAN resource list: `…/dataset/<id>/fuseki/sparql`
+- A **Query** button in the dataset view that opens **Sparklis** — a sentence-building query interface with an embedded YASGUI editor for raw SPARQL
 
 ---
 
